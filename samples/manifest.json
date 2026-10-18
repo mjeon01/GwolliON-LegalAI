@@ -1,0 +1,105 @@
+[
+  {
+    "id": "employment-basic",
+    "title": "기본 항목이 있는 근로계약",
+    "contract_type": "employment",
+    "tag": "기본 항목",
+    "description": "월급·시간·휴일을 원문과 대조해보세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-10-10"
+    },
+    "expected": {
+      "wage": 2500000,
+      "wage_status": "found",
+      "issue_types": [
+        "review_scope"
+      ]
+    }
+  },
+  {
+    "id": "employment-missing",
+    "title": "종료일·지급방법·휴게·연차가 빈 계약",
+    "contract_type": "employment",
+    "tag": "정보 누락",
+    "description": "작성되지 않은 항목과 확인할 내용을 살펴보세요.",
+    "context": {},
+    "expected": {
+      "wage": 12000,
+      "wage_status": "found",
+      "issue_types": [
+        "missing_terms",
+        "break_time"
+      ]
+    }
+  },
+  {
+    "id": "employment-conflict",
+    "title": "월급이 서로 다른 계약",
+    "contract_type": "employment",
+    "tag": "조항 충돌",
+    "description": "본문과 특약의 금액을 함께 확인해보세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-10-10"
+    },
+    "expected": {
+      "wage_status": "conflict",
+      "issue_types": [
+        "conflicting_terms"
+      ]
+    }
+  },
+  {
+    "id": "employment-attention",
+    "title": "수당·퇴사 배상 특약이 있는 계약",
+    "contract_type": "employment",
+    "tag": "주의 특약",
+    "description": "법령 근거와 사업장 규모에 따른 질문을 확인하세요.",
+    "context": {
+      "document_complete": true
+    },
+    "expected": {
+      "wage": 2500000,
+      "wage_status": "found",
+      "issue_types": [
+        "penalty",
+        "included_allowance",
+        "work_hours"
+      ]
+    }
+  },
+  {
+    "id": "lease-basic",
+    "title": "처음 확인하는 주택 임대차계약",
+    "contract_type": "lease",
+    "tag": "주거 확인",
+    "description": "보증금·월세와 입주·전입신고를 확인하세요.",
+    "context": {
+      "document_complete": true
+    },
+    "expected": {
+      "deposit": 10000000,
+      "issue_types": [
+        "lease_registration"
+      ]
+    }
+  },
+  {
+    "id": "lease-return",
+    "title": "보증금 반환을 준비하는 계약",
+    "contract_type": "lease",
+    "tag": "반환 상담",
+    "description": "미반환 상황을 입력하고 상담 요약을 만들어보세요.",
+    "context": {
+      "document_complete": true
+    },
+    "expected": {
+      "deposit": 100000000,
+      "issue_types": [
+        "lease_registration",
+        "deposit_return"
+      ]
+    }
+  }
+]

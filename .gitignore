@@ -1,0 +1,18 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+**/.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+.obsidian/
+obsidian/.obsidian/
+data/
+var/
+tmp/
+node_modules/
+playwright-report/
+test-results/
+# Local planning source; implementation notes live in obsidian/.
+/plan.hwp

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173c35">
+  <meta name="description" content="계약서의 주의 조항과 원문 근거를 확인하고, 쉬운 설명과 상담 문서 초안을 준비하는 권리ON 로컬 MVP">
+  <title>권리ON · 내 계약서 살펴보기</title>
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/workspace.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">본문으로 이동</a>
+<aside class="sidebar">
+  <a class="brand" href="/" aria-label="권리ON 홈"><span class="brand-mark" aria-hidden="true">ON</span><span>권리<span class="brand-on">ON</span><small>내 권리를 켜는 첫걸음</small></span></a>
+  <div class="workspace-label">MY WORKSPACE</div>
+  <button class="nav-button active" id="new-document"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h5"/></svg><span class="desktop-label">계약서 살펴보기</span><span class="mobile-only">새 분석</span></button>
+  <button class="nav-button prepare-nav" id="prepare-document"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 4H5v17h14V4h-3M9 3h6v4H9zM8 12h8M8 16h6"/></svg><span>상담·고소 문서 준비</span></button>
+  <button class="mobile-only secondary" id="history-toggle" aria-expanded="false" aria-controls="history">최근 기록</button>
+  <div class="history-heading"><span>최근 분석</span><span class="tiny" id="history-count">0</span></div>
+  <div id="history" class="history-list"><p class="muted">분석한 계약서가 여기에 모입니다.</p></div>
+  <div class="sidebar-bottom"><span class="status-dot" aria-hidden="true"></span><span>이 컴퓨터에 저장<small>계약서 원문은 로컬에서 처리</small></span></div>
+</aside>
+<div class="main-shell">
+  <header class="topbar"><span class="breadcrumb">내 작업공간 <span>/</span> <strong id="current-page">계약서 살펴보기</strong></span><span class="pill"><span class="status-dot" aria-hidden="true"></span> LOCAL MVP</span></header>
+  <main id="main">
+    <div id="entry-view">
+      <div class="intro entry-intro"><div><div class="eyebrow"><span></span> 내 권리를 켜는 첫걸음</div><h1>어려운 계약서,<br>내 입장에서 읽어보세요.</h1><p>주의할 조항부터 쉬운 설명, 상담 준비까지.<br>혼자 읽기 어려웠던 계약서를 차근차근 살펴봅니다.</p></div><ol class="journey" aria-label="이용 순서"><li><span>01</span> 계약서 가져오기</li><li><span>02</span> 주의 조항 확인</li><li><span>03</span> 질문하고 문서 준비</li></ol></div>
+      <div class="entry-layout">
+        <section class="panel input-panel" aria-labelledby="input-heading">
+          <div class="section-head"><div><span class="section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h5"/></svg></span><h2 id="input-heading">계약서 가져오기</h2></div><span class="subtle">근로 · 주택 임대차 · 부동산 매매</span></div>
+          <form id="analyze-form">
+            <div class="document-info"><div class="two-fields"><div class="field"><label for="contract-type">계약서 종류</label><select id="contract-type"><option value="employment">근로계약서</option><option value="lease">주택 임대차계약서</option><option value="sale">부동산 매매계약서</option></select></div><div class="field"><label for="user-role">나는 어느 입장인가요?</label><select id="user-role"><option value="worker">근로자 · 일하는 사람</option><option value="employer">사업주 · 고용하는 사람</option></select></div></div>
+            <div class="field"><label for="document-title">문서 이름</label><input id="document-title" maxlength="120" value="내 계약서" required></div></div>
+            <label class="upload-zone" for="file-input"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6"/></svg><strong>클릭해서 계약서를 가져오세요</strong><span>TXT · PDF · JPG · PNG · WEBP / 최대 5MB</span><input id="file-input" type="file" accept=".txt,.pdf,.jpg,.jpeg,.png,.webp"><span id="file-status" role="status"></span></label><p class="upload-limit">PDF 최대 20페이지 · 스캔·사진 OCR 최대 5페이지</p>
+            <p class="field-help" id="sample-download" hidden></p>
+            <div class="field document-field"><label for="document-text">읽은 내용을 확인하거나 직접 입력하세요 <span id="character-count">0자</span></label><textarea id="document-text" rows="6" minlength="20" maxlength="50000" placeholder="월급, 근로시간, 계약기간과 특약을 포함해 계약서 내용을 붙여넣으세요." required></textarea><p class="field-help">OCR로 읽은 날짜·금액·시간·체크 표시를 원본과 대조한 뒤 분석하세요. 이름·연락처는 가려도 됩니다.</p></div>
+            <label class="checkbox-label complete-check"><input id="document-complete" type="checkbox">모든 페이지와 별첨을 입력했어요</label>
+            <details class="review-settings" id="review-settings"><summary>검토 설정 <span id="settings-summary">AI 검토 · 공식 근거 조회</span></summary><div class="analysis-settings"><div class="field"><label for="engine">검토 방식</label><select id="engine"><option value="ollama">AI 검토 · 책임·특약 표현의 의미 (6,000자)</option><option value="rules">빠른 검토 · 주요 위험 유형</option></select></div><p class="field-help">AI 검토는 로컬 Ollama가 필요합니다. 모델 없이 시작하려면 빠른 검토를 선택하세요.</p></div>
+            <label class="checkbox-label"><input id="live-evidence" type="checkbox" checked>공식 법령과 관련 사례도 조회해 비교할게요</label><p class="field-help">계약서 원문·개인정보는 보내지 않습니다. 법령명과 일반 법률 쟁점만 국가법령정보센터에 조회합니다. 선택을 해제하면 저장된 근거를 사용합니다.</p></details>
+            <div id="form-error" class="error-box" role="alert" hidden></div>
+            <button class="primary analyze-button" id="analyze-button" type="submit">계약서 분석하기 <span aria-hidden="true">→</span></button>
+            <p class="footnote">입력한 계약서와 결과는 이 컴퓨터에 저장됩니다. 분석 기록에서 삭제할 수 있어요.</p>
+          </form>
+        </section>
+        <aside class="entry-aside">
+          <section class="sample-section" id="sample-section" aria-labelledby="sample-heading"><div class="section-head"><div><span class="step-number">TRY IT</span><h2 id="sample-heading">샘플로 시작하기</h2></div><span class="subtle">가상 계약서 6종</span></div><p class="sample-intro">계약서가 없어도 바로 살펴볼 수 있어요.</p><div class="sample-grid" id="samples"></div></section>
+          <section class="scope-note"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 3 7v6c0 4 9 8 9 8s9-4 9-8V7zM8 12l3 3 5-6"/></svg><div><h3>원문과 근거를 함께 확인해요</h3><p>주의할 문구와 판단 이유를 연결합니다. 정보가 부족하면 추가로 확인할 내용을 알려드려요.</p></div></section>
+        </aside>
+      </div>
+    </div>
+    <section id="loading-view" class="loading-view" aria-live="polite" hidden><div class="spinner" aria-hidden="true"></div><h1>계약서를 살펴보고 있어요</h1><p id="loading-text">중요한 조건과 확인할 조항을 연결합니다.</p><p class="muted">로컬 AI는 모델을 읽어오는 데 시간이 걸릴 수 있습니다.</p><button id="loading-back" class="secondary">입력 화면으로 돌아가기</button></section>
+    <section id="result-view" hidden>
+      <div class="result-heading"><div><div class="eyebrow">계약서 살펴보기 · <span id="result-revision"></span></div><h1 id="result-title" tabindex="-1"></h1><p id="result-meta"></p></div><div class="result-toolbar"><button class="secondary" id="edit-document">내용 수정</button><button class="secondary danger" id="delete-analysis">기록 삭제</button></div></div>
+      <div id="review-verdict" class="review-verdict" role="status"></div><p id="reading-notice" class="reading-notice" role="status" hidden></p><div class="summary-strip" id="summary-strip"></div>
+      <div class="result-layout"><section class="panel original-panel"><div class="section-head"><h2 id="original-heading">계약서 원문</h2><span class="subtle" id="page-count"></span></div><p class="field-help">결과의 ‘원문 보기’를 누르면 해당 줄로 이동합니다.</p><div class="document-paper" id="original-blocks"></div></section>
+      <div class="result-right"><div class="result-tabs" role="tablist" aria-label="분석 결과"><button role="tab" id="tab-review" aria-selected="true" aria-controls="review-panel" data-tab="review">검토 결과</button><button role="tab" id="tab-chat" aria-selected="false" aria-controls="chat-panel" data-tab="chat" tabindex="-1">질문하기</button><button role="tab" id="tab-draft" aria-selected="false" aria-controls="draft-panel" data-tab="draft" tabindex="-1">문서 초안</button><button role="tab" id="tab-language" aria-selected="false" aria-controls="language-panel" data-tab="language" tabindex="-1">다국어</button></div>
+      <section id="review-panel" role="tabpanel" aria-labelledby="tab-review">
+        <div id="risk-findings"></div>
+        <details class="panel supporting-details" id="grounding-panel" hidden><summary>검토에 제공한 근거 자료 <span id="grounding-count"></span></summary><p id="grounding-status" class="field-help"></p><div id="grounding-warning" class="reading-notice" role="status" hidden></div><div id="grounding-sources"></div></details>
+        <details class="panel supporting-details" id="additional-details"><summary>누락·충돌 및 추가 확인 사항 <span id="issue-count"></span></summary><div id="issues"></div></details>
+        <details class="panel supporting-details" id="questions-panel"><summary>실제 상황과 추가 확인 질문</summary><p class="muted">답변하면 관련 조건을 다시 검토합니다. 모르면 비워두세요.</p><form id="answers-form"><div id="questions" class="question-grid"></div><div id="answers-error" class="error-box" role="alert" hidden></div><button class="primary" id="answers-button">답변 반영하기</button></form></details>
+        <details class="panel terms-panel" id="terms-details"><summary>추출한 계약조건과 원문 대조</summary><div id="terms"></div><details class="structured-details" id="structured-details" hidden><summary>구조화 데이터 보기</summary><pre id="structured-json"></pre><button type="button" id="download-json" class="secondary">JSON 저장</button></details></details>
+        <section class="panel action-panel"><h2>다음으로 할 수 있는 일</h2><ol id="actions"></ol><button class="secondary" id="consultation-draft">상담 요청문 준비하기</button></section><section class="coverage" id="coverage"></section>
+      </section>
+      <section id="chat-panel" role="tabpanel" aria-labelledby="tab-chat" hidden><section class="panel"><h2>계약서에 관해 질문하세요</h2><p class="muted">빠른 설명은 검토 내용을 풀어 설명합니다. 직접 입력한 질문은 로컬 AI가 계약 원문과 대화 내용을 참고해 답합니다.</p><div id="chat-focus" class="chat-focus"></div><div class="quick-questions"><button data-intent="explain">쉽게 설명해줘</button><button data-intent="scenario">어떤 문제가 생겨?</button><button data-intent="rewrite">어떻게 고치면 돼?</button><button data-intent="prepare">상담에 뭘 준비해?</button></div><div id="chat-messages" class="chat-messages" aria-live="polite"></div><form id="chat-form"><label for="chat-question" class="field-label">궁금한 내용</label><textarea id="chat-question" rows="3" minlength="2" maxlength="1500" placeholder="예: 이 특약 때문에 이사를 못 하게 될 수도 있어?" required></textarea><button id="send-chat" class="primary">질문 보내기</button><p id="chat-status" role="status" class="muted"></p><div id="chat-error" class="error-box" role="alert" hidden></div></form></section></section>
+      <section id="draft-panel" role="tabpanel" aria-labelledby="tab-draft" hidden><section class="panel"><div class="section-head"><h2>도움을 요청할 문서 준비</h2><span class="pill">검토용 초안</span></div><p class="muted">계약 문구와 직접 설명한 사건 경위를 구분해 정리합니다. 모르는 사실은 빈칸으로 남깁니다.</p><label for="draft-kind" class="field-label">어떤 문서가 필요한가요?</label><select id="draft-kind"><option value="lawyer_request">변호사 상담 요청문</option><option value="help_request">다른 사람·기관에 도움 요청문</option><option value="complaint">고소장 초안</option><option value="summary">상담 준비 요약서</option><option value="request">계약조건 사실확인 요청문</option></select><div id="draft-intake" class="incident-intake"></div><div id="draft-error" class="error-box" role="alert" hidden></div><div class="draft-controls"><button id="generate-draft" class="primary">초안 만들기</button></div><label for="draft-text" class="field-label">검토하고 수정하세요</label><textarea id="draft-text" rows="18" placeholder="초안을 만들면 여기에 표시됩니다."></textarea><div class="draft-controls"><button id="copy-draft" class="secondary" disabled>내용 복사</button><button id="download-draft" class="secondary" disabled>TXT 저장</button></div><p class="field-help" id="draft-missing"></p></section></section>
+      <section id="language-panel" role="tabpanel" aria-labelledby="tab-language" hidden><section class="panel"><h2>같은 결과, 다른 언어로</h2><p class="muted">중국어 간체·스페인어 안내 템플릿입니다. 원문·숫자·출처를 유지하며, 언어·법률 검수는 아직 진행하지 않았습니다.</p><div class="draft-controls"><label class="sr-only" for="language">안내 언어</label><select id="language"><option value="zh">中文（简体）</option><option value="es">Español</option></select><button id="generate-translation" class="primary">안내 보기</button></div><div id="translation"></div></section></section>
+      <div id="result-error" class="error-box" role="alert" hidden></div>
+      </div></div>
+    </section>
+    <section id="draft-entry-view" hidden><div class="intro"><div class="eyebrow">계약서 없이도 준비할 수 있어요</div><h1>도움을 요청할 내용을<br>차근차근 정리해보세요.</h1><p>실제로 있었던 일과 가지고 있는 자료를 알려주세요. 상담 요청문이나 고소장 초안으로 정리합니다.</p></div><section class="panel standalone-panel"><form id="standalone-form"><label for="standalone-kind" class="field-label">어떤 문서가 필요한가요?</label><select id="standalone-kind"><option value="lawyer_request">변호사 상담 요청문</option><option value="help_request">다른 사람·기관에 도움 요청문</option><option value="complaint">고소장 초안</option></select><div id="standalone-intake" class="incident-intake"></div><button id="standalone-generate" class="primary" type="submit">초안 만들기</button><p id="standalone-status" class="muted" role="status"></p><div id="standalone-error" class="error-box" role="alert" hidden></div></form><label for="standalone-text" class="field-label">검토하고 수정하세요</label><textarea id="standalone-text" rows="18" placeholder="초안을 만들면 여기에 표시됩니다."></textarea><div class="draft-controls"><button id="standalone-download" class="secondary" disabled>TXT 저장</button></div><p class="field-help" id="standalone-missing"></p><p class="footnote">이 화면에 입력한 사건 경위와 초안은 서버 기록에 저장하지 않습니다. 필요한 내용을 내려받아 보관하세요.</p></section></section>
+    <footer>권리ON <span>·</span> 계약을 읽고, 질문하고, 내 권리를 알아가는 공간</footer>
+  </main>
+</div><div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
