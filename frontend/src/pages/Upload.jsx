@@ -11,7 +11,6 @@ import {
   Icon,
   PageHead,
   PrivacyNote,
-  EngineSelect,
 } from "../components/UI.jsx";
 const blank = {
   title: "",
@@ -21,7 +20,6 @@ const blank = {
   context: {},
   reading: null,
   document_id: null,
-  engine: CLOUD_AI_ENABLED ? "openai" : "rules",
 };
 export default function Upload() {
   const [form, setForm] = useSession("upload", blank);
@@ -32,9 +30,6 @@ export default function Upload() {
   const [readSignature, setReadSignature] = useState("");
   const photoSignature = JSON.stringify(photos.map((p) => [p.id, p.rotation]));
   const photosChanged = photos.length > 0 && photoSignature !== readSignature;
-  const [readingMode, setReadingMode] = useState(
-    CLOUD_AI_ENABLED ? "openai" : "local",
-  );
   const [drag, setDrag] = useState(false);
   const fileInput = useRef();
   const ownedUrls = useRef(new Set());
@@ -152,7 +147,7 @@ export default function Upload() {
       const body = new FormData();
       items.forEach((p) => body.append("files", p.file));
       body.append("rotations", JSON.stringify(items.map((p) => p.rotation)));
-      body.append("reading_mode", readingMode);
+      body.append("reading_mode", CLOUD_AI_ENABLED ? "openai" : "local");
       const data = await api("/api/uploads", {
         method: "POST",
         body,
@@ -224,7 +219,7 @@ export default function Upload() {
         body: JSON.stringify({
           ...form,
           title: form.title.trim() || "내 계약서",
-          engine: CLOUD_AI_ENABLED ? form.engine || "openai" : "rules",
+          engine: CLOUD_AI_ENABLED ? "openai" : "rules",
           language: CLOUD_AI_ENABLED ? language() : "ko",
           evidence_mode: "local",
         }),
@@ -262,18 +257,6 @@ export default function Upload() {
               <h2>{t("계약서 등록")}</h2>
               <span className="small muted">{t("사진 5장 · 장당 5MB")}</span>
             </div>
-            {CLOUD_AI_ENABLED && (
-              <Field label={t("사진·스캔 읽기 방식")}>
-                <select
-                  value={readingMode}
-                  onChange={(e) => setReadingMode(e.target.value)}
-                >
-                  <option value="openai">{t("OpenAI 사진 판독")}</option>
-                  <option value="local">{t("로컬 OCR")}</option>
-                </select>
-              </Field>
-            )}
-            {readingMode === "openai" && <PrivacyNote />}
             {CLOUD_AI_ENABLED && health && !health.openai_configured && (
               <div className="notice">
                 {t(
@@ -544,11 +527,6 @@ export default function Upload() {
                 <option value="false">{t("일부만 포함했어요")}</option>
               </select>
             </Field>
-            <EngineSelect
-              value={form.engine || "openai"}
-              onChange={(value) => set("engine", value)}
-              rules
-            />
           </fieldset>
           <ErrorNotice message={error} />
           {busy && (
@@ -557,7 +535,7 @@ export default function Upload() {
               {t(busy)}
             </p>
           )}
-          {(form.engine || "openai") === "openai" && <PrivacyNote />}
+          <PrivacyNote />
           <div className="form-bottom">
             <span className="small muted">
               {t("결과는 다음 페이지에서 확인합니다.")}

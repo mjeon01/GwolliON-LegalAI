@@ -404,7 +404,7 @@ def review_contract(request, blocks, checks, issues, extraction):
 
 
 def openai_review(blocks, contract_type, role, grounding):
-    from backend.openai_client import OpenAIError, require_key
+    from backend.openai_client import DAILY_LIMIT_MESSAGE, OpenAIError, require_key
     _, model = require_key()
     # Whole clauses stay together. Oversized clauses are explicitly unreviewed.
     chunks, current, size, coverage = [], [], 0, []
@@ -435,6 +435,8 @@ def openai_review(blocks, contract_type, role, grounding):
             coverage.append({**scope, "status": "failed", "error_code": getattr(exc, "code", "validation_failed")})
     if coverage and all(c["status"] == "failed" for c in coverage):
         code = next((c["error_code"] for c in coverage if c["error_code"] != "clause_too_long"), "clause_too_long")
+        if code == "openai_daily_limit":
+            raise OpenAIError(code, DAILY_LIMIT_MESSAGE, 429)
         raise OpenAIError(code, "OpenAI 검토를 완료하지 못했습니다. 모델 설정·사용량·연결을 확인하고 다시 시도해주세요. 긴 조항은 줄바꿈으로 나눠주세요.")
     return {"method": "openai", "model": model, "complete": all(c["status"] == "complete" for c in coverage),
             "findings": findings, "rejected_candidates": rejected, "ranges": coverage,

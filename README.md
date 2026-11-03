@@ -87,6 +87,7 @@ OPENAI_MODEL=gpt-5.4-mini
 | --- | --- |
 | `OPENAI_API_KEY` | OpenAI 서버 전용 키 |
 | `OPENAI_MODEL` | 이미지 입력·구조화 출력을 지원하는 모델. 기본 `gpt-5.4-mini` |
+| `OPENAI_DAILY_LIMIT` | 하루(한국 시간) OpenAI 호출 상한. 초과하면 요청을 보내지 않음. 기본 `300` |
 | `OLLAMA_URL` | 로컬 Ollama 주소. 기본 `http://127.0.0.1:11434` |
 | `OLLAMA_MODEL` | 기본 `qwen2.5:7b` |
 | `legal_api_key` | 국가법령정보 공동활용 OC. 공식 근거 조회 API 사용 시 필요 |

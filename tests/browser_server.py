@@ -1,4 +1,4 @@
-"""Isolated synthetic browser server: local OCR/model mocked, cloud calls forbidden."""
+"""Isolated synthetic browser server: OpenAI, local OCR and local models are all mocked."""
 import json
 from pathlib import Path
 import re
@@ -47,8 +47,8 @@ if __name__ == '__main__':
     with tempfile.TemporaryDirectory(prefix='gwollion-browser-') as folder, \
          patch('backend.app.SAMPLES_DIR', ROOT/'tests/fixtures/samples'), \
          patch('backend.openai_client.settings', return_value=('browser-test-only', 'browser-mock')), \
-         patch('backend.openai_client.generate', side_effect=AssertionError('Unexpected cloud call')), \
-         patch('backend.translation.generate', side_effect=AssertionError('Unexpected translation call')), \
+         patch('backend.openai_client.generate', side_effect=model), \
+         patch('backend.translation.generate', side_effect=model), \
          patch('backend.auto_translation.generate', side_effect=auto_model), \
          patch('backend.chat.generate', side_effect=model), \
          patch('backend.chat_translation.generate', side_effect=model), \

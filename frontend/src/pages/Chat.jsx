@@ -16,7 +16,6 @@ import {
   Icon,
   PageHead,
   PrivacyNote,
-  EngineSelect,
   Workflow,
 } from "../components/UI.jsx";
 const prompts = [
@@ -29,7 +28,6 @@ export default function Chat({ result: r }) {
   const lang = useLanguage();
   const translated = useTranslatedReview(r);
   const findings = translated.result.review.findings;
-  const [engine, setEngine] = useState(CLOUD_AI_ENABLED ? "openai" : "ollama");
   const initial = findings.some((f) => f.finding_id === params.get("finding"))
     ? params.get("finding")
     : findings[0]?.finding_id || "";
@@ -118,7 +116,7 @@ export default function Chat({ result: r }) {
           question: text,
           intent,
           language: lang,
-          engine: CLOUD_AI_ENABLED ? engine : "ollama",
+          engine: CLOUD_AI_ENABLED ? "openai" : "ollama",
         },
         (event, data) => {
           if (event === "status")
@@ -417,8 +415,7 @@ export default function Chat({ result: r }) {
                 </button>
               ))}
             </div>
-            <EngineSelect value={engine} onChange={setEngine} />
-            {(engine === "openai" || lang !== "ko") && <PrivacyNote />}
+            <PrivacyNote />
             <form
               onSubmit={(e) => {
                 e.preventDefault();

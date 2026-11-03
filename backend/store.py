@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 import json
 import re
 import sqlite3
@@ -58,6 +59,7 @@ class Store:
                 # Instances start concurrently, and CREATE TABLE IF NOT EXISTS can still collide.
                 db.execute(f"SELECT pg_advisory_xact_lock({SCHEMA_LOCK})")
             db.execute("CREATE TABLE IF NOT EXISTS analyses (id TEXT PRIMARY KEY, revision INTEGER NOT NULL, status TEXT NOT NULL, request TEXT NOT NULL, result TEXT, error TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP)")
+            db.execute("CREATE TABLE IF NOT EXISTS openai_usage (day TEXT PRIMARY KEY, calls INTEGER NOT NULL)")
             db.execute("CREATE TABLE IF NOT EXISTS chats (analysis_id TEXT NOT NULL, revision INTEGER NOT NULL, turn INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY (analysis_id, revision, turn))")
             db.execute("CREATE TABLE IF NOT EXISTS translations (analysis_id TEXT NOT NULL, revision INTEGER NOT NULL, language TEXT NOT NULL, purpose TEXT NOT NULL, source_hash TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY (analysis_id,revision,language,purpose,source_hash))")
             db.execute("CREATE TABLE IF NOT EXISTS document_pages (document_id TEXT NOT NULL, page INTEGER NOT NULL, width INTEGER NOT NULL, height INTEGER NOT NULL, image BLOB NOT NULL, words TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (document_id, page))")
@@ -82,6 +84,12 @@ class Store:
                 yield db
         finally:
             db.close()
+
+    def take_openai_call(self, limit, day=None):
+        """Atomically count one call against a Korean-time day; False once the limit is reached."""
+        day = day or datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+        with self.connect() as db:
+            return bool(db.execute("INSERT INTO openai_usage(day,calls) VALUES (?,1) ON CONFLICT (day) DO UPDATE SET calls=openai_usage.calls+1 WHERE openai_usage.calls<? RETURNING calls", (day, limit)).fetchall())
 
     def create(self, id, request):
         with self.connect() as db:

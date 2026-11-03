@@ -27,6 +27,7 @@ from backend.pdf_export import render_pdf
 from backend.pages import highlights, ocr_words, snapshot
 from starlette.concurrency import run_in_threadpool
 from backend.sample_translations import sample_translation
+from backend import openai_client
 from backend.openai_client import OpenAIError, settings as openai_settings, require_key
 from backend.translation import content_hash, translate_review, translate_document, translate_incident
 
@@ -41,7 +42,9 @@ def create_app(db_path=None):
         app.state.executor = ThreadPoolExecutor(max_workers=1)
         app.state.translator = ThreadPoolExecutor(max_workers=1)
         app.state.translation_jobs = {}
+        openai_client.quota = app.state.store.take_openai_call
         yield
+        openai_client.quota = None
         app.state.executor.shutdown(wait=True, cancel_futures=True)
         app.state.translator.shutdown(wait=True, cancel_futures=True)
 

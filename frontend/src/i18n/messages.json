@@ -1,4 +1,8 @@
 {
+  "오늘 AI 사용량이 모두 소진되었습니다. 내일 다시 시도해주세요.": {
+    "zh": "今日AI使用量已用完，请明天再试。",
+    "es": "Se ha agotado el uso de IA de hoy. Inténtelo de nuevo mañana."
+  },
   "5명 미만": {
     "zh": "少于5人",
     "es": "Menos de 5"

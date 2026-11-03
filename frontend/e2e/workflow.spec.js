@@ -21,24 +21,17 @@ async function noOverflow(page) {
   ).toBe(true);
 }
 
-test("local photos → review → question → edited TXT with multilingual UI", async ({
+test("photos → review → question → edited TXT with multilingual UI", async ({
   page,
 }, info) => {
   const crashes = [];
-  const cloudRequests = [];
   const analysisRequests = [];
   page.on("request", (request) => {
-    if (/translations/.test(request.url())) cloudRequests.push(request.url());
     if (
       request.method() === "POST" &&
       request.headers()["content-type"]?.includes("application/json")
     ) {
       const body = request.postDataJSON();
-      if (
-        !request.url().endsWith("/auto-translation") &&
-        body.engine === "openai"
-      )
-        cloudRequests.push(request.url());
       if (request.url().endsWith("/api/analyses")) analysisRequests.push(body);
     }
   });
@@ -99,9 +92,10 @@ test("local photos → review → question → edited TXT with multilingual UI",
   await expect(page.locator(".finding-card")).toHaveCount(2);
   await expect(page.locator(".doc-mark.tone-risk")).toHaveCount(2);
   const id = new URL(page.url()).searchParams.get("id");
-  expect(analysisRequests[0].engine).toBe("rules");
+  expect(analysisRequests[0].engine).toBe("openai");
   await selectLanguage(page, "zh");
-  await expect(page.getByText(/OpenAI|OPENAI_API_KEY/)).toHaveCount(0);
+  await expect(page.getByText(/OPENAI_API_KEY/)).toHaveCount(0);
+  await expect(page.locator("select option", { hasText: "Ollama" })).toHaveCount(0);
   await expect(page.locator(".evidence").first()).toContainText("잔금");
   await noOverflow(page);
   await page.screenshot({
@@ -137,21 +131,25 @@ test("local photos → review → question → edited TXT with multilingual UI",
   await page
     .getByLabel("Qué ocurrió realmente")
     .fill("상대방에게 서류 제공일을 요청했지만 아직 답변을 받지 못했습니다.");
-  await expect(page.locator(".incident-translation")).toHaveCount(0);
+  await expect(page.locator(".incident-translation")).toHaveCount(1);
+  await page.getByRole("button", { name: "Interpretar en coreano" }).click();
+  await page
+    .getByLabel("La interpretación coreana coincide con mi relato.")
+    .check();
   await page
     .getByRole("button", { name: "Crear borrador", exact: true })
     .click();
   await expect(page.locator(".document-view")).toContainText(
     "변호사 상담 요청문",
   );
-  await expect(page.locator(".document-translation")).toHaveCount(0);
+  await expect(page.locator(".document-translation")).toHaveCount(1);
   await page.locator(".blank-chips button").first().click();
   await expect(page.locator("#draft-editor")).toBeFocused();
   const edited = await page.locator("#draft-editor").inputValue();
   await page.locator("#draft-editor").fill(edited + "\n확인일: 2026-11-03");
   page.once("dialog", (dialog) => dialog.accept());
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Guardar PDF" }).click();
+  await page.getByRole("button", { name: "Guardar PDF", exact: true }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/\.pdf$/);
   const pdf = await fs.readFile(await download.path());
@@ -165,9 +163,8 @@ test("local photos → review → question → edited TXT with multilingual UI",
   await expect(page.locator("#draft-editor")).toHaveValue(
     edited + "\n확인일: 2026-11-03",
   );
-  await expect(page.getByRole("button", { name: "Guardar PDF" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Guardar PDF", exact: true })).toBeEnabled();
   expect(crashes).toEqual([]);
-  expect(cloudRequests).toEqual([]);
 });
 
 test("review marks the actual document and links marks to explanations", async ({
@@ -242,7 +239,8 @@ test("language persists, samples translate and errors preserve input", async ({
   await noOverflow(page);
   await page.goto("/upload/");
   await expect(page.locator(".language-trigger")).toContainText("Español");
-  await expect(page.getByText(/OpenAI|OPENAI_API_KEY/)).toHaveCount(0);
+  await expect(page.getByText(/OPENAI_API_KEY/)).toHaveCount(0);
+  await expect(page.locator("select option", { hasText: "Ollama" })).toHaveCount(0);
   await page
     .getByLabel("Nombre del contrato", { exact: true })
     .fill("Mi prueba");

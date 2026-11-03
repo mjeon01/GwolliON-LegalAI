@@ -41,6 +41,15 @@ class PostgresStoreTests(unittest.TestCase):
         with self.assertRaises(StaleRevision):
             store.revise(id, 1, {"title": "새"}, {"status": "completed"})
 
+    def test_daily_counter_stops_at_the_limit(self):
+        day = "test-" + str(uuid4())
+        self.addCleanup(self._forget, day)
+        self.assertEqual([self.store.take_openai_call(1, day) for _ in range(2)], [True, False])
+
+    def _forget(self, day):
+        with self.store.connect() as db:
+            db.execute("DELETE FROM openai_usage WHERE day=?", (day,))
+
     def test_documents_keep_binary_pages_and_a_second_instance_sees_them(self):
         pages = [{"page": 1, "width": 10, "height": 20, "image": b"\x00\xffpng", "words": [{"t": "가"}]}]
         document = self.store.save_document(pages)

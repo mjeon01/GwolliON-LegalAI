@@ -271,18 +271,3 @@ export function PrivacyNote() {
     </p>
   );
 }
-export function EngineSelect({ value, onChange, rules = false }) {
-  if (!CLOUD_AI_ENABLED) return null;
-  return (
-    <Field label={t("검토·답변 방식")}>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        <option value="openai">OpenAI AI</option>
-        {rules ? (
-          <option value="rules">{t("로컬 규칙 검토")}</option>
-        ) : (
-          <option value="ollama">{t("로컬 Ollama")}</option>
-        )}
-      </select>
-    </Field>
-  );
-}

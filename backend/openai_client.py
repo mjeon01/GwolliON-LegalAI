@@ -12,6 +12,11 @@ from backend.config import load_env
 log = logging.getLogger(__name__)
 
 
+DAILY_LIMIT_MESSAGE = '오늘 AI 사용량이 모두 소진되었습니다. 내일 다시 시도해주세요.'
+# Set by the app to its store's counter; takes the daily limit, returns False once it is used up.
+quota = None
+
+
 class OpenAIError(ValueError):
     def __init__(self, code, message, status=502):
         super().__init__(message)
@@ -71,6 +76,9 @@ def validate_shape(value, schema):
 
 def generate(schema, prompt, *, images=(), num_predict=6000, num_ctx=None):
     key, model = require_key()
+    # This key cannot be capped at OpenAI, so every paid request is counted here first.
+    if quota is not None and not quota(int(os.getenv('OPENAI_DAILY_LIMIT', '300'))):
+        raise OpenAIError('openai_daily_limit', DAILY_LIMIT_MESSAGE, 429)
     started = time.monotonic()
     error, usage = None, {}
     content = [{'type': 'input_text', 'text': prompt}]
