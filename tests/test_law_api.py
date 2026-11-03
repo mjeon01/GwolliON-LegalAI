@@ -18,7 +18,7 @@ class LawAPITests(unittest.TestCase):
         response.read.return_value = json.dumps({"result": "validation failed", "msg": "OC=test-secret"}).encode()
         opener = MagicMock()
         opener.open.return_value = response
-        with patch.object(client, "build_opener", return_value=opener):
+        with patch("backend.law_client.build_opener", return_value=opener):
             result = client.fetch_json(client.DEFAULT_SEARCH, {"target": "eflaw"}, "test-secret", 5)
         self.assertFalse(result["ok"])
         self.assertEqual(result["error_type"], "api_validation")

@@ -1,10 +1,11 @@
 import json
 import os
 import re
+import time
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
-from scripts.check_law_api import load_env
+from backend.config import load_env
 from backend.knowledge import ROOT
 
 EMPLOYMENT = {
@@ -158,6 +159,9 @@ def candidate(key, raw, block):
         return None
     if key == "work_hours" and value is None and not re.search(r"(?:근로|근무)\s*시간\s*[:：은는]?\s*.*\d+\s*시간", raw):
         return None
+    # "계약기간 중 퇴사하면…" uses the label in a sentence; it does not state a period.
+    if key == "period" and value is None and re.search(r"(?:계약|임대차)\s*기간\s*(?:중|동안|내|이내|만료|종료)", raw):
+        return None
     if key == "period" and value is None and not re.search(r"무기|정함\s*(?:이\s*)?없|\d+\s*(?:년|개월|월|일)", raw):
         return None
     if key == "period" and value is None and re.search(r"\b\d{5,}\b|\d{4}\s*(?:년|[-./])", raw):
@@ -212,6 +216,49 @@ def generate(schema, prompt, timeout=90, num_predict=1800, num_ctx=16384):
     if len(raw) > 1024 * 1024:
         raise ValueError("Model response too large")
     return json.loads(json.loads(raw)["response"]), model
+
+
+class GenerationCancelled(Exception):
+    pass
+
+
+def generate_stream(schema, prompt, timeout=90, num_predict=1800, num_ctx=16384, on_progress=None, cancelled=None):
+    """Consume Ollama NDJSON without exposing unvalidated model output to the UI."""
+    url, model = ollama_settings()
+    payload = {"model": model, "prompt": prompt, "format": schema, "stream": True,
+               "options": {"temperature": 0, "num_predict": num_predict, "num_ctx": num_ctx}}
+    request = Request(url + "/api/generate", json.dumps(payload, ensure_ascii=False).encode(), {"Content-Type": "application/json"})
+    chunks, size, complete = [], 0, False
+    started = time.monotonic()
+    with urlopen(request, timeout=timeout) as response:
+        while True:
+            if cancelled is not None and cancelled.is_set():
+                raise GenerationCancelled()
+            if time.monotonic() - started > timeout:
+                raise TimeoutError("Local model stream timed out")
+            line = response.readline(1024 * 1024 + 1)
+            if not line:
+                break
+            size += len(line)
+            if size > 1024 * 1024:
+                raise ValueError("모델 응답이 허용 크기를 넘었습니다.")
+            item = json.loads(line)
+            if not isinstance(item, dict) or item.get("error"):
+                raise RuntimeError("Local model stream failed")
+            chunk = item.get("response", "")
+            if not isinstance(chunk, str):
+                raise ValueError("모델 응답 형식을 확인하지 못했습니다.")
+            chunks.append(chunk)
+            if chunk and on_progress:
+                on_progress("generating")
+            if item.get("done") is True:
+                if item.get("done_reason") == "length":
+                    raise ValueError("답변이 길어 생성을 완료하지 못했습니다. 질문을 짧게 나누어주세요.")
+                complete = True
+                break
+    if not complete:
+        raise ValueError("답변 수신이 중단되었습니다. 다시 시도해주세요.")
+    return json.loads("".join(chunks)), model
 
 
 def ollama_extract(blocks, contract_type):

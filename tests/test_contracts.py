@@ -17,12 +17,12 @@ from backend.schemas import AnalyzeRequest
 from backend.store import Store
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLES = json.loads((ROOT / "samples/manifest.json").read_text())
+SAMPLES = json.loads((ROOT / "tests/fixtures/samples/manifest.json").read_text())
 
 
 def analyze_sample(id, context=None):
     sample = next(s for s in SAMPLES if s["id"] == id)
-    request = AnalyzeRequest(title=sample["title"], text=(ROOT / "samples" / f"{id}.txt").read_text(), contract_type=sample["contract_type"], context=context if context is not None else sample["context"])
+    request = AnalyzeRequest(title=sample["title"], text=(ROOT / "tests/fixtures/samples" / f"{id}.txt").read_text(), contract_type=sample["contract_type"], context=context if context is not None else sample["context"])
     blocks, terms, extraction = extract(request)
     return evaluate(request, blocks, terms, extraction, "fixture", 1)
 
@@ -110,7 +110,7 @@ class ExtractionTests(unittest.TestCase):
         self.assertIn("wage_period",[i["issue_type"] for i in result["issues"]])
 
     def test_successful_model_omissions_are_supplemented_with_named_provenance(self):
-        r = AnalyzeRequest(text=(ROOT / "samples/employment-basic.txt").read_text(),engine="ollama")
+        r = AnalyzeRequest(text=(ROOT / "tests/fixtures/samples/employment-basic.txt").read_text(),engine="ollama")
         with patch("backend.extraction.generate",return_value=({"terms":[]},"fixture-model")), patch("backend.review.semantic_review",return_value={"method":"ollama","complete":True,"findings":[],"rejected_candidates":0}):
             b,t,e = extract(r)
         self.assertEqual(e["method"], "ollama_with_form_rules")
@@ -132,7 +132,7 @@ class ExtractionTests(unittest.TestCase):
         document=draft(result,"request")
         self.assertTrue(document["review_required"])
         self.assertFalse(any(f["label"]=="임금" for f in document["facts_used"]))
-        self.assertIn("[직접 입력]",document["draft_text"])
+        self.assertIn("직접 입력]",document["draft_text"])
         self.assertIn("임금",document["missing_fields"])
         self.assertIsNone(result["structured_contract"]["wage"]["amount"])
 
@@ -156,7 +156,7 @@ class ExtractionTests(unittest.TestCase):
         self.assertEqual(absent, {"working_hours.break", "wage.payday", "wage.payment_method", "contract_period.end", "annual_leave"})
 
     def test_indefinite_contract_does_not_require_an_end_date(self):
-        sample = (ROOT / "samples/employment-basic.txt").read_text()
+        sample = (ROOT / "tests/fixtures/samples/employment-basic.txt").read_text()
         sample = sample.replace("기간의 정함이 있는 경우", "기간의 정함이 없는 경우")
         sample = sample.replace("근로계약기간 : 2026년 10월 10일부터 2027년 10월 09일까지", "근로개시일 : 2026년 10월 10일부터")
         r = AnalyzeRequest(text=sample, context={"document_complete": True})
@@ -192,6 +192,9 @@ class APITests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory()
         self.path=Path(self.temp.name)/"test.sqlite3"
+        samples=patch("backend.app.SAMPLES_DIR",ROOT/"tests/fixtures/samples")
+        samples.start()
+        self.addCleanup(samples.stop)
         self.client=TestClient(create_app(self.path))
         self.client.__enter__()
 
@@ -243,7 +246,7 @@ class APITests(unittest.TestCase):
 
     def test_pdf_upload_all_samples_matches_scenario(self):
         for s in SAMPLES:
-            raw=(ROOT/"samples/pdf"/(s["id"]+".pdf")).read_bytes()
+            raw=(ROOT/"tests/fixtures/samples/pdf"/(s["id"]+".pdf")).read_bytes()
             response=self.client.post("/api/uploads",files={"file":(s["id"]+".pdf",raw,"application/pdf")})
             self.assertEqual(response.status_code,200)
             r=AnalyzeRequest(text=response.json()["text"],contract_type=s["contract_type"],context=s["context"])
@@ -268,7 +271,7 @@ class APITests(unittest.TestCase):
         self.assertEqual(response.status_code,200)
         self.assertTrue(response.json()["reading"]["ocr_used"])
         self.assertIn("원본",response.json()["reading"]["warnings"][0])
-        source = fitz.open(ROOT / "samples/pdf/employment-basic.pdf")
+        source = fitz.open(ROOT / "tests/fixtures/samples/pdf/employment-basic.pdf")
         source.new_page()
         raw = source.tobytes(); source.close()
         with patch("backend.reading.recognize",return_value=text) as recognize:

@@ -1,37 +1,95 @@
 """Drafts use traceable facts; language guides keep amounts and evidence intact."""
+import re
+
 from backend.analysis import QUESTION_LABELS
 
 
-def draft(result, kind, incident=None):
+CONTEXT_LABELS = {"document_complete": "모든 페이지·별첨 포함", "event_date": "기준 날짜", "workplace_size": "상시 근로자 수",
+                  "weekly_work_hours": "실제 주당 근로시간", "move_in": "입주 완료", "resident_registration": "전입신고 완료", "deposit_returned": "보증금 전액 반환"}
+CONTEXT_VALUES = {True: "예", False: "아니오", "under5": "5명 미만", "5plus": "5명 이상"}
+# Facts about the user's own situation, not questions for the other party.
+PRIVATE_ISSUES = {"review_scope", "lease_registration", "hours_context", "deposit_unreturned"}
+
+
+def clean_value(text):
+    """Contract lines carry their numbering and label; a document needs only the value."""
+    text = re.sub(r"^\s*(?:\d+\.|[-·•])\s*", "", text).strip()
+    labelled = re.match(r"^[^\d:：]{1,20}[:：]\s*(.+)$", text)
+    return labelled[1].strip() if labelled else text
+
+
+def quoted(evidence):
+    return "“" + re.sub(r"^\s*(?:\d+[.)]|[-·•])\s*", "", evidence["quote"]).strip() + "”"
+
+
+def korean_date(value):
+    match = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})", value or "")
+    return f"{match[1]}년 {int(match[2])}월 {int(match[3])}일" if match else (value or "").strip()
+
+
+def draft(result, kind, incident=None, finding_ids=None, written_on="", reply_by=""):
     incident = incident.model_dump() if hasattr(incident, "model_dump") else (incident or {})
-    facts = []
+    facts, seen = [], set()
     for term in (result or {}).get("terms", []):
         if term["status"] == "found":
             value = term["candidates"][0]
-            facts.append({"label": term["label"], "value": value["value_text"], "origin": "document", "evidence": value["evidence"]})
+            shown = clean_value(value["value_text"])
+            if shown not in seen:
+                seen.add(shown)
+                facts.append({"label": term["label"], "value": shown, "origin": "document", "evidence": value["evidence"]})
     for key, value in (result or {}).get("context", {}).items():
         if value is not None and value != "unknown":
-            label = QUESTION_LABELS[key]
-            text = "예" if value is True else "아니오" if value is False else str(value)
-            facts.append({"label": label, "value": text, "origin": "user_confirmed", "context_key": key})
+            facts.append({"label": CONTEXT_LABELS[key], "value": CONTEXT_VALUES.get(value, str(value)), "origin": "user_confirmed", "context_key": key})
+    all_findings = (result or {}).get("review", {}).get("findings", [])
+    findings = [f for f in all_findings if finding_ids is None or f["finding_id"] in finding_ids]
+    written_on, reply_by = korean_date(written_on), korean_date(reply_by)
     if kind in {"lawyer_request", "help_request", "complaint"}:
-        return action_draft(result, kind, incident, facts)
-    fact_lines = [f"- {f['label']}: {f['value']}" for f in facts]
+        return action_draft(result, kind, incident, facts, findings, written_on)
+    excluded = {f["issue_type"] for f in all_findings if f not in findings}
+    issues = [i for i in result["issues"] if i["issue_type"] not in excluded]
+    document_facts = [f"- {f['label']}: {f['value']}" for f in facts if f["origin"] == "document"]
     conflicts = [t["label"] for t in result["terms"] if t["status"] == "conflict"]
-    missing = ["작성자", "수신인", "작성일"] + [t["label"] for t in result["terms"] if t["status"] != "found"]
-    title = "상담 준비 요약서" if kind == "summary" else "계약조건 사실확인 요청문"
-    text = [title, "", f"대상 문서: {result['title']}", "작성자: [직접 입력]", "수신인: [직접 입력]", "작성일: [직접 입력]", "", "1. 문서와 사용자 답변에서 확인한 사실", *fact_lines]
+    missing = [t["label"] for t in result["terms"] if t["status"] != "found"]
+    writer = incident.get("writer", "").strip() or "[내 이름 직접 입력]"
+    recipient = incident.get("counterparty", "").strip() or "[받는 사람 직접 입력]"
+    dated = written_on or "[작성일 직접 입력]"
+    reply = reply_by or "[회신 희망일 직접 입력]"
     if kind == "summary":
-        text += ["", "2. 상담에서 확인할 사항", *[f"- {i['title']}: {i['explanation_ko']}" for i in result["issues"]], "", "3. 준비할 자료와 다음 행동", *["- " + a for a in result["actions"]]]
+        text = ["상담 준비 요약서", "", f"대상 계약: {result['title']}", f"작성자: {writer}", f"작성일: {dated}", "", "1. 계약서에서 확인한 내용", *document_facts]
+        answers = [f"- {f['label']}: {f['value']}" for f in facts if f["origin"] == "user_confirmed"]
+        if answers:
+            text += ["", "2. 내가 확인해 준 사실", *answers]
+        text += ["", f"{3 if answers else 2}. 상담에서 확인할 사항"]
+        for issue in issues:
+            text += [f"- {issue['title']}: {issue['explanation_ko']}", *[f"  문구: {quoted(e)}" for e in issue["evidence"]]]
+        text += ["", f"{4 if answers else 3}. 준비할 자료와 다음 행동", *["- " + a for a in result["actions"]]]
+        if conflicts:
+            text += ["", "서로 다른 내용이 있어 확정하지 않은 항목: " + ", ".join(conflicts)]
+        title = "상담 준비 요약서"
+    elif kind == "request":
+        title = "사실확인 요청문"
+        text = [title, "", f"수신: {recipient}", f"발신: {writer}", f"작성일: {dated}", f"대상 계약: {result['title']}", "", "안녕하세요. 위 계약의 내용 중 아래 사항을 정확히 확인하고 싶어 요청드립니다.", "", "1. 계약서에서 확인한 내용", *document_facts, "", "2. 확인을 요청하는 사항"]
+        for finding in findings:
+            text += [f"- {finding['title']}", *[f"  문구: {quoted(e)}" for e in finding["evidence"]]]
+        finding_types = {f["issue_type"] for f in all_findings}
+        for issue in issues:
+            if issue["issue_type"] not in PRIVATE_ISSUES | finding_types | {"missing_terms"}:
+                text += [f"- {issue['title']}", *[f"  문구: {quoted(e)}" for e in issue["evidence"]]]
+        if missing:
+            text += ["- 계약서에서 찾지 못한 항목: " + ", ".join(missing)]
+        text += ["", f"위 사항의 내용과 적용 근거를 {reply}까지 서면으로 알려 주시기 바랍니다.", "", "3. 첨부 자료", "[계약서·별첨 등 실제 첨부할 자료 직접 입력]", "", f"{dated}", f"발신인: {writer} (서명)"]
     else:
-        text += ["", "2. 확인 요청", "아래 계약조건의 내용과 적용 근거를 서면으로 확인해 주시기 바랍니다.", *[f"- {i['title']}" for i in result["issues"]], "답변 희망일: [직접 입력]", "", "3. 첨부 자료", "계약서·별첨·관련 기록: [직접 확인 후 입력]"]
-    if conflicts:
-        text += ["", "서로 다른 후보가 있어 확정하지 않은 항목: " + ", ".join(conflicts)]
-    text += ["", "검토 메모: 이 초안은 원문과 사용자 답변을 정리한 자료입니다. 사실·날짜·수신인을 검토하고 수정하세요."]
-    return {"analysis_revision": result["analysis_revision"], "kind": kind, "draft_text": "\n".join(text), "facts_used": facts, "missing_fields": missing, "review_required": True}
+        title = "계약 수정 요청서"
+        text = [title, "", f"수신: {recipient}", f"발신: {writer}", f"작성일: {dated}", f"대상 계약: {result['title']}", "", "안녕하세요. 위 계약서를 검토하는 과정에서 아래 조항을 함께 조정하고 싶어 말씀드립니다.", "", "1. 수정을 요청하는 조항"]
+        for number, finding in enumerate(findings, 1):
+            text += ["", f"조항 {number}. {finding['title']}", *[f"현재 문구: {quoted(e)}" for e in finding["evidence"]], f"제안 문구: {finding['revision_suggestion']}", f"요청 이유: {finding['why_unfavorable']}"]
+        text += ["", "2. 회신 요청", f"위 제안에 대한 의견을 {reply}까지 서면으로 알려 주시기 바랍니다. 다른 조정안이 있다면 함께 논의하고 싶습니다.", "", f"{dated}", f"발신인: {writer} (서명)"]
+    return {"analysis_revision": result["analysis_revision"], "kind": kind, "title": title, "draft_text": "\n".join(text), "facts_used": facts,
+            "missing_fields": ["작성자", "수신인", "작성일"] + missing, "review_required": True,
+            "review_note": "이 초안은 계약서와 입력한 내용을 정리한 자료입니다. 사실·날짜·수신인을 확인하고 수정하세요. 조항의 법적 효력을 확정한 내용은 아닙니다."}
 
 
-def action_draft(result, kind, incident, document_facts):
+def action_draft(result, kind, incident, document_facts, findings=None, written_on=""):
     """Use explicit incident facts; contractual sums are never claimed damages."""
     from backend.knowledge import Knowledge
     labels = {"writer": "작성자", "counterparty": "상대방", "date": "사건 시점", "place": "사건 장소", "summary": "사건 경위", "loss": "사용자가 주장하는 피해", "evidence": "보유 자료", "desired_outcome": "요청하는 도움"}
@@ -39,8 +97,8 @@ def action_draft(result, kind, incident, document_facts):
                 for key, label in labels.items() if incident.get(key, "").strip()]
     def supplied(key, placeholder="[직접 입력]"):
         return incident.get(key, "").strip() or placeholder
-    findings = (result or {}).get("review", {}).get("findings", [])
-    clauses = [f"- {f['title']}\n  원문: “{f['evidence'][0]['quote']}”\n  확인할 부담: {f['why_unfavorable']}" for f in findings]
+    findings = (result or {}).get("review", {}).get("findings", []) if findings is None else findings
+    clauses = [f"- {f['title']}\n  원문: {quoted(f['evidence'][0])}\n  확인할 부담: {f['why_unfavorable']}" for f in findings]
     missing = [label for key, label in labels.items() if not incident.get(key, "").strip()] + ["수신 기관·수신인", "작성일", "작성자 연락처·주소", "서명"]
     sources = []
     if kind == "complaint":
@@ -60,15 +118,16 @@ def action_draft(result, kind, incident, document_facts):
     else:
         lawyer = kind == "lawyer_request"
         title = "변호사 상담 요청문" if lawyer else "도움 요청문"
-        lines = [title, "", "수신: [변호사·상담기관 직접 입력]" if lawyer else "수신: [도움을 요청할 사람·기관 직접 입력]", f"작성자: {supplied('writer')}", "회신 연락처: [직접 입력]", "작성일: [직접 입력]", "", "안녕하세요. 아래 계약 또는 사건과 관련해 도움을 요청드립니다.", "", "1. 제가 설명하는 상황", f"상대방: {supplied('counterparty', '[알고 있는 정보 입력]')}", f"시점: {supplied('date')}", f"장소: {supplied('place')}", supplied("summary", "[현재 상황과 상대방의 구체적인 말·행동을 입력]"), "", "2. 계약서에서 확인한 내용"]
+        lines = [title, "", "수신: [변호사·상담기관 직접 입력]" if lawyer else "수신: [도움을 요청할 사람·기관 직접 입력]", f"작성자: {supplied('writer')}", "회신 연락처: [직접 입력]", f"작성일: {written_on or '[직접 입력]'}", "", "안녕하세요. 아래 계약 또는 사건과 관련해 도움을 요청드립니다.", "", "1. 제가 설명하는 상황", f"상대방: {supplied('counterparty', '[알고 있는 정보 입력]')}", f"시점: {supplied('date')}", f"장소: {supplied('place')}", supplied("summary", "[현재 상황과 상대방의 구체적인 말·행동을 입력]"), "", "2. 계약서에서 확인한 내용"]
         if result:
             lines += [f"대상 문서: {result['title']}", f"검토 입장: {result.get('review', {}).get('role_label', '계약 당사자')}", *[f"- {f['label']}: {f['value']}" for f in document_facts if f["origin"] == "document"], "", "제가 검토받고 싶은 조항", *(clauses or ["이번 검토 범위에서 불리한 조항이 발견되지 않았거나 별도 주의 조항이 표시되지 않았습니다."])]
         else:
             lines += ["[관련 계약서나 합의가 있으면 자료를 첨부하고 조항을 입력]"]
-        lines += ["", "3. 요청드리는 도움", supplied("desired_outcome", "불리한 약정의 의미와 수정 필요성, 현재 사실관계에서 가능한 대응 방법, 추가로 준비할 자료를 검토해 주시기 바랍니다." if lawyer else "위 상황을 이해하고 필요한 상담이나 대응을 준비할 수 있도록 도움을 부탁드립니다."), *[f"- ‘{f['title']}’ 조항을 수정하거나 삭제할 필요가 있는지 확인 부탁드립니다." for f in findings], "", "4. 피해 또는 부담 (사용자 설명)", supplied("loss", "[실제로 발생한 피해와 앞으로 우려되는 부담을 구분해 입력]"), "", "5. 제가 보유한 자료", supplied("evidence", "[계약서·이체내역·메시지 등 실제 보유 자료 입력]"), "", "확인한 사실과 아직 모르는 부분을 함께 검토받고 싶습니다. 가능한 상담 일정과 추가로 필요한 자료를 알려주시면 감사하겠습니다.", "", "작성 메모: 위 사건 경위는 사용자의 설명이며, 계약 문구만으로 피해 발생이나 범죄를 확인하지 않았습니다. 빈칸과 인적 사항을 검토한 뒤 사용하세요."]
+        lines += ["", "3. 요청드리는 도움", supplied("desired_outcome", "불리한 약정의 의미와 수정 필요성, 현재 사실관계에서 가능한 대응 방법, 추가로 준비할 자료를 검토해 주시기 바랍니다." if lawyer else "위 상황을 이해하고 필요한 상담이나 대응을 준비할 수 있도록 도움을 부탁드립니다."), *[f"- ‘{f['title']}’ 조항을 수정하거나 삭제할 필요가 있는지 확인 부탁드립니다." for f in findings], "", "4. 피해 또는 부담 (사용자 설명)", supplied("loss", "[실제로 발생한 피해와 앞으로 우려되는 부담을 구분해 입력]"), "", "5. 제가 보유한 자료", supplied("evidence", "[계약서·이체내역·메시지 등 실제 보유 자료 입력]"), "", "확인한 사실과 아직 모르는 부분을 함께 검토받고 싶습니다. 가능한 상담 일정과 추가로 필요한 자료를 알려주시면 감사하겠습니다."]
     return {"analysis_revision": (result or {}).get("analysis_revision"), "kind": kind, "title": title,
             "draft_text": "\n".join(lines), "facts_used": reported + (document_facts if kind != "complaint" else []),
-            "contract_clauses_used": [f["evidence"] for f in findings], "missing_fields": list(dict.fromkeys(missing)), "sources": sources, "review_required": True}
+            "contract_clauses_used": [f["evidence"] for f in findings], "missing_fields": list(dict.fromkeys(missing)), "sources": sources, "review_required": True,
+            "review_note": "사건 경위는 입력한 설명이며, 계약 문구만으로 피해 발생이나 범죄를 확인하지 않았습니다. 빈칸과 인적 사항을 확인한 뒤 사용하세요."}
 
 
 GUIDES = {

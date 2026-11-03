@@ -50,13 +50,15 @@ class WorkspaceRouteTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             with TestClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
                 samples = client.get('/api/samples').json()
-                self.assertEqual(len(samples), 6)
+                self.assertEqual(len(samples), 5)
                 for sample in samples:
                     with self.subTest(sample=sample['id']):
                         response = client.get(f"/api/samples/{sample['id']}/pdf")
                         self.assertEqual(response.status_code, 200)
                         self.assertEqual(response.headers['content-type'], 'application/pdf')
                         self.assertTrue(response.content.startswith(b'%PDF-'))
+                        image = client.get(f"/api/samples/{sample['id']}/png")
+                        self.assertEqual(image.headers['content-type'], 'image/png')
 
 
 class MissingFrontendTests(unittest.TestCase):

@@ -1,191 +1,190 @@
+import { t } from "../i18n/index.js";
+import useTranslatedReview from "../hooks/useTranslatedReview.js";
 import { useEffect, useState } from "react";
-import { go, href, params, post } from "../lib.js";
+import { go, href, params, post } from "../lib/index.js";
+import DocumentReview from "../components/DocumentReview.jsx";
 import {
   Back,
   ButtonLink,
   ErrorNotice,
-  Evidence,
   Field,
   Icon,
   PageHead,
   Workflow,
 } from "../components/UI.jsx";
-
-export default function Review({ result: r }) {
+export default function Review({ result: original }) {
+  const {
+    result: r,
+    translated,
+    blocks,
+    done,
+    total,
+    untranslated,
+    busy,
+    error,
+    retry,
+    lang,
+  } = useTranslatedReview(original);
   const review = r.review;
   return (
     <>
       <PageHead
         eyebrow="01 / Review results"
-        title={r.title}
-        description={`${review.role_label}의 입장에서 살펴본 계약서 · 검토 버전 ${r.analysis_revision}`}
+        title={t(r.title)}
+        description={t(
+          "{0}의 입장에서 살펴본 계약서 · 검토 버전 {1}",
+          review.role_label,
+          r.analysis_revision,
+        )}
         action={
           <ButtonLink to={href("original", r.analysis_id)} icon="file">
-            계약서 원문
+            {t("계약서 원문")}
           </ButtonLink>
         }
       />
       <Workflow result={r} />
+      {lang !== "ko" && (
+        <div className="notice translation-status" role="status">
+          <p>
+            {busy
+              ? total
+                ? t("계약서와 설명을 번역하고 있습니다. ({0}/{1})", done, total)
+                : t("번역을 준비하고 있습니다.")
+              : translated
+                ? t(
+                    "이 컴퓨터의 AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.",
+                  )
+                : t("한국어 원문을 표시합니다. 번역을 다시 시도해주세요.")}
+            {translated &&
+              untranslated > 0 &&
+              " " +
+                t(
+                  "검증을 통과하지 못한 {0}줄은 한국어로 표시합니다.",
+                  untranslated,
+                )}
+          </p>
+          {!busy && !translated && (
+            <button className="text-link" onClick={retry}>
+              {t("번역 다시 시도")}
+            </button>
+          )}
+        </div>
+      )}
+      <ErrorNotice message={error} />
+      {original.extraction?.semantic_review?.ranges?.some(
+        (v) => v.status !== "complete",
+      ) && (
+        <div className="notice" role="alert">
+          <strong>{t("일부 범위의 AI 검토가 완료되지 않았습니다.")}</strong>
+          <ul>
+            {original.extraction.semantic_review.ranges
+              .filter((v) => v.status !== "complete")
+              .map((v, i) => (
+                <li key={i}>
+                  {t(v.block_ids.join(", "))} · {t(v.status)} ·{" "}
+                  {v.error_code || ""}
+                </li>
+              ))}
+          </ul>
+          <ButtonLink to="/upload/">{t("원문 확인 후 다시 검토")}</ButtonLink>
+        </div>
+      )}
       <section className="verdict-panel">
         <div className="verdict-copy">
           <span className="badge">
-            {
+            {t(
               {
                 warning: "주의할 조항 발견",
                 needs_information: "추가 정보 확인 필요",
                 clear: "검토 범위 내 주의 조항 없음",
-              }[review.verdict]
-            }
+              }[review.verdict],
+            )}
           </span>
-          <h2>{review.headline}</h2>
-          <p>{review.scope_note}</p>
+          <h2>{t(review.headline)}</h2>
+          <p>{t(review.scope_note)}</p>
         </div>
         <div className="result-count">
-          <strong>{String(review.findings.length).padStart(2, "0")}</strong>
-          <span>확인할 주의 조항</span>
+          <strong>{t(String(review.findings.length).padStart(2, "0"))}</strong>
+          <span>{t("확인할 주의 조항")}</span>
         </div>
       </section>
-      <div className="review-layout">
-        <div>
-          {r.questions.length > 0 && (
-            <a
-              className="notice notice-link"
-              href={href("confirm", r.analysis_id)}
-            >
-              <Icon name="alert" />
-              <div>
-                <strong>
-                  검토를 보완할 질문 {r.questions.length}개가 있습니다.
-                </strong>
-                <p>실제 상황을 알려주시면 결과를 다시 확인합니다.</p>
-              </div>
-              <Icon />
-            </a>
-          )}
-          <div className="section-heading">
-            <h2>주의해서 읽을 조항</h2>
-            <span className="small muted">
-              계약서의 표현을 근거로 정리했습니다.
-            </span>
-          </div>
-          {review.findings.length ? (
-            review.findings.map((f, i) => (
-              <article className="panel finding-card" key={f.finding_id}>
-                <div className="finding-top">
-                  <span className="index">0{i + 1}</span>
-                  <span className="badge">내 입장에서 주의</span>
-                </div>
-                <h2>{f.title}</h2>
-                <Evidence evidence={f.evidence} id={r.analysis_id} />
-                <h3>어떤 부담이 있나요?</h3>
-                <p>{f.why_unfavorable}</p>
-                <details>
-                  <summary>상황 예시와 수정 제안</summary>
-                  <h3>예상할 수 있는 상황</h3>
-                  <p>{f.scenario}</p>
-                  <h3>협의할 수정 문구</h3>
-                  <p className="suggestion">{f.revision_suggestion}</p>
-                  {f.applicability_questions?.length > 0 && (
-                    <ul>
-                      {f.applicability_questions.map((q, n) => (
-                        <li key={n}>{q}</li>
-                      ))}
-                    </ul>
-                  )}
-                  <p className="small muted">{f.legal_note}</p>
-                </details>
-                <div className="finding-actions">
-                  <ButtonLink
-                    to={href("chat", r.analysis_id, { finding: f.finding_id })}
-                    icon="chat"
-                  >
-                    이 조항 질문하기
-                  </ButtonLink>
-                  <a
-                    className="text-link"
-                    href={href("sources", r.analysis_id, {
-                      finding: f.finding_id,
-                    })}
-                  >
-                    근거 자료 <Icon />
-                  </a>
-                </div>
-              </article>
-            ))
-          ) : (
-            <div className="panel">
-              <h3>표시된 주의 조항은 없습니다.</h3>
-              <p className="muted">
-                계약 전체의 안전성을 보증하는 결과는 아닙니다. 함께 확인할
-                내용과 검토 범위도 확인하세요.
-              </p>
-            </div>
-          )}
-          <h2 className="subheading">함께 확인할 내용</h2>
-          <div className="panel">
-            {r.issues.map((issue) => (
-              <div className="issue" key={issue.issue_id}>
-                <h3>{issue.title}</h3>
-                <p>{issue.explanation_ko}</p>
-              </div>
-            ))}
-          </div>
-          <details className="scope-details">
-            <summary>이번 검토의 범위와 한계</summary>
-            <ul>
-              {[
-                ...new Set([
-                  ...(review.pending_reasons || []),
-                  ...(r.coverage?.limitations || []),
-                ]),
-              ].map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-            <p>등록된 주요 위험 유형을 저장된 법령과 비교한 결과입니다.</p>
-          </details>
-        </div>
-        <aside className="result-sidebar">
-          <div className="panel next-step">
+      <DocumentReview
+        result={r}
+        original={original}
+        translated={translated}
+        translatedBlocks={blocks}
+      >
+        <section className="next-band panel">
+          <div>
             <p className="eyebrow">Your next step</p>
-            <h2>
-              이해한 만큼,
-              <br />
-              다음 단계를 준비하세요.
-            </h2>
+            <h2>{t("이해한 만큼, 다음 단계를 준비하세요.")}</h2>
             <p>
-              궁금한 조항을 질문하거나 검토 내용을 상담용 문서로 정리하세요.
+              {t(
+                "궁금한 조항을 질문하거나 검토 내용을 상담용 문서로 정리하세요.",
+              )}
             </p>
+          </div>
+          <div className="next-band-actions">
             <ButtonLink primary to={href("chat", r.analysis_id)} icon="chat">
-              조항 질문하기
+              {t("조항 질문하기")}
             </ButtonLink>
             <ButtonLink to={href("draft", r.analysis_id)} icon="pen">
-              상담 문서 작성
+              {t("상담 문서 작성")}
             </ButtonLink>
           </div>
-          <div className="panel key-facts">
-            <h3>계약서에서 찾은 조건</h3>
-            {r.terms.slice(0, 6).map((term) => (
-              <div key={term.key}>
-                <span>{term.label}</span>
-                <strong>
-                  {term.status === "not_found"
+        </section>
+        <div className="panel key-facts">
+          <h3>{t("계약서에서 찾은 조건")}</h3>
+          {r.terms.slice(0, 6).map((term) => (
+            <div key={term.key}>
+              <span>{t(term.label)}</span>
+              <strong>
+                {t(
+                  term.status === "not_found"
                     ? "원문에서 찾지 못함"
                     : term.status === "conflict"
                       ? "서로 다른 내용 · 확인 필요"
-                      : term.candidates[0]?.value_text}
-                </strong>
-              </div>
-            ))}
-            <a className="text-link" href={href("original", r.analysis_id)}>
-              원문에서 확인 <Icon />
-            </a>
-          </div>
-          <a className="text-link" href={href("sources", r.analysis_id)}>
-            <Icon name="book" /> 검토에 사용한 근거 자료
+                      : term.candidates[0]?.value_text,
+                )}
+              </strong>
+            </div>
+          ))}
+          <a className="text-link" href={href("original", r.analysis_id)}>
+            {t("원문에서 확인")}
+            <Icon />
           </a>
-        </aside>
-      </div>
+        </div>
+      </DocumentReview>
+      {r.questions.length > 0 && (
+        <a className="notice notice-link" href={href("confirm", r.analysis_id)}>
+          <Icon name="alert" />
+          <div>
+            <strong>
+              {t("검토를 보완할 질문 {0}개가 있습니다.", r.questions.length)}
+            </strong>
+            <p>{t("실제 상황을 알려주시면 결과를 다시 확인합니다.")}</p>
+          </div>
+          <Icon />
+        </a>
+      )}
+      <details className="scope-details">
+        <summary>{t("이번 검토의 범위와 한계")}</summary>
+        <ul>
+          {[
+            ...new Set([
+              ...(review.pending_reasons || []),
+              ...(r.coverage?.limitations || []),
+            ]),
+          ].map((item, i) => (
+            <li key={i}>{t(item)}</li>
+          ))}
+        </ul>
+        <p>{t("등록된 주요 위험 유형을 저장된 법령과 비교한 결과입니다.")}</p>
+      </details>
+      <a className="text-link" href={href("sources", r.analysis_id)}>
+        <Icon name="book" />
+        {t("검토에 사용한 근거 자료")}
+      </a>
     </>
   );
 }
@@ -193,23 +192,24 @@ export function Original({ result: r }) {
   const block = params.get("block");
   useEffect(() => {
     if (block)
-      document
-        .getElementById("block-" + block)
-        ?.scrollIntoView({ block: "center" });
+      document.getElementById("block-" + block)?.scrollIntoView({
+        block: "center",
+      });
   }, [block]);
   return (
     <>
       <Back result={r} />
       <PageHead
         eyebrow="Original document"
-        title="판단의 출발점, 계약서 원문."
-        description={r.title}
+        title={t("판단의 출발점, 계약서 원문.")}
+        description={t(r.title)}
       />
       <div className="notice">
         <Icon name="file" />
         <p>
-          파일에서 읽어 검토에 사용한 텍스트입니다. 업로드한 원본 파일과
-          금액·날짜를 대조하세요.
+          {t(
+            "파일에서 읽어 검토에 사용한 텍스트입니다. 업로드한 원본 파일과 금액·날짜를 대조하세요.",
+          )}
         </p>
       </div>
       <article className="paper original-paper">
@@ -220,9 +220,9 @@ export function Original({ result: r }) {
             className={block === b.block_id ? "highlighted-block" : ""}
           >
             <span className="paper-label">
-              {b.page}페이지 · {b.block_id}
+              {t("{0}페이지 · {1}", b.page, b.block_id)}
             </span>
-            <p>{b.text}</p>
+            <p lang="ko">{b.text}</p>
           </section>
         ))}
       </article>
@@ -241,7 +241,7 @@ export function Sources({ result: r }) {
       <Back result={r} />
       <PageHead
         eyebrow="Evidence & sources"
-        title="검토의 근거를 확인하세요."
+        title={t("검토의 근거를 확인하세요.")}
         description={
           finding?.title ||
           "검토에 제공된 자료입니다. 적용 시점과 사실관계를 함께 확인하세요."
@@ -250,8 +250,9 @@ export function Sources({ result: r }) {
       <div className="notice">
         <Icon name="book" />
         <p>
-          저장된 법령 자료를 사용했습니다. 실제 적용 전에는 해당 시점의 법령과
-          사실관계를 확인하세요.
+          {t(
+            "저장된 법령 자료를 사용했습니다. 실제 적용 전에는 해당 시점의 법령과 사실관계를 확인하세요.",
+          )}
         </p>
       </div>
       <div className="source-list">
@@ -266,22 +267,26 @@ export function Sources({ result: r }) {
                 dataset: "참고자료",
               }[s.kind || "law"] || "근거 자료"}
             </span>
-            <h2>{s.title}</h2>
+            <h2>{t(s.title)}</h2>
             <p className="small muted">
-              {s.effective_date && `시행 ${s.effective_date} · `}
-              {s.checked_at
-                ? `조회 ${s.checked_at.slice(0, 10)}`
-                : "저장된 자료"}
+              {s.effective_date && t("시행 {0} · ", s.effective_date)}
+              {t(
+                s.checked_at
+                  ? t("조회 {0}", s.checked_at.slice(0, 10))
+                  : "저장된 자료",
+              )}
             </p>
-            {finding?.citations
-              ?.filter((c) => c.source_id === s.source_id)
-              .map((c, i) => (
-                <blockquote className="evidence" key={i}>
-                  {c.quote}
-                </blockquote>
-              ))}
-            <pre>{s.text}</pre>
-            <p className="small muted">{s.version_note}</p>
+            {t(
+              finding?.citations
+                ?.filter((c) => c.source_id === s.source_id)
+                .map((c, i) => (
+                  <blockquote className="evidence" key={i}>
+                    {c.quote}
+                  </blockquote>
+                )),
+            )}
+            <pre lang="ko">{s.text}</pre>
+            <p className="small muted">{t(s.version_note)}</p>
             {/^https:\/\/(?:www\.)?law\.go\.kr\//.test(s.official_url) && (
               <a
                 href={s.official_url}
@@ -289,15 +294,16 @@ export function Sources({ result: r }) {
                 rel="noopener noreferrer"
                 className="text-link"
               >
-                국가법령정보센터에서 확인 ↗
+                {t("국가법령정보센터에서 확인 ↗")}
               </a>
             )}
           </article>
         ))}
         {!sources.length && (
           <div className="panel">
-            이 조항에 직접 연결된 법령 자료가 없습니다. 원문과 검토 범위를
-            확인해주세요.
+            {t(
+              "이 조항에 직접 연결된 법령 자료가 없습니다. 원문과 검토 범위를 확인해주세요.",
+            )}
           </div>
         )}
       </div>
@@ -349,8 +355,10 @@ export function Confirm({ result: r }) {
       <Back result={r} />
       <PageHead
         eyebrow="A little more context"
-        title="몇 가지만 더 확인할게요."
-        description="모르는 내용은 그대로 두세요. 답변한 정보로 검토 결과를 갱신합니다."
+        title={t("몇 가지만 더 확인할게요.")}
+        description={t(
+          "모르는 내용은 그대로 두세요. 답변한 정보로 검토 결과를 갱신합니다.",
+        )}
       />
       <form className="panel narrow-form" onSubmit={submit}>
         <fieldset disabled={busy}>
@@ -405,7 +413,7 @@ export function Confirm({ result: r }) {
                       ]
                   ).map(([v, l]) => (
                     <option value={v} key={v}>
-                      {l}
+                      {t(l)}
                     </option>
                   ))}
                 </select>
@@ -415,7 +423,7 @@ export function Confirm({ result: r }) {
         </fieldset>
         <ErrorNotice message={error} />
         <button className="btn btn-primary" disabled={busy}>
-          {busy ? "다시 검토하는 중…" : "답변으로 다시 검토하기"} <Icon />
+          {t(busy ? "다시 검토하는 중…" : "답변으로 다시 검토하기")} <Icon />
         </button>
       </form>
     </>

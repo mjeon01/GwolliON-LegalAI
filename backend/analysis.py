@@ -44,6 +44,11 @@ def extract(request):
     if request.engine == "ollama":
         from backend.review import semantic_review
         metadata["semantic_review"] = semantic_review(blocks, request.contract_type, request.user_role, grounding)
+    if request.engine == "openai":
+        from backend.review import openai_review
+        metadata["semantic_review"] = openai_review(blocks, request.contract_type, request.user_role, grounding)
+        metadata["model"] = metadata["semantic_review"]["model"]
+        metadata["method"] = "rules_and_openai"
     return blocks, assemble_terms(found, request.contract_type), metadata
 
 
@@ -58,6 +63,9 @@ def evaluate(request, blocks, terms, extraction, analysis_id, revision):
         if request.engine == "ollama":
             from backend.review import semantic_review
             extraction["semantic_review"] = semantic_review(blocks, request.contract_type, request.user_role, grounding)
+        elif request.engine == "openai":
+            from backend.review import openai_review
+            extraction["semantic_review"] = openai_review(blocks, request.contract_type, request.user_role, grounding)
     knowledge = Knowledge(supplemental=grounding.get("sources", []))
     fields = {t["key"]: t for t in terms}
     structured = structure_contract(terms, blocks, request.contract_type)
@@ -177,7 +185,7 @@ def evaluate(request, blocks, terms, extraction, analysis_id, revision):
             "status": "awaiting_input" if questions else "completed", "created_at": datetime.now(timezone.utc).isoformat(),
             "blocks": blocks, "terms": terms, "structured_contract": structured, "validation_checks": checks,
             "pipeline": ["document_reading", "contract_structuring", "user_perspective_review", "review_validation"],
-            "reading": request.reading.model_dump() if request.reading else {"methods": ["manual_text"], "ocr_used": False, "warnings": []},
+            "reading": {k:v for k,v in request.reading.model_dump().items() if k != "pages" or v} if request.reading else {"methods": ["manual_text"], "ocr_used": False, "warnings": []},
             "issues": issues, "questions": questions, "sources": list(sources.values()),
             "grounding": {k: v for k, v in grounding.items() if k != "sources"}, "evidence_mode": request.evidence_mode,
             "actions": actions, "context": context, "extraction": extraction,

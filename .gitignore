@@ -1,17 +1,24 @@
+# Local credentials and machine-specific settings.
 .env
 .env.*
+.vercel/
+.claude/settings.local.json
 .DS_Store
-**/.DS_Store
+**/.obsidian/
+
+# Dependencies and interpreter caches.
+.venv/
 __pycache__/
 *.py[cod]
-.venv/
-**/.obsidian/
-data/
-var/
-tmp/
 node_modules/
+
+# Generated bundles, reports and scratch files.
+/frontend/dist/
 playwright-report/
 test-results/
-# Local planning originals and generated frontend bundles.
+tmp/
+
+# Local source data, user records and private planning originals.
+/data/
+/var/
 /docs/private/
-/frontend/dist/

@@ -8,15 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-
-def flatten(node):
-    if isinstance(node, str):
-        return [node]
-    if isinstance(node, list):
-        return [text for item in node for text in flatten(item)]
-    if isinstance(node, dict):
-        return [text for key, value in node.items() if key in {"조문내용", "항내용", "호내용", "목내용", "항", "호", "목"} for text in flatten(value)]
-    return []
+from backend.law_client import flatten
 
 
 def main():

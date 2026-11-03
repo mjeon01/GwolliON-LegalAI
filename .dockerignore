@@ -1,0 +1,14 @@
+*
+!requirements.txt
+!backend/
+!scripts/
+!resources/
+!samples/
+!frontend/
+frontend/node_modules/
+frontend/dist/
+frontend/tmp/
+frontend/test-results/
+**/__pycache__/
+**/.env
+**/.env.*

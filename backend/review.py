@@ -155,10 +155,10 @@ def priority_blocks(blocks):
     return [b for b in blocks if re.search(signals, b["text"])]
 
 
-def _semantic_review(blocks, contract_type, role, grounding=None, _feedback=None, candidates=None):
+def _semantic_review(blocks, contract_type, role, grounding=None, _feedback=None, candidates=None, engine="ollama", exhaustive=False):
     from backend.retrieval import prompt_sources, validate_citations
     supplied = prompt_sources(grounding or {})
-    screened = blocks if candidates is not None else priority_blocks(blocks)
+    screened = blocks if exhaustive or candidates is not None else priority_blocks(blocks)
     if not screened:
         return {"method": "candidate_screen", "model": None, "complete": True,
                 "rejected_candidates": 0, "rejection_reasons": [], "findings": [],
@@ -201,7 +201,13 @@ applicability_questions에는 사업장 규모·사건 날짜·하자 원인 등
         prompt += "\n이전 응답에서 다음 후보가 원문 의미 검증에 실패했다. 아래 검증 사유를 반영하여 전체 문서를 다시 검토한다. 같은 부담을 원문에 없는 권한으로 다시 만들지 않는다. 실제로 명시된 다른 부담은 계속 검토한다.\n" + json.dumps(_feedback, ensure_ascii=False)
     if candidates is not None:
         prompt += "\n계약 원문만 읽어 찾은 다음 후보에 대해서만 설명과 근거를 검토한다. 새로운 조항을 추가하지 않는다. quote와 block_id는 후보와 정확히 같아야 한다. 참고자료의 다른 계약 내용을 원문에 덧붙이지 않는다. 확인되지 않는 후보는 생략한다.\n" + json.dumps(candidates, ensure_ascii=False)
-    payload, model = generate(schema, prompt, num_predict=3000, num_ctx=32768)
+    if exhaustive:
+        prompt += "\n이 호출의 모든 블록을 검토한다. 신호 단어 유무와 관계없이 실제 명시된 부담을 검토하되 보통의 동시이행·하자 확인 조건은 위험으로 만들지 않는다. 후보가 8개를 초과하거나 확인하지 못한 내용이 있으면 complete=false."
+    if engine == "openai":
+        from backend.openai_client import generate as run_model
+    else:
+        run_model = generate
+    payload, model = run_model(schema, prompt, num_predict=6000, num_ctx=32768)
     if not isinstance(payload, dict) or type(payload.get("complete")) is not bool or not isinstance(payload.get("findings"), list):
         raise ValueError("Invalid review response")
     index = {b["block_id"]: b for b in blocks}
@@ -276,14 +282,14 @@ applicability_questions에는 사업장 규모·사건 날짜·하자 원인 등
                 continue
         accepted.append(row)
     if unsupported and _feedback is None:
-        corrected = _semantic_review(blocks, contract_type, role, grounding, _feedback=unsupported, candidates=candidates)
+        corrected = _semantic_review(blocks, contract_type, role, grounding, _feedback=unsupported, candidates=candidates, engine=engine, exhaustive=exhaustive)
         corrected["correction_passes"] = 1
         corrected["initial_rejection_reasons"] = rejection_reasons
         if any(item["revision_failed"] and not any(row["quote"] == item["quote"] for row in corrected["findings"]) for item in unsupported):
             corrected["complete"] = False
             corrected["rejection_reasons"].append("revision_candidate_unresolved")
         return corrected
-    return {"method": "ollama", "model": model, "complete": payload["complete"] and not rejected,
+    return {"method": engine, "model": model, "complete": payload["complete"] and not rejected and (not exhaustive or len(payload["findings"]) < 8),
             "rejected_candidates": rejected, "rejection_reasons": rejection_reasons, "findings": accepted,
             "supplied_source_ids": [s["source_id"] for s in supplied], "correction_passes": 0, "repaired_block_ids": repaired_ids,
             "candidate_block_ids": [b["block_id"] for b in screened], "scope": "책임·권리 제한·일방 결정 등의 표현을 포함한 후보의 의미 검토"}
@@ -341,7 +347,7 @@ def review_contract(request, blocks, checks, issues, extraction):
                          "risk_level": "warning", "user_role": role, "why_unfavorable": why,
                          "plain_explanation": why, "scenario": scenario, "revision_suggestion": suggestion,
                          "evidence": evidence, "source_ids": ids, "method": method,
-                         "basis_type": basis_type, "citations": list(citations) if method == "ollama" else [{"source_id": i, "quote": sources[i]["text"], "kind": "law"} for i in ids],
+                         "basis_type": basis_type, "citations": list(citations) if method in {"ollama", "openai"} else [{"source_id": i, "quote": sources[i]["text"], "kind": "law"} for i in ids],
                          "applicability_questions": list(questions),
                          "legal_note": "법률 기준과 적용 조건을 비교할 필요가 있습니다. 약정의 효력이나 위법 여부를 확정한 결과는 아닙니다." if ids else "계약상 부담에 대한 검토 제안입니다. 법적 효력은 별도로 확인해야 합니다."})
 
@@ -359,10 +365,12 @@ def review_contract(request, blocks, checks, issues, extraction):
     for candidate in (semantic or {}).get("findings", []):
         if any(rule_matches(candidate["quote"], r[3], r[0]) for r in RULES if r[1] == request.contract_type and role in r[2]):
             continue
+        if any(candidate["quote"] == e["quote"] for f in findings for e in f["evidence"]):
+            continue
         b, quote = index[candidate["block_id"]], candidate["quote"]
         start = b["text"].index(quote)
         append("semantic_clause", candidate["title"], candidate["why_unfavorable"], candidate["scenario"], candidate["revision_suggestion"],
-               [{"block_id": b["block_id"], "page": b["page"], "start": start, "end": start+len(quote), "quote": quote}], method="ollama",
+               [{"block_id": b["block_id"], "page": b["page"], "start": start, "end": start+len(quote), "quote": quote}], method=(semantic or {}).get("method", "ollama"),
                citations=candidate.get("citations", []), questions=candidate.get("applicability_questions", []), basis_type=candidate.get("basis_type", "contract_burden"))
     reasons = []
     if request.contract_type == "employment" and re.search(r"단시간|시간제|아르바이트|기간제", "\n".join(b["text"] for b in blocks[:8])):
@@ -389,7 +397,45 @@ def review_contract(request, blocks, checks, issues, extraction):
                 "clear": "이번 검토 범위에서 불리한 조항이 발견되지 않았습니다."}[verdict]
     checked = [r[0] for r in RULES if r[1] == request.contract_type and role in r[2]]
     return {"verdict": verdict, "headline": headline, "role_label": ROLE_LABELS[role], "findings": findings,
-            "pending_reasons": reasons, "scope_note": "기본 조건과 책임·권리 제한·일방 결정 등의 표현을 포함한 후보를 검토했습니다. 이런 표현 없이 적힌 불리한 조건은 놓칠 수 있습니다. 실제 이행, 등기·권리 순위, 금액의 적정성과 모든 조항의 법적 효력은 추가 검토가 필요합니다.",
+            "pending_reasons": reasons, "scope_note": ("입력된 조항을 나눠 규칙과 AI로 검토했습니다. 미완료 범위는 별도로 표시합니다. 실제 이행, 등기·권리 순위, 금액의 적정성과 조항의 법적 효력은 추가 확인이 필요합니다." if request.engine == "openai" else "기본 조건과 책임·권리 제한·일방 결정 등의 표현을 포함한 후보를 검토했습니다. 이런 표현 없이 적힌 불리한 조건은 놓칠 수 있습니다. 실제 이행, 등기·권리 순위, 금액의 적정성과 모든 조항의 법적 효력은 추가 검토가 필요합니다."),
             "method": "rules_and_semantic" if semantic else "rules", "checked_categories": checked,
             "checked_items": [r[4] for r in RULES if r[1] == request.contract_type and role in r[2]],
             "semantic_complete": semantic["complete"] if semantic else None}, list(sources.values())
+
+
+def openai_review(blocks, contract_type, role, grounding):
+    from backend.openai_client import OpenAIError, require_key
+    _, model = require_key()
+    # Whole clauses stay together. Oversized clauses are explicitly unreviewed.
+    chunks, current, size, coverage = [], [], 0, []
+    for block in blocks:
+        length = len(block["text"])
+        if length > 7000:
+            if current:
+                chunks.append(current)
+                current, size = [], 0
+            coverage.append({"block_ids": [block["block_id"]], "pages": [block["page"]], "status": "failed", "error_code": "clause_too_long"})
+            continue
+        if current and (size + length > 7000 or len(current) >= 35):
+            chunks.append(current)
+            current, size = [], 0
+        current.append(block)
+        size += length
+    if current:
+        chunks.append(current)
+    findings, rejected = [], 0
+    for chunk in chunks:
+        scope = {"block_ids": [b["block_id"] for b in chunk], "pages": sorted({b["page"] for b in chunk})}
+        try:
+            reviewed = _semantic_review(chunk, contract_type, role, grounding, engine="openai", exhaustive=True)
+            findings.extend(reviewed["findings"])
+            rejected += reviewed["rejected_candidates"]
+            coverage.append({**scope, "status": "complete" if reviewed["complete"] else "partial", "error_code": None})
+        except (OpenAIError, ValueError) as exc:
+            coverage.append({**scope, "status": "failed", "error_code": getattr(exc, "code", "validation_failed")})
+    if coverage and all(c["status"] == "failed" for c in coverage):
+        code = next((c["error_code"] for c in coverage if c["error_code"] != "clause_too_long"), "clause_too_long")
+        raise OpenAIError(code, "OpenAI 검토를 완료하지 못했습니다. 모델 설정·사용량·연결을 확인하고 다시 시도해주세요. 긴 조항은 줄바꿈으로 나눠주세요.")
+    return {"method": "openai", "model": model, "complete": all(c["status"] == "complete" for c in coverage),
+            "findings": findings, "rejected_candidates": rejected, "ranges": coverage,
+            "scope": "입력된 모든 조항을 분할 검토; 실패·미완료 범위는 별도 표시"}

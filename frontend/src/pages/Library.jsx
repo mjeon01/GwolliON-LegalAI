@@ -1,5 +1,7 @@
+import { useLanguage, t } from "../i18n/index.js";
 import { useRef, useState } from "react";
-import { api, dateLabel, href, statusLabel, useLoad } from "../lib.js";
+import { api, dateLabel, href, statusLabel } from "../lib/index.js";
+import useLoad from "../hooks/useLoad.js";
 import {
   ButtonLink,
   Empty,
@@ -8,39 +10,65 @@ import {
   Loading,
   PageHead,
 } from "../components/UI.jsx";
-
 export function Samples() {
+  const lang = useLanguage();
   const { data, error, loading } = useLoad("/api/samples");
   return (
     <>
       <PageHead
         eyebrow="Explore your rights"
-        title="계약서 없이 먼저 경험해보세요."
-        description="가상의 계약서로 검토부터 상담 문서 준비까지 둘러볼 수 있습니다."
+        title={t("계약서 없이 먼저 경험해보세요.")}
+        description={t(
+          "가상의 계약서로 검토부터 상담 문서 준비까지 둘러볼 수 있습니다.",
+        )}
       />
       <ErrorNotice message={error} />
       {loading ? (
         <Loading />
       ) : (
         <div className="sample-grid">
-          {data?.map((item, i) => (
-            <a
-              className="sample-card panel"
-              href={href("upload", null, { sample: item.id })}
-              key={item.id}
-            >
-              <div className="sample-top">
-                <span className="index">0{i + 1}</span>
-                <span className="badge">{item.tag}</span>
-              </div>
-              <Icon name="file" />
-              <h2>{item.title}</h2>
-              <p>{item.description}</p>
-              <span className="text-link">
-                이 계약서로 시작하기 <Icon />
-              </span>
-            </a>
-          ))}
+          {t(
+            data?.map((item, i) => (
+              <article className="sample-card panel" key={item.id}>
+                <div className="sample-top">
+                  <span className="index">0{t(i + 1)}</span>
+                  <span className="badge">
+                    {item.translations?.[lang]?.tag || item.tag}
+                  </span>
+                </div>
+                <Icon name="file" />
+                <h2>{item.translations?.[lang]?.title || item.title}</h2>
+                <p>
+                  {item.translations?.[lang]?.description || item.description}
+                </p>
+                <a
+                  className="text-link"
+                  href={href("upload", null, {
+                    sample: item.id,
+                  })}
+                >
+                  {t("이 계약서로 시작하기")}
+                  <Icon />
+                </a>
+                <a
+                  className="text-link"
+                  href={`/api/samples/${item.id}/pdf`}
+                  download
+                >
+                  {t("PDF 저장")}
+                  <Icon name="download" />
+                </a>
+                <a
+                  className="text-link"
+                  href={`/api/samples/${item.id}/png`}
+                  download
+                >
+                  {t("PNG 저장")}
+                  <Icon name="download" />
+                </a>
+              </article>
+            )),
+          )}
         </div>
       )}
     </>
@@ -104,19 +132,19 @@ export function Library({ target = "review", selector = false }) {
             ? `Workspace / ${target === "chat" ? "Questions" : "Documents"}`
             : "Your archive"
         }
-        title={
+        title={t(
           selector
-            ? `${label}에 사용할 계약서를 선택하세요.`
-            : "다시 꺼내보는 나의 계약서."
-        }
-        description={
+            ? t("{0}에 사용할 계약서를 선택하세요.", label)
+            : "다시 꺼내보는 나의 계약서.",
+        )}
+        description={t(
           selector
             ? "검토한 계약서를 선택하면 해당 작업 페이지로 이동합니다."
-            : "이 컴퓨터에 저장된 검토 결과와 대화를 이어서 확인하세요."
-        }
+            : "이 컴퓨터에 저장된 검토 결과와 대화를 이어서 확인하세요.",
+        )}
         action={
           <ButtonLink to="/upload/" primary>
-            새 계약서 검토
+            {t("새 계약서 검토")}
           </ButtonLink>
         }
       />
@@ -125,23 +153,28 @@ export function Library({ target = "review", selector = false }) {
         <Loading />
       ) : !items.length ? (
         <Empty
-          title="아직 검토한 계약서가 없습니다."
-          action={<ButtonLink to="/samples/">샘플로 시작하기</ButtonLink>}
+          title={t("아직 검토한 계약서가 없습니다.")}
+          action={
+            <ButtonLink to="/samples/">{t("샘플로 시작하기")}</ButtonLink>
+          }
         >
-          계약서를 등록하면 이곳에서 이어서 작업할 수 있습니다.
+          {t("계약서를 등록하면 이곳에서 이어서 작업할 수 있습니다.")}
         </Empty>
       ) : (
         <>
           <div className="archive-toolbar">
             <span>
-              전체 <strong>{items.length}</strong>건{" "}
-              <span className="muted small">· 최근 50건</span>
+              {t("전체")}
+              <strong>{items.length}</strong>
+              {t("건")}
+              {t(" ")}
+              <span className="muted small">{t("· 최근 50건")}</span>
             </span>
             <label className="search-box">
-              <span className="visually-hidden">계약서 이름 검색</span>
+              <span className="visually-hidden">{t("계약서 이름 검색")}</span>
               <input
                 type="search"
-                placeholder="계약서 이름으로 검색"
+                placeholder={t("계약서 이름으로 검색")}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -157,23 +190,24 @@ export function Library({ target = "review", selector = false }) {
                   className="archive-title"
                   href={href(target, item.analysis_id)}
                 >
-                  <h2>{item.title}</h2>
+                  <h2>{t(item.title)}</h2>
                   <span>
-                    {dateLabel(item.created_at)} · 버전 {item.analysis_revision}
+                    {t(dateLabel(item.created_at))}
+                    {t("· 버전 {0}", item.analysis_revision)}
                   </span>
                 </a>
                 <span
                   className={`badge ${item.status === "failed" ? "danger" : ""}`}
                 >
-                  {statusLabel(item.status)}
+                  {t(statusLabel(item.status))}
                 </span>
                 <a className="text-link" href={href(target, item.analysis_id)}>
-                  {label} <Icon />
+                  {t(label)} <Icon />
                 </a>
                 {!selector && (
                   <button
                     className="icon-button"
-                    aria-label={`${item.title} 기록 삭제`}
+                    aria-label={t("{0} 기록 삭제", item.title)}
                     onClick={() => confirm(item)}
                   >
                     <Icon name="trash" />
@@ -183,8 +217,8 @@ export function Library({ target = "review", selector = false }) {
             ))}
           </div>
           {!filtered.length && (
-            <Empty title="검색 결과가 없습니다.">
-              다른 계약서 이름으로 검색해보세요.
+            <Empty title={t("검색 결과가 없습니다.")}>
+              {t("다른 계약서 이름으로 검색해보세요.")}
             </Empty>
           )}
         </>
@@ -197,13 +231,14 @@ export function Library({ target = "review", selector = false }) {
         }}
       >
         <p className="eyebrow">Delete record</p>
-        <h2>이 기록을 삭제할까요?</h2>
+        <h2>{t("이 기록을 삭제할까요?")}</h2>
         <p>
-          <strong>{selected?.title}</strong>
+          <strong>{t(selected?.title)}</strong>
         </p>
         <p>
-          계약서 원문, 검토 결과, 대화가 함께 삭제됩니다. 삭제한 내용은 복구할
-          수 없습니다.
+          {t(
+            "계약서 원문, 페이지 이미지, 검토 결과, 대화가 함께 삭제됩니다. 삭제한 내용은 복구할 수 없습니다.",
+          )}
         </p>
         <ErrorNotice message={deleteError} />
         <div className="action-row">
@@ -212,10 +247,10 @@ export function Library({ target = "review", selector = false }) {
             disabled={busy}
             onClick={() => dialog.current.close()}
           >
-            유지하기
+            {t("유지하기")}
           </button>
           <button className="btn btn-primary" disabled={busy} onClick={remove}>
-            {busy ? "삭제 중…" : "기록 삭제"}
+            {t(busy ? "삭제 중…" : "기록 삭제")}
           </button>
         </div>
       </dialog>

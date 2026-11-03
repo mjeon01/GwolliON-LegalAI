@@ -71,7 +71,7 @@ class OfficialEvidenceTests(unittest.TestCase):
             LegalAPI(self.directory / "mismatch", transport=transport, settings={"legal_api_key": "fixture-secret"}).cases("prec", "임대차보증금 반환")
 
     def test_live_failure_uses_explicit_fallback_and_prevents_clear(self):
-        text = (Path(__file__).resolve().parents[1] / "samples/employment-basic.txt").read_text()
+        text = (Path(__file__).resolve().parents[1] / "tests/fixtures/samples/employment-basic.txt").read_text()
         request = AnalyzeRequest(text=text, evidence_mode="live", context={"document_complete": True})
         with patch("backend.retrieval.LegalAPI", side_effect=EvidenceError("credential_missing")):
             blocks, terms, metadata = extract(request)

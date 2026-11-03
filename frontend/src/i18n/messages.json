@@ -1,0 +1,1950 @@
+{
+  "5명 미만": {
+    "zh": "少于5人",
+    "es": "Menos de 5"
+  },
+  "5명 이상": {
+    "zh": "5人或以上",
+    "es": "5 o más"
+  },
+  "HEIC 사진은 JPG로 변환한 뒤 등록해주세요.": {
+    "zh": "请先将HEIC照片转换为JPG。",
+    "es": "Convierta la foto HEIC a JPG antes de subirla."
+  },
+  "OpenAI 데이터 보관 정책 ↗": {
+    "zh": "OpenAI数据保留政策 ↗",
+    "es": "Política de conservación de datos de OpenAI ↗"
+  },
+  "OpenAI 사진 판독": {
+    "zh": "OpenAI图片识别",
+    "es": "Lectura de fotos con OpenAI"
+  },
+  "OpenAI 키가 아직 없습니다. 서버 .env에 OPENAI_API_KEY를 설정하거나 로컬 방식을 선택해주세요.": {
+    "zh": "尚未配置OpenAI密钥。请在服务器.env中设置OPENAI_API_KEY，或选择本地方式。",
+    "es": "Falta la clave de OpenAI. Configure OPENAI_API_KEY en el .env del servidor o elija el modo local."
+  },
+  "PDF 저장": {
+    "zh": "保存PDF",
+    "es": "Guardar PDF"
+  },
+  "PDF, TXT, JPG, PNG, WEBP 파일을 선택해주세요.": {
+    "zh": "请选择PDF、TXT、JPG、PNG或WEBP文件。",
+    "es": "Seleccione un archivo PDF, TXT, JPG, PNG o WEBP."
+  },
+  "TXT 저장": {
+    "zh": "保存TXT",
+    "es": "Guardar TXT"
+  },
+  "TXT·PDF는 하나씩 등록해주세요.": {
+    "zh": "TXT或PDF请每次上传一个。",
+    "es": "Suba un solo TXT o PDF a la vez."
+  },
+  "[판독 불가]": {
+    "zh": "[无法识别]",
+    "es": "[Ilegible]"
+  },
+  "_상담문서": {
+    "zh": "_咨询文件",
+    "es": "_consulta"
+  },
+  "{0} · 권리ON": {
+    "zh": "{0} · 권리ON",
+    "es": "{0} · 권리ON"
+  },
+  "{0} 기록 삭제": {
+    "zh": "删除{0}记录",
+    "es": "Eliminar registro de {0}"
+  },
+  "{0}에 사용할 계약서를 선택하세요.": {
+    "zh": "请选择用于{0}的合同。",
+    "es": "Seleccione el contrato para {0}."
+  },
+  "{0}의 입장에서 살펴본 계약서 · 검토 버전 {1}": {
+    "zh": "从{0}立场审核的合同 · 版本{1}",
+    "es": "Contrato revisado desde la posición de {0} · Versión {1}"
+  },
+  "· 버전": {
+    "zh": "· 版本",
+    "es": "· Versión"
+  },
+  "· 최근 50건": {
+    "zh": "· 最近50条",
+    "es": "· Últimos 50"
+  },
+  "가상의 계약서로 검토부터 상담 문서 준비까지 둘러볼 수 있습니다.": {
+    "zh": "使用虚拟合同体验审核、提问和咨询文件准备。",
+    "es": "Pruebe la revisión, las preguntas y los documentos con contratos ficticios."
+  },
+  "가지고 있는 증거·자료": {
+    "zh": "持有的证据和资料",
+    "es": "Pruebas y documentos disponibles"
+  },
+  "같은 조항도 당사자에 따라 부담이 달라집니다.": {
+    "zh": "同一条款对不同当事人的负担也不同。",
+    "es": "Una misma cláusula afecta de forma distinta a cada parte."
+  },
+  "개": {
+    "zh": "项",
+    "es": " elementos"
+  },
+  "개가 있습니다.": {
+    "zh": "项需要确认。",
+    "es": " preguntas pendientes."
+  },
+  "건": {
+    "zh": "条",
+    "es": " registros"
+  },
+  "검색 결과가 없습니다.": {
+    "zh": "没有搜索结果。",
+    "es": "No hay resultados."
+  },
+  "검토 결과": {
+    "zh": "审核结果",
+    "es": "Resultados"
+  },
+  "검토 결과로": {
+    "zh": "返回审核结果",
+    "es": "Volver a resultados"
+  },
+  "검토 결과를 바탕으로 초안을 만듭니다.": {
+    "zh": "根据审核结果生成草稿。",
+    "es": "Crearemos un borrador basado en la revisión."
+  },
+  "검토 기록": {
+    "zh": "审核记录",
+    "es": "Historial"
+  },
+  "검토 기록으로": {
+    "zh": "查看审核记录",
+    "es": "Ir al historial"
+  },
+  "검토 버전": {
+    "zh": "审核版本",
+    "es": "Versión"
+  },
+  "검토 범위 내 주의 조항 없음": {
+    "zh": "审核范围内未发现风险条款",
+    "es": "Sin cláusulas de riesgo en el alcance revisado"
+  },
+  "검토 시작하기": {
+    "zh": "开始审核",
+    "es": "Iniciar revisión"
+  },
+  "검토 요약": {
+    "zh": "审核摘要",
+    "es": "Resumen de revisión"
+  },
+  "검토 후 다음 단계로": {
+    "zh": "审核后继续下一步",
+    "es": "Continúe después de revisar"
+  },
+  "검토·답변 방식": {
+    "zh": "审核或回答方式",
+    "es": "Modo de revisión o respuesta"
+  },
+  "검토를 보완할 질문": {
+    "zh": "待补充的问题",
+    "es": "Preguntas para completar la revisión: "
+  },
+  "검토를 시작하고 있습니다.": {
+    "zh": "正在开始审核。",
+    "es": "Iniciando la revisión."
+  },
+  "검토에 사용한 근거 자료": {
+    "zh": "审核所用依据",
+    "es": "Fuentes de la revisión"
+  },
+  "검토에 제공된 자료입니다. 적용 시점과 사실관계를 함께 확인하세요.": {
+    "zh": "这些是审核参考资料。请核对适用时间和具体事实。",
+    "es": "Compruebe las fechas de aplicación y los hechos de las fuentes utilizadas."
+  },
+  "검토의 근거를 확인하세요.": {
+    "zh": "查看审核依据。",
+    "es": "Consulte las fuentes de la revisión."
+  },
+  "검토한 계약서를 선택하면 해당 작업 페이지로 이동합니다.": {
+    "zh": "选择已审核合同后进入相应页面。",
+    "es": "Seleccione un contrato revisado para continuar."
+  },
+  "검토한 계약조건과 확인할 쟁점으로 문서를 만듭니다. 이름·날짜와 추가 설명은 생성한 초안에서 직접 편집하세요.": {
+    "zh": "根据合同条件和待确认问题生成文件。可在草稿中编辑姓名、日期和补充说明。",
+    "es": "Se usarán las condiciones y cuestiones revisadas. Edite los nombres, las fechas y las explicaciones en el borrador."
+  },
+  "검토할 계약서 내용을 20자 이상 입력해주세요.": {
+    "zh": "请输入至少20个字符的合同内容。",
+    "es": "Introduzca al menos 20 caracteres del contrato."
+  },
+  "결과는 다음 페이지에서 확인합니다.": {
+    "zh": "在下一页查看结果。",
+    "es": "Los resultados aparecerán en la siguiente página."
+  },
+  "계약 또는 사건 날짜": {
+    "zh": "合同或事件日期",
+    "es": "Fecha del contrato o del hecho"
+  },
+  "계약 전체의 안전성을 보증하는 결과는 아닙니다. 함께 확인할 내용과 검토 범위도 확인하세요.": {
+    "zh": "此结果不保证整份合同安全。请查看待确认内容和审核范围。",
+    "es": "El resultado no garantiza la seguridad de todo el contrato. Revise también las cuestiones pendientes y el alcance."
+  },
+  "계약 조건과 확인할 쟁점을 한 문서로 모읍니다.": {
+    "zh": "汇总合同条件和待确认问题。",
+    "es": "Reúna las condiciones y los puntos por confirmar."
+  },
+  "계약 종료 후 보증금을 모두 받았나요?": {
+    "zh": "合同结束后是否已收到全部押金？",
+    "es": "¿Recibió todo el depósito al finalizar el contrato?"
+  },
+  "계약 종류": {
+    "zh": "合同类型",
+    "es": "Tipo de contrato"
+  },
+  "계약서 검토": {
+    "zh": "合同审核",
+    "es": "Revisar contrato"
+  },
+  "계약서 검토 시작": {
+    "zh": "开始审核合同",
+    "es": "Revisar un contrato"
+  },
+  "계약서 내용": {
+    "zh": "合同内容",
+    "es": "Contenido del contrato"
+  },
+  "계약서 등록": {
+    "zh": "上传合同",
+    "es": "Añadir contrato"
+  },
+  "계약서 없이 먼저 경험해보세요.": {
+    "zh": "先使用样本体验。",
+    "es": "Pruebe con un contrato de ejemplo."
+  },
+  "계약서 원문": {
+    "zh": "合同原文",
+    "es": "Original del contrato"
+  },
+  "계약서 이름": {
+    "zh": "合同名称",
+    "es": "Nombre del contrato"
+  },
+  "계약서 이름 검색": {
+    "zh": "搜索合同名称",
+    "es": "Buscar por nombre"
+  },
+  "계약서 이름으로 검색": {
+    "zh": "按合同名称搜索",
+    "es": "Buscar por nombre del contrato"
+  },
+  "계약서 이해하기": {
+    "zh": "理解合同",
+    "es": "Entender el contrato"
+  },
+  "계약서 작업 단계": {
+    "zh": "合同处理步骤",
+    "es": "Pasos del contrato"
+  },
+  "계약서 전체": {
+    "zh": "整份合同",
+    "es": "Contrato completo"
+  },
+  "계약서 전체에 대해 질문합니다.": {
+    "zh": "针对整份合同提问。",
+    "es": "Pregunte sobre el contrato completo."
+  },
+  "계약서 질문과 답변": {
+    "zh": "合同问答",
+    "es": "Preguntas y respuestas"
+  },
+  "계약서 파일": {
+    "zh": "合同文件",
+    "es": "Archivo del contrato"
+  },
+  "계약서 파일을 여기에 놓아주세요": {
+    "zh": "将合同文件拖放到这里",
+    "es": "Arrastre aquí el contrato"
+  },
+  "계약서를 검토하고 있습니다.": {
+    "zh": "正在审核合同。",
+    "es": "Revisando el contrato."
+  },
+  "계약서를 등록하고, 내용을 확인한 뒤 검토를 시작하세요.": {
+    "zh": "上传合同并确认内容后开始审核。",
+    "es": "Añada el contrato, compruebe el texto e inicie la revisión."
+  },
+  "계약서를 등록하면 이곳에서 이어서 작업할 수 있습니다.": {
+    "zh": "添加合同后可以在这里继续处理。",
+    "es": "Añada un contrato para continuar aquí."
+  },
+  "계약서에서 찾은 조건": {
+    "zh": "合同中提取的条件",
+    "es": "Condiciones encontradas"
+  },
+  "계약서의 표현을 근거로 정리했습니다.": {
+    "zh": "根据合同原文整理。",
+    "es": "Basado en el texto del contrato."
+  },
+  "계약에서 내 입장": {
+    "zh": "我在合同中的立场",
+    "es": "Mi posición en el contrato"
+  },
+  "계약을 이해하고, 다음을 준비하는 공간.": {
+    "zh": "理解合同，准备下一步。",
+    "es": "Entienda su contrato y prepare el siguiente paso."
+  },
+  "관련 근거 보기": {
+    "zh": "查看相关依据",
+    "es": "Ver fuentes relacionadas"
+  },
+  "관련 장소": {
+    "zh": "相关地点",
+    "es": "Lugar relacionado"
+  },
+  "국가법령정보센터에서 확인 ↗": {
+    "zh": "在韩国国家法令信息中心查看 ↗",
+    "es": "Consultar el centro oficial de legislación ↗"
+  },
+  "궁금한 내용을 입력하거나 왼쪽에서 주의 조항을 선택하세요.": {
+    "zh": "输入问题或选择需要关注的条款。",
+    "es": "Escriba su pregunta o seleccione una cláusula."
+  },
+  "궁금한 조항을 질문하거나 검토 내용을 상담용 문서로 정리하세요.": {
+    "zh": "就条款提问，或将审核内容整理为咨询文件。",
+    "es": "Pregunte sobre las cláusulas o prepare un documento para la consulta."
+  },
+  "권리": {
+    "zh": "권리",
+    "es": "권리"
+  },
+  "권리ON": {
+    "zh": "권리ON",
+    "es": "권리ON"
+  },
+  "권리ON 홈": {
+    "zh": "권리ON首页",
+    "es": "Inicio de 권리ON"
+  },
+  "근거 자료": {
+    "zh": "依据资料",
+    "es": "Fuentes"
+  },
+  "근로 · 주택 임대차 · 매매계약": {
+    "zh": "劳动 · 住房租赁 · 买卖合同",
+    "es": "Contratos laborales · Alquiler · Compraventa"
+  },
+  "근로계약": {
+    "zh": "劳动合同",
+    "es": "Contrato laboral"
+  },
+  "기록 삭제": {
+    "zh": "删除记录",
+    "es": "Eliminar registro"
+  },
+  "기록에서 다른 계약서를 선택하거나 다시 등록해주세요.": {
+    "zh": "请从记录中选择其他合同或重新添加。",
+    "es": "Seleccione otro contrato del historial o vuelva a añadirlo."
+  },
+  "기준": {
+    "zh": "为准",
+    "es": "como referencia"
+  },
+  "긴 계약서는 주의 조항을 선택하면 해당 범위에 집중해 질문할 수 있습니다.": {
+    "zh": "对于长合同，可选择条款并针对该部分提问。",
+    "es": "En contratos largos, seleccione una cláusula para centrar la pregunta."
+  },
+  "나의 권리를 켜다.": {
+    "zh": "点亮我的权利。",
+    "es": "Active sus derechos."
+  },
+  "나의 질문": {
+    "zh": "我的问题",
+    "es": "Mi pregunta"
+  },
+  "내 계약서": {
+    "zh": "我的合同",
+    "es": "Mi contrato"
+  },
+  "내 권리부터": {
+    "zh": "从我的权利开始",
+    "es": "Sus derechos,"
+  },
+  "내 상황을 더해주세요": {
+    "zh": "补充我的情况",
+    "es": "Añada su situación"
+  },
+  "내 이름": {
+    "zh": "我的姓名",
+    "es": "Mi nombre"
+  },
+  "내 입장에서 주의": {
+    "zh": "从我的立场需注意",
+    "es": "Atención desde mi posición"
+  },
+  "내 입장을 선택하세요": {
+    "zh": "请选择自己的立场",
+    "es": "Elija su posición"
+  },
+  "내용을 불러오는 중입니다.": {
+    "zh": "正在加载内容。",
+    "es": "Cargando contenido."
+  },
+  "네, 모두 포함했어요": {
+    "zh": "是，已全部包含",
+    "es": "Sí, está todo incluido"
+  },
+  "다른 계약서 이름으로 검색해보세요.": {
+    "zh": "请尝试其他合同名称。",
+    "es": "Pruebe otro nombre de contrato."
+  },
+  "다시 검토하는 중…": {
+    "zh": "正在重新审核…",
+    "es": "Revisando de nuevo…"
+  },
+  "다시 꺼내보는 나의 계약서.": {
+    "zh": "再次查看我的合同。",
+    "es": "Vuelva a sus contratos."
+  },
+  "다음 단계를 준비하세요.": {
+    "zh": "准备下一步。",
+    "es": "Prepare el siguiente paso."
+  },
+  "답변에 사용한 계약서 원문": {
+    "zh": "回答引用的合同原文",
+    "es": "Texto original usado en la respuesta"
+  },
+  "답변으로 다시 검토하기": {
+    "zh": "根据回答重新审核",
+    "es": "Revisar con estas respuestas"
+  },
+  "답변을 준비하고 있습니다.": {
+    "zh": "正在准备回答。",
+    "es": "Preparando la respuesta."
+  },
+  "당신의 상황을 담은": {
+    "zh": "记录您的情况",
+    "es": "Su situación,"
+  },
+  "두 언어 TXT 저장": {
+    "zh": "保存双语TXT",
+    "es": "Guardar TXT bilingüe"
+  },
+  "두 언어 복사": {
+    "zh": "复制双语内容",
+    "es": "Copiar ambos idiomas"
+  },
+  "뒤로 이동": {
+    "zh": "向后移动",
+    "es": "Mover después"
+  },
+  "등록된 주요 위험 유형을 저장된 법령과 비교한 결과입니다.": {
+    "zh": "这是已登记的主要风险类型与已保存法令的比较结果。",
+    "es": "Se compararon las categorías de riesgo con las normas guardadas."
+  },
+  "로컬 AI 답변": {
+    "zh": "本地AI回答",
+    "es": "Respuesta de IA local"
+  },
+  "로컬 OCR": {
+    "zh": "本地OCR",
+    "es": "OCR local"
+  },
+  "로컬 Ollama": {
+    "zh": "本地Ollama",
+    "es": "Ollama local"
+  },
+  "로컬 규칙 검토": {
+    "zh": "本地规则审核",
+    "es": "Reglas locales"
+  },
+  "매매계약": {
+    "zh": "买卖合同",
+    "es": "Compraventa"
+  },
+  "메뉴 닫기": {
+    "zh": "关闭菜单",
+    "es": "Cerrar menú"
+  },
+  "메뉴 열기": {
+    "zh": "打开菜单",
+    "es": "Abrir menú"
+  },
+  "메인화면으로": {
+    "zh": "返回首页",
+    "es": "Ir al inicio"
+  },
+  "명확하게.": {
+    "zh": "清楚明白。",
+    "es": "con claridad."
+  },
+  "몇 가지만 더 확인할게요.": {
+    "zh": "再确认几项信息。",
+    "es": "Confirme algunos detalles más."
+  },
+  "모든 페이지를 원본과 대조하고 확인 표시를 해주세요.": {
+    "zh": "请对照原件核对所有页面并勾选确认。",
+    "es": "Compare todas las páginas con el original y confírmelas."
+  },
+  "모든 페이지와 별첨이 포함되어 있나요?": {
+    "zh": "是否包含所有页面和附件？",
+    "es": "¿Incluye todas las páginas y anexos?"
+  },
+  "모르는 내용은 그대로 두세요. 답변한 정보로 검토 결과를 갱신합니다.": {
+    "zh": "不确定的内容可留空。我们会根据回答更新审核。",
+    "es": "Deje lo que no sepa sin completar. Actualizaremos la revisión con sus respuestas."
+  },
+  "모름": {
+    "zh": "不清楚",
+    "es": "No lo sé"
+  },
+  "모호한 계약조건을 상대방에게 확인합니다.": {
+    "zh": "向对方确认不明确的合同条件。",
+    "es": "Pida a la otra parte que aclare las condiciones."
+  },
+  "문서 작성": {
+    "zh": "准备文件",
+    "es": "Documentos"
+  },
+  "문서 작성으로": {
+    "zh": "前往文件编写",
+    "es": "Preparar documento"
+  },
+  "문서 종류를 고르고 상황을 입력하면": {
+    "zh": "选择文件类型并填写情况，",
+    "es": "Elija un documento y describa su situación."
+  },
+  "문서 초안 만들기": {
+    "zh": "生成文件草稿",
+    "es": "Crear borrador"
+  },
+  "문서 초안 편집": {
+    "zh": "编辑文件草稿",
+    "es": "Editar borrador"
+  },
+  "문서를 복사했습니다.": {
+    "zh": "已复制文件。",
+    "es": "Documento copiado."
+  },
+  "발생한 손해 또는 미지급 금액": {
+    "zh": "实际损失或未付金额",
+    "es": "Daños o importes pendientes"
+  },
+  "배경 움직임 멈춤": {
+    "zh": "暂停背景动画",
+    "es": "Pausar animación"
+  },
+  "배경 움직임 재생": {
+    "zh": "播放背景动画",
+    "es": "Reanudar animación"
+  },
+  "버전": {
+    "zh": "版本",
+    "es": "Versión"
+  },
+  "번역 다시 시도": {
+    "zh": "重试翻译",
+    "es": "Reintentar traducción"
+  },
+  "번역 문서": {
+    "zh": "翻译文件",
+    "es": "Documento traducido"
+  },
+  "번역 중…": {
+    "zh": "正在翻译…",
+    "es": "Traduciendo…"
+  },
+  "번역본": {
+    "zh": "译文",
+    "es": "Traducción"
+  },
+  "번역을 갱신했습니다. 한국어 원문과 대조해주세요.": {
+    "zh": "译文已更新，请与韩文原文对照。",
+    "es": "Traducción actualizada. Compárela con el original coreano."
+  },
+  "법령": {
+    "zh": "法律法规",
+    "es": "Legislación"
+  },
+  "법령해석": {
+    "zh": "法令解释",
+    "es": "Interpretación legal"
+  },
+  "복사하지 못했습니다. 문서 내용을 선택해 복사하거나 한국어 TXT 저장해주세요.": {
+    "zh": "复制失败。请选择文字复制，或保存TXT。",
+    "es": "No se pudo copiar. Seleccione el texto o guárdelo como TXT."
+  },
+  "본문으로 건너뛰기": {
+    "zh": "跳转到正文",
+    "es": "Saltar al contenido"
+  },
+  "불리한 조항을 찾고, 궁금한 내용을 묻고.": {
+    "zh": "找出不利条款，提出您的疑问。",
+    "es": "Detecte cláusulas desfavorables y resuelva sus dudas."
+  },
+  "빠진 내용을 확인하세요": {
+    "zh": "检查遗漏内容",
+    "es": "Compruebe lo que falta"
+  },
+  "사건 경위의 한국어 해석을 확인한 뒤 문서에 반영해주세요.": {
+    "zh": "请确认事情经过的韩文解释后再写入文件。",
+    "es": "Confirme la interpretación coreana de los hechos antes de incluirla."
+  },
+  "사건 설명이 바뀌었습니다. 한국어 해석을 다시 확인해주세요.": {
+    "zh": "情况说明已更改，请重新确认韩文解释。",
+    "es": "La descripción cambió. Revise de nuevo la interpretación coreana."
+  },
+  "사실확인 요청문": {
+    "zh": "事实确认请求书",
+    "es": "Solicitud de aclaración"
+  },
+  "사진 5장 · 장당 5MB": {
+    "zh": "最多5张 · 每张5MB",
+    "es": "5 fotos · 5 MB por foto"
+  },
+  "사진 {0}: {1}": {
+    "zh": "照片{0}：{1}",
+    "es": "Foto {0}: {1}"
+  },
+  "사진·스캔 읽기 방식": {
+    "zh": "照片或扫描件读取方式",
+    "es": "Lectura de fotos y escaneos"
+  },
+  "사진은 최대 5장, 전체 25MB까지 등록할 수 있습니다.": {
+    "zh": "最多上传5张照片，总计25MB。",
+    "es": "Puede subir hasta 5 fotos y 25 MB en total."
+  },
+  "사진을 변경한 뒤 다시 읽기를 누르면 새 원문으로 바뀝니다.": {
+    "zh": "更改照片后重新读取，将更新原文。",
+    "es": "Vuelva a leer las fotos tras cambiarlas para actualizar el texto."
+  },
+  "사진의 순서를 정하고, 읽은 내용을 원본과 나란히 확인하세요.": {
+    "zh": "排列照片顺序，并对照原件检查识别内容。",
+    "es": "Ordene las fotos y compare el texto con el original."
+  },
+  "삭제": {
+    "zh": "删除",
+    "es": "Eliminar"
+  },
+  "삭제 중…": {
+    "zh": "正在删除…",
+    "es": "Eliminando…"
+  },
+  "상단 메뉴에서 필요한 작업을 선택해주세요.": {
+    "zh": "请从顶部菜单选择所需操作。",
+    "es": "Elija una opción del menú superior."
+  },
+  "상담 때 무엇을 준비할까?": {
+    "zh": "咨询时需要准备什么？",
+    "es": "¿Qué preparo para la consulta?"
+  },
+  "상담 문서 작성": {
+    "zh": "准备咨询文件",
+    "es": "Preparar consulta"
+  },
+  "상담 요청문": {
+    "zh": "咨询请求书",
+    "es": "Solicitud de consulta"
+  },
+  "상담에 필요한 문서까지 준비하세요.": {
+    "zh": "准备好咨询所需的文件。",
+    "es": "Prepare también los documentos para su consulta."
+  },
+  "상대방": {
+    "zh": "对方",
+    "es": "Otra parte"
+  },
+  "상시 근로자 수": {
+    "zh": "常用劳动者人数",
+    "es": "Número habitual de trabajadores"
+  },
+  "상황 예시와 수정 제안": {
+    "zh": "情景示例与修改建议",
+    "es": "Ejemplos y propuestas de cambio"
+  },
+  "새 계약서 검토": {
+    "zh": "审核新合同",
+    "es": "Revisar otro contrato"
+  },
+  "새 초안을 만들면 현재 편집한 문서가 바뀝니다. 다시 만들까요?": {
+    "zh": "生成新草稿将替换当前编辑内容。是否继续？",
+    "es": "El nuevo borrador sustituirá el documento editado. ¿Continuar?"
+  },
+  "샘플 계약서": {
+    "zh": "示例合同",
+    "es": "Contratos de ejemplo"
+  },
+  "샘플로 먼저 살펴보기": {
+    "zh": "先查看示例",
+    "es": "Explorar ejemplos"
+  },
+  "샘플로 시작하기": {
+    "zh": "从示例开始",
+    "es": "Empezar con un ejemplo"
+  },
+  "샘플을 불러오는 중입니다.": {
+    "zh": "正在加载示例。",
+    "es": "Cargando ejemplo."
+  },
+  "서로 다른 내용 · 확인 필요": {
+    "zh": "内容有差异 · 需要确认",
+    "es": "Valores distintos · Por confirmar"
+  },
+  "선택 언어로 검토 설명을 번역하고 있습니다.": {
+    "zh": "正在翻译审核说明。",
+    "es": "Traduciendo las explicaciones de la revisión."
+  },
+  "선택한 주의 조항": {
+    "zh": "已选择的风险条款",
+    "es": "Cláusula seleccionada"
+  },
+  "설명은 번역본입니다. 계약서·법령 인용은 한국어 원문을 유지합니다.": {
+    "zh": "说明为译文，合同及法律引文保留韩文原文。",
+    "es": "Las explicaciones están traducidas. Las citas del contrato y las leyes se conservan en coreano."
+  },
+  "쉽게 설명해줘": {
+    "zh": "请用简单的话解释",
+    "es": "Explícamelo de forma sencilla"
+  },
+  "시행 {0} · ": {
+    "zh": "施行日期{0} · ",
+    "es": "Vigente desde {0} · "
+  },
+  "실제 상황을 알려주시면 결과를 다시 확인합니다.": {
+    "zh": "补充实际情况后可重新核查结果。",
+    "es": "Con más información podremos revisar el resultado."
+  },
+  "실제 주당 근로시간": {
+    "zh": "实际每周工作时间",
+    "es": "Horas reales por semana"
+  },
+  "실제로 있었던 일": {
+    "zh": "实际发生的事情",
+    "es": "Qué ocurrió realmente"
+  },
+  "아는 내용만 적어주세요. 비워둔 내용은 초안에서 확인할 수 있습니다.": {
+    "zh": "只填写已知信息。空白项可在草稿中确认。",
+    "es": "Escriba solo lo que sepa. Podrá completar lo pendiente en el borrador."
+  },
+  "아니오": {
+    "zh": "否",
+    "es": "No"
+  },
+  "아래 질문을 선택해 조항의 의미와 수정 방향을 확인하세요.": {
+    "zh": "选择下方问题，了解条款含义和修改方向。",
+    "es": "Elija una pregunta para entender la cláusula y sus posibles cambios."
+  },
+  "아래는 이전에 생성한 초안입니다. 선택한 문서로 바꾸려면 다시 만들기를 눌러주세요.": {
+    "zh": "下方是之前的草稿。如需更换文件类型，请重新生成。",
+    "es": "Se muestra el borrador anterior. Vuelva a generarlo para cambiar de tipo."
+  },
+  "아직 검토한 계약서가 없습니다.": {
+    "zh": "还没有审核过的合同。",
+    "es": "Todavía no hay contratos revisados."
+  },
+  "아직 확인하지 못했어요": {
+    "zh": "尚未确认",
+    "es": "Aún no lo he comprobado"
+  },
+  "앞으로 이동": {
+    "zh": "向前移动",
+    "es": "Mover antes"
+  },
+  "어떤 계약서를 살펴볼까요?": {
+    "zh": "想审核哪份合同？",
+    "es": "¿Qué contrato revisamos?"
+  },
+  "어떤 문서가 필요한가요?": {
+    "zh": "需要哪种文件？",
+    "es": "¿Qué documento necesita?"
+  },
+  "어떤 부담이 있나요?": {
+    "zh": "可能产生什么负担？",
+    "es": "¿Qué carga puede suponer?"
+  },
+  "어떤 상황에서 불리해?": {
+    "zh": "什么情况下对我不利？",
+    "es": "¿En qué situaciones me perjudica?"
+  },
+  "어떤 조항이 궁금한가요?": {
+    "zh": "想了解哪项条款？",
+    "es": "¿Qué cláusula le genera dudas?"
+  },
+  "어떻게 수정하면 좋을까?": {
+    "zh": "应该如何修改？",
+    "es": "¿Cómo podría modificarla?"
+  },
+  "어려운 계약서,": {
+    "zh": "复杂的合同，",
+    "es": "Contratos complejos."
+  },
+  "어려운 계약서, 내 권리부터 명확하게": {
+    "zh": "理解复杂合同，明确我的权利",
+    "es": "Entienda su contrato y sus derechos"
+  },
+  "어려운 문구, 하나씩 짚어볼까요?": {
+    "zh": "逐一了解难懂的条款。",
+    "es": "Aclaremos las cláusulas paso a paso."
+  },
+  "예": {
+    "zh": "是",
+    "es": "Sí"
+  },
+  "예: 2026년 근로계약서": {
+    "zh": "例如：2026年劳动合同",
+    "es": "Ej.: contrato laboral de 2026"
+  },
+  "예상할 수 있는 상황": {
+    "zh": "可能出现的情景",
+    "es": "Situación posible"
+  },
+  "원문 확인 후 다시 검토": {
+    "zh": "确认原文后重新审核",
+    "es": "Revisar de nuevo el original"
+  },
+  "원문과 검토 결과를 바탕으로 답합니다.": {
+    "zh": "根据原文和审核结果回答。",
+    "es": "Respuestas basadas en el original y la revisión."
+  },
+  "원문에서 찾지 못함": {
+    "zh": "原文中未找到",
+    "es": "No encontrado en el original"
+  },
+  "원문에서 확인": {
+    "zh": "查看原文",
+    "es": "Ver en el original"
+  },
+  "원문을 수정하면 수정한 내용으로 검토합니다.": {
+    "zh": "修改原文后，将按修改后的内容审核。",
+    "es": "Se revisará el texto que haya editado."
+  },
+  "원본과 대조해 금액·날짜·누락을 확인했습니다.": {
+    "zh": "已对照原件核对金额、日期和遗漏。",
+    "es": "He comprobado los importes, las fechas y las omisiones con el original."
+  },
+  "원하는 해결 방향": {
+    "zh": "期望的解决方式",
+    "es": "Resultado deseado"
+  },
+  "유지하기": {
+    "zh": "保留",
+    "es": "Conservar"
+  },
+  "이 계약서로 시작하기": {
+    "zh": "使用此合同开始",
+    "es": "Usar este contrato"
+  },
+  "이 계약서를 불러오지 못했습니다.": {
+    "zh": "无法加载此合同。",
+    "es": "No se pudo cargar el contrato."
+  },
+  "이 계약서에서 궁금한 내용을 적어주세요.": {
+    "zh": "请输入关于此合同的问题。",
+    "es": "Escriba su pregunta sobre el contrato."
+  },
+  "이 기록을 삭제할까요?": {
+    "zh": "删除此记录？",
+    "es": "¿Eliminar este registro?"
+  },
+  "이 순서로 사진 읽기": {
+    "zh": "按此顺序读取照片",
+    "es": "Leer las fotos en este orden"
+  },
+  "이 조항 질문하기": {
+    "zh": "就此条款提问",
+    "es": "Preguntar por esta cláusula"
+  },
+  "이 조항에 직접 연결된 법령 자료가 없습니다. 원문과 검토 범위를 확인해주세요.": {
+    "zh": "此条款没有直接关联的法令资料。请查看原文及审核范围。",
+    "es": "No hay fuentes legales vinculadas directamente. Compruebe el original y el alcance."
+  },
+  "이 컴퓨터에 저장된 검토 결과와 대화를 이어서 확인하세요.": {
+    "zh": "继续查看保存在此电脑的审核与对话。",
+    "es": "Continúe las revisiones y conversaciones guardadas en este equipo."
+  },
+  "이 페이지는 현재 작업 공간에 없습니다.": {
+    "zh": "当前工作区没有此页面。",
+    "es": "Esta página no está disponible."
+  },
+  "이 페이지를 읽지 못했습니다. 다시 읽거나 원문을 직접 입력해주세요.": {
+    "zh": "此页识别失败。请重试或手动输入原文。",
+    "es": "No se pudo leer esta página. Reintente o introduzca el texto manualmente."
+  },
+  "이곳에 계약서 내용을 붙여넣으세요.": {
+    "zh": "在此粘贴合同内容。",
+    "es": "Pegue aquí el contenido del contrato."
+  },
+  "이미지·텍스트가 OpenAI로 전송됩니다. 응답 저장은 끄지만 완전한 무보관은 아닙니다.": {
+    "zh": "图片和文本将发送至OpenAI。已关闭响应存储，但不代表完全不保留数据。",
+    "es": "Las imágenes y el texto se envían a OpenAI. Se desactiva el almacenamiento de respuestas, pero esto no elimina toda retención de datos."
+  },
+  "이번 검토의 범위와 한계": {
+    "zh": "本次审核范围与限制",
+    "es": "Alcance y límites de la revisión"
+  },
+  "이해한 만큼,": {
+    "zh": "理解之后，",
+    "es": "Con lo que ha aprendido,"
+  },
+  "일부 범위의 AI 검토가 완료되지 않았습니다.": {
+    "zh": "部分内容的AI审核尚未完成。",
+    "es": "La revisión de IA no se completó en algunos fragmentos."
+  },
+  "일부만 포함했어요": {
+    "zh": "只包含部分内容",
+    "es": "Solo una parte"
+  },
+  "일이 있었던 날짜": {
+    "zh": "事情发生日期",
+    "es": "Fecha de los hechos"
+  },
+  "읽은 내용 확인": {
+    "zh": "确认识别内容",
+    "es": "Comprobar texto leído"
+  },
+  "읽은 텍스트는 50,000자까지 지원합니다.": {
+    "zh": "识别文本最多支持50,000个字符。",
+    "es": "Se admiten hasta 50.000 caracteres."
+  },
+  "입력 내용으로 다시 만들기": {
+    "zh": "根据输入重新生成",
+    "es": "Volver a generar"
+  },
+  "입력 복원 후 다시 검토": {
+    "zh": "恢复输入并重新审核",
+    "es": "Recuperar texto y reintentar"
+  },
+  "입력과 편집 내용은 현재 브라우저 탭에 임시 저장됩니다. 보관할 문서는 한국어 TXT 저장하세요.": {
+    "zh": "输入和编辑内容暂存在当前标签页。请将需要保留的文件保存为TXT。",
+    "es": "Los cambios se guardan temporalmente en esta pestaña. Guarde como TXT los documentos que quiera conservar."
+  },
+  "입주를 완료했나요?": {
+    "zh": "是否已入住？",
+    "es": "¿Ya ocupa la vivienda?"
+  },
+  "작성 시 확인할 정보": {
+    "zh": "编写时需确认的信息",
+    "es": "Datos por completar: "
+  },
+  "잠시만 기다려주세요.": {
+    "zh": "请稍候。",
+    "es": "Espere un momento."
+  },
+  "저장된 법령 자료를 사용했습니다. 실제 적용 전에는 해당 시점의 법령과 사실관계를 확인하세요.": {
+    "zh": "使用了已保存的法令资料。实际应用前请核对相关时间的法律及事实。",
+    "es": "Se usaron normas guardadas. Compruebe la versión aplicable y los hechos antes de utilizarlas."
+  },
+  "저장된 자료": {
+    "zh": "已保存资料",
+    "es": "Fuente guardada"
+  },
+  "전입신고를 마쳤나요?": {
+    "zh": "是否已办理迁入登记？",
+    "es": "¿Ha registrado su residencia?"
+  },
+  "전체": {
+    "zh": "全部",
+    "es": "Total: "
+  },
+  "전체 페이지와 별첨을 포함했나요?": {
+    "zh": "是否包含所有页面和附件？",
+    "es": "¿Incluyó todas las páginas y anexos?"
+  },
+  "전할 내용을 명확하게.": {
+    "zh": "把要表达的内容写清楚。",
+    "es": "Exprese su situación con claridad."
+  },
+  "정확한 원문에서.": {
+    "zh": "从准确的原文开始。",
+    "es": "con un texto fiel."
+  },
+  "제출 전 이름·날짜·금액과 실제 사실을 확인하세요. 아래 초안을 직접 수정할 수 있습니다.": {
+    "zh": "提交前请确认姓名、日期、金额和实际事实。可直接编辑下方草稿。",
+    "es": "Compruebe nombres, fechas, importes y hechos antes de entregar el documento. Puede editar el borrador."
+  },
+  "조항 질문": {
+    "zh": "条款提问",
+    "es": "Preguntas"
+  },
+  "조항 질문하기": {
+    "zh": "咨询条款",
+    "es": "Preguntar"
+  },
+  "조항 해설": {
+    "zh": "条款解释",
+    "es": "Explicación de la cláusula"
+  },
+  "조회 {0}": {
+    "zh": "查询日期{0}",
+    "es": "Consultado el {0}"
+  },
+  "좋은 검토는": {
+    "zh": "好的审核，",
+    "es": "Una buena revisión empieza"
+  },
+  "주 메뉴": {
+    "zh": "主菜单",
+    "es": "Menú principal"
+  },
+  "주의 조항과 내 상황을 정리해 상담을 준비합니다.": {
+    "zh": "整理风险条款和自己的情况，准备咨询。",
+    "es": "Organice las cláusulas y su situación para una consulta."
+  },
+  "주의할 조항 발견": {
+    "zh": "发现需注意条款",
+    "es": "Cláusulas que requieren atención"
+  },
+  "주의할 조항을 확인하고 질문과 상담 문서로 이어갈 수 있습니다.": {
+    "zh": "确认风险条款后，可继续提问和准备咨询文件。",
+    "es": "Revise las cláusulas y continúe con preguntas y documentos."
+  },
+  "주의해서 읽을 조항": {
+    "zh": "需要仔细阅读的条款",
+    "es": "Cláusulas para revisar con atención"
+  },
+  "주택 임대차계약": {
+    "zh": "住房租赁合同",
+    "es": "Alquiler de vivienda"
+  },
+  "직접 질문하기": {
+    "zh": "输入问题",
+    "es": "Escriba su pregunta"
+  },
+  "질문 보내기": {
+    "zh": "发送问题",
+    "es": "Enviar pregunta"
+  },
+  "질문의 한국어 해석": {
+    "zh": "问题的韩文解释",
+    "es": "Interpretación coreana de la pregunta"
+  },
+  "질문하기": {
+    "zh": "提问",
+    "es": "Preguntar"
+  },
+  "질문할 범위": {
+    "zh": "提问范围",
+    "es": "Alcance de la pregunta"
+  },
+  "참고 근거 확인": {
+    "zh": "查看参考依据",
+    "es": "Consultar fuentes"
+  },
+  "참고자료": {
+    "zh": "参考资料",
+    "es": "Referencia"
+  },
+  "초안을 만드는 중…": {
+    "zh": "正在生成草稿…",
+    "es": "Creando borrador…"
+  },
+  "초안을 만들었습니다. 내용을 확인하고 직접 수정할 수 있습니다.": {
+    "zh": "草稿已生成，请确认并修改内容。",
+    "es": "Borrador creado. Revise y edite el contenido."
+  },
+  "최신 화면 다시 불러오기": {
+    "zh": "重新加载最新页面",
+    "es": "Cargar la vista actualizada"
+  },
+  "추가 정보 확인": {
+    "zh": "确认补充信息",
+    "es": "Información adicional"
+  },
+  "추가 정보 확인 필요": {
+    "zh": "需要补充信息",
+    "es": "Se necesita más información"
+  },
+  "파일 선택하기": {
+    "zh": "选择文件",
+    "es": "Elegir archivos"
+  },
+  "파일에서 계약서 내용을 읽고 있습니다.": {
+    "zh": "正在读取合同文件。",
+    "es": "Leyendo el contrato del archivo."
+  },
+  "파일에서 읽어 검토에 사용한 텍스트입니다. 업로드한 원본 파일과 금액·날짜를 대조하세요.": {
+    "zh": "这是从文件读取并用于审核的文本。请与原文件核对金额和日期。",
+    "es": "Este es el texto usado en la revisión. Compare los importes y las fechas con el archivo original."
+  },
+  "파일은 장당 5MB까지 등록할 수 있습니다.": {
+    "zh": "每个文件最大5MB。",
+    "es": "Cada archivo puede tener hasta 5 MB."
+  },
+  "판단의 출발점, 계약서 원문.": {
+    "zh": "判断的起点：合同原文。",
+    "es": "El punto de partida: el original."
+  },
+  "판독에 사용한 사진": {
+    "zh": "用于识别的照片",
+    "es": "Foto utilizada para la lectura"
+  },
+  "판례": {
+    "zh": "判例",
+    "es": "Jurisprudencia"
+  },
+  "페이지": {
+    "zh": "页",
+    "es": "Página"
+  },
+  "페이지 ·": {
+    "zh": "页 ·",
+    "es": " · Página ·"
+  },
+  "페이지 원문 보기": {
+    "zh": "页原文",
+    "es": " · Ver página original"
+  },
+  "편집본 번역 갱신": {
+    "zh": "更新编辑稿翻译",
+    "es": "Actualizar traducción"
+  },
+  "표시된 주의 조항은 없습니다.": {
+    "zh": "没有标出的风险条款。",
+    "es": "No se han señalado cláusulas de riesgo."
+  },
+  "한 장의 준비.": {
+    "zh": "一份准备。",
+    "es": "en un documento."
+  },
+  "한국어": {
+    "zh": "한국어",
+    "es": "한국어"
+  },
+  "한국어 TXT 저장": {
+    "zh": "保存韩文TXT",
+    "es": "Guardar TXT coreano"
+  },
+  "한국어 계약서 원문을 입력하세요. 질문과 사건 경위는 한국어·중국어·스페인어를 지원합니다.": {
+    "zh": "请输入韩文合同原文。问题和事情经过可用韩文、中文或西班牙文输入。",
+    "es": "Introduzca el contrato en coreano. Puede escribir preguntas y hechos en coreano, chino o español."
+  },
+  "한국어 답변": {
+    "zh": "韩文回答",
+    "es": "Respuesta en coreano"
+  },
+  "한국어 복사": {
+    "zh": "复制韩文",
+    "es": "Copiar coreano"
+  },
+  "한국어 수정 문구": {
+    "zh": "韩文修改建议",
+    "es": "Redacción propuesta en coreano"
+  },
+  "한국어 원문 확인·수정": {
+    "zh": "确认或修改韩文原文",
+    "es": "Comprobar y editar el original coreano"
+  },
+  "한국어 원문을 표시합니다. 번역을 다시 시도해주세요.": {
+    "zh": "正在显示韩文原文。请重新尝试翻译。",
+    "es": "Se muestra el original coreano. Vuelva a intentar la traducción."
+  },
+  "한국어 편집본이 변경되었거나 번역이 없습니다. 번역을 갱신해주세요.": {
+    "zh": "韩文编辑稿已更改或尚无译文。请更新翻译。",
+    "es": "El texto coreano cambió o aún no hay traducción. Actualícela."
+  },
+  "한국어 해석을 확인·수정한 뒤 문서에 반영하세요.": {
+    "zh": "请确认或修改韩文解释后再写入文件。",
+    "es": "Revise y corrija la interpretación coreana antes de incorporarla."
+  },
+  "한국어 해석이 실제 설명과 일치합니다.": {
+    "zh": "韩文解释与实际说明一致。",
+    "es": "La interpretación coreana coincide con mi relato."
+  },
+  "한국어·중국어·스페인어로 질문할 수 있습니다.": {
+    "zh": "可用韩文、中文或西班牙文提问。",
+    "es": "Puede preguntar en coreano, chino o español."
+  },
+  "한국어로 해석하기": {
+    "zh": "转换为韩文",
+    "es": "Interpretar en coreano"
+  },
+  "함께 확인할 내용": {
+    "zh": "还需确认的内容",
+    "es": "Otras cuestiones por comprobar"
+  },
+  "행정심판": {
+    "zh": "行政裁决",
+    "es": "Resolución administrativa"
+  },
+  "현재 한국어 편집본과 연결된 번역입니다.": {
+    "zh": "此译文对应当前韩文编辑稿。",
+    "es": "La traducción corresponde al texto coreano actual."
+  },
+  "협의할 수정 문구": {
+    "zh": "可协商的修改条文",
+    "es": "Texto propuesto para negociar"
+  },
+  "화면 언어": {
+    "zh": "界面语言",
+    "es": "Idioma"
+  },
+  "화면을 표시하지 못했습니다. 다시 불러오거나 검토 기록으로 이동해주세요.": {
+    "zh": "无法显示页面。请重新加载或前往审核记录。",
+    "es": "No se pudo mostrar la página. Recárguela o vaya al historial."
+  },
+  "확인할 주의 조항": {
+    "zh": "需确认的条款",
+    "es": "Cláusulas por revisar"
+  },
+  "회전": {
+    "zh": "旋转",
+    "es": "Girar"
+  },
+  "한국어\n{0}\n\n{1}\n{2}": {
+    "zh": "한국어\n{0}\n\n{1}\n{2}",
+    "es": "한국어\n{0}\n\n{1}\n{2}"
+  },
+  "근로자": {
+    "zh": "劳动者",
+    "es": "Trabajador"
+  },
+  "사용자": {
+    "zh": "雇主",
+    "es": "Empleador"
+  },
+  "사용자(사업주)": {
+    "zh": "雇主",
+    "es": "Empleador"
+  },
+  "임차인": {
+    "zh": "承租人",
+    "es": "Arrendatario"
+  },
+  "임대인": {
+    "zh": "出租人",
+    "es": "Arrendador"
+  },
+  "매수인": {
+    "zh": "买方",
+    "es": "Comprador"
+  },
+  "매도인": {
+    "zh": "卖方",
+    "es": "Vendedor"
+  },
+  "검토 완료": {
+    "zh": "审核完成",
+    "es": "Revisión terminada"
+  },
+  "추가 확인 필요": {
+    "zh": "需要进一步确认",
+    "es": "Por confirmar"
+  },
+  "대기 중": {
+    "zh": "等待中",
+    "es": "En espera"
+  },
+  "검토 중": {
+    "zh": "审核中",
+    "es": "Revisando"
+  },
+  "검토 실패": {
+    "zh": "审核失败",
+    "es": "Revisión fallida"
+  },
+  "작업 공간": {
+    "zh": "工作区",
+    "es": "Espacio de trabajo"
+  },
+  "요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.": {
+    "zh": "请求处理失败，请稍后重试。",
+    "es": "No se pudo procesar la solicitud. Reinténtelo más tarde."
+  },
+  "JPG·PNG·WEBP 사진을 사용해주세요. HEIC는 JPG로 변환해주세요.": {
+    "zh": "请使用JPG、PNG或WEBP照片。HEIC请转换为JPG。",
+    "es": "Use JPG, PNG o WEBP. Convierta HEIC a JPG."
+  },
+  "OCR 사용 표시와 읽기 방식이 일치하지 않습니다.": {
+    "zh": "OCR标记与读取方式不一致，请重新读取。",
+    "es": "El indicador OCR no coincide con el modo de lectura. Lea el archivo de nuevo."
+  },
+  "OCR 제한 시간을 초과했습니다. 더 선명한 사진이나 페이지를 나눈 PDF를 사용해주세요.": {
+    "zh": "OCR超时，请使用更清晰的照片或拆分PDF。",
+    "es": "El OCR agotó el tiempo. Use una foto más clara o divida el PDF."
+  },
+  "OCR로 문서를 읽지 못했습니다. 파일을 확인하거나 텍스트를 직접 입력해주세요.": {
+    "zh": "OCR读取失败，请检查文件或手动输入文本。",
+    "es": "El OCR no pudo leer el documento. Revise el archivo o escriba el texto."
+  },
+  "OpenAI 사용량 또는 요청 한도에 도달했습니다. 사용량을 확인하고 잠시 후 다시 시도해주세요.": {
+    "zh": "已达到OpenAI使用量或请求限制。请检查用量并稍后重试。",
+    "es": "Se alcanzó el límite de uso o solicitudes de OpenAI. Revise el consumo y vuelva a intentarlo."
+  },
+  "OpenAI 요청에 실패했습니다. OPENAI_MODEL 설정과 연결 상태를 확인한 뒤 다시 시도해주세요.": {
+    "zh": "OpenAI请求失败。请检查OPENAI_MODEL设置及网络连接后重试。",
+    "es": "Falló la solicitud a OpenAI. Compruebe OPENAI_MODEL y la conexión y reintente."
+  },
+  "OpenAI 응답 시간이 초과됐습니다. 입력은 유지됩니다. 다시 시도해주세요.": {
+    "zh": "OpenAI响应超时。输入已保留，请重试。",
+    "es": "OpenAI agotó el tiempo. Se conserva el texto. Reinténtelo."
+  },
+  "OpenAI 응답 형식을 검증하지 못했습니다. 기존 입력과 결과를 유지합니다. 다시 시도해주세요.": {
+    "zh": "无法验证OpenAI响应格式。已有输入和结果已保留，请重试。",
+    "es": "No se pudo validar la respuesta de OpenAI. Se conservan los datos y resultados. Reinténtelo."
+  },
+  "OpenAI 응답이 완료되지 않았습니다. 입력을 보존했습니다. 범위를 줄이거나 다시 시도해주세요.": {
+    "zh": "OpenAI响应未完成。输入已保留，请缩小范围或重试。",
+    "es": "La respuesta de OpenAI quedó incompleta. Se conservó el texto. Reduzca el alcance o reintente."
+  },
+  "OpenAI 인증 또는 모델 접근 권한을 확인한 뒤 다시 시도해주세요.": {
+    "zh": "请检查OpenAI认证和模型访问权限后重试。",
+    "es": "Compruebe la autenticación y los permisos del modelo de OpenAI y reintente."
+  },
+  "OpenAI가 이 요청에 답변하지 못했습니다. 입력을 확인한 뒤 다시 시도해주세요.": {
+    "zh": "OpenAI未能回答此请求，请检查输入后重试。",
+    "es": "OpenAI no pudo responder. Revise el texto y reintente."
+  },
+  "OpenAI에 연결할 수 없습니다. 네트워크를 확인한 뒤 다시 시도해주세요.": {
+    "zh": "无法连接OpenAI，请检查网络后重试。",
+    "es": "No se pudo conectar con OpenAI. Compruebe la red y reintente."
+  },
+  "PDF 페이지가 너무 큽니다. A4 크기로 저장해주세요.": {
+    "zh": "PDF页面过大，请保存为A4尺寸。",
+    "es": "La página del PDF es demasiado grande. Guárdela en A4."
+  },
+  "TXT, PDF 또는 JPG·PNG·WEBP 사진을 사용해주세요.": {
+    "zh": "请使用TXT、PDF或JPG、PNG、WEBP照片。",
+    "es": "Use TXT, PDF o fotos JPG, PNG y WEBP."
+  },
+  "UTF-8로 저장된 텍스트 파일을 사용해주세요.": {
+    "zh": "请使用UTF-8编码的文本文件。",
+    "es": "Use un archivo de texto guardado en UTF-8."
+  },
+  "결과가 갱신됐습니다. 최신 분석을 불러와 다시 진행해주세요.": {
+    "zh": "结果已更新，请加载最新审核后重试。",
+    "es": "El resultado cambió. Cargue la revisión actualizada y continúe."
+  },
+  "계약서 내용을 20자 이상 입력해주세요.": {
+    "zh": "请输入至少20个字符的合同内容。",
+    "es": "Introduzca al menos 20 caracteres del contrato."
+  },
+  "계약서 종류에 맞는 본인의 입장을 선택해주세요.": {
+    "zh": "请选择与合同类型对应的立场。",
+    "es": "Elija una posición válida para ese tipo de contrato."
+  },
+  "고소 초안에는 실제로 있었던 일을 20자 이상 입력해주세요.": {
+    "zh": "投诉草稿需要至少20个字符的实际经过。",
+    "es": "Describa los hechos reales con al menos 20 caracteres para el borrador de denuncia."
+  },
+  "궁금한 내용을 입력해주세요.": {
+    "zh": "请输入您的问题。",
+    "es": "Escriba su pregunta."
+  },
+  "답변 형식을 검증하지 못했습니다.": {
+    "zh": "无法验证回答格式。",
+    "es": "No se pudo validar el formato de la respuesta."
+  },
+  "답변에 인용 근거로 검증되지 않은 법률 표현이나 다른 언어가 있습니다.": {
+    "zh": "回答包含未经依据验证的法律表述或其他语言。",
+    "es": "La respuesta contiene afirmaciones legales sin verificar u otro idioma."
+  },
+  "답변의 원문·법령 근거 ID가 제공 자료와 일치하지 않습니다.": {
+    "zh": "回答的原文或法律依据ID与提供的资料不一致。",
+    "es": "Los identificadores de las fuentes no coinciden con el material disponible."
+  },
+  "답변의 원문·의무·근거 검증에 실패해 표시하지 않았습니다. 해당 조항의 빠른 설명을 확인해주세요.": {
+    "zh": "原文、义务或依据验证失败，未显示回答。请查看条款的快速解释。",
+    "es": "La respuesta no superó la verificación y no se muestra. Consulte la explicación rápida de la cláusula."
+  },
+  "로컬 AI 답변을 완료하지 못했습니다. Ollama 실행 여부를 확인하고 다시 시도해주세요.": {
+    "zh": "本地AI回答失败。请确认Ollama正在运行后重试。",
+    "es": "La IA local no pudo responder. Compruebe que Ollama esté activo y reintente."
+  },
+  "모든 페이지의 판독 결과를 확인·수정한 뒤 확인 표시를 해주세요.": {
+    "zh": "请确认并修改所有页面的识别结果，然后勾选确认。",
+    "es": "Revise y corrija la lectura de todas las páginas y confírmelas."
+  },
+  "문서는 20페이지까지 지원합니다.": {
+    "zh": "最多支持20页。",
+    "es": "Se admiten hasta 20 páginas."
+  },
+  "번역에 누락된 내용이 있습니다. 원문을 유지합니다. 다시 번역해주세요.": {
+    "zh": "翻译有遗漏。原文已保留，请重试。",
+    "es": "La traducción omite contenido. Se conserva el original. Reinténtelo."
+  },
+  "번역에서 금액·날짜·인용·당사자 보존 검사를 통과하지 못했습니다. 원문을 유지합니다. 다시 번역해주세요.": {
+    "zh": "译文未通过金额、日期、引文或当事人保留检查。原文已保留，请重试。",
+    "es": "La traducción no conservó importes, fechas, citas o partes. Se mantiene el original. Reinténtelo."
+  },
+  "번역의 의미·당사자 역할 검사에 실패했습니다. 한국어 원문을 확인하고 다시 번역해주세요.": {
+    "zh": "译文未通过语义或当事人角色检查，请确认韩文原文后重试。",
+    "es": "Falló la comprobación del significado o las partes. Revise el original coreano y reintente."
+  },
+  "분석 완료 후 진행해주세요.": {
+    "zh": "请等待审核完成。",
+    "es": "Espere a que termine la revisión."
+  },
+  "분석을 찾을 수 없습니다.": {
+    "zh": "找不到审核记录。",
+    "es": "No se encontró la revisión."
+  },
+  "분석을 찾을 수 없습니다. 삭제되었을 수 있습니다.": {
+    "zh": "找不到审核记录，可能已被删除。",
+    "es": "No se encontró la revisión. Puede haberse eliminado."
+  },
+  "분석이 갱신되거나 삭제됐습니다. 최신 결과를 확인해주세요.": {
+    "zh": "审核已更新或删除，请查看最新结果。",
+    "es": "La revisión cambió o se eliminó. Consulte el resultado actual."
+  },
+  "분석이나 대화가 갱신되거나 삭제됐습니다. 최신 결과를 확인해주세요.": {
+    "zh": "审核或对话已更新或删除，请查看最新结果。",
+    "es": "La revisión o conversación cambió o se eliminó. Consulte el resultado actual."
+  },
+  "사진 회전 정보를 확인해주세요.": {
+    "zh": "请检查照片旋转信息。",
+    "es": "Compruebe el giro de las fotos."
+  },
+  "사진은 2,000만 화소 이하로 올려주세요.": {
+    "zh": "照片请勿超过2000万像素。",
+    "es": "Use fotos de hasta 20 megapíxeles."
+  },
+  "사진은 최대 5장까지 등록할 수 있습니다.": {
+    "zh": "最多上传5张照片。",
+    "es": "Puede subir hasta 5 fotos."
+  },
+  "샘플을 찾을 수 없습니다.": {
+    "zh": "找不到示例。",
+    "es": "No se encontró el ejemplo."
+  },
+  "서버 .env에 OPENAI_API_KEY를 설정한 뒤 다시 시도하거나 로컬 방식을 직접 선택해주세요.": {
+    "zh": "请在服务器.env中设置OPENAI_API_KEY后重试，或选择本地方式。",
+    "es": "Configure OPENAI_API_KEY en el .env del servidor y reintente, o elija el modo local."
+  },
+  "선택한 조항을 최신 검토 결과에서 찾지 못했습니다.": {
+    "zh": "最新审核结果中找不到所选条款。",
+    "es": "No se encontró esa cláusula en la revisión actual."
+  },
+  "선택한 조항의 원문도 6,000자를 넘습니다. 내용을 수정해 해당 조항의 범위를 줄인 뒤 질문해주세요.": {
+    "zh": "所选条款超过6000个字符。请缩小范围后再提问。",
+    "es": "La cláusula supera 6.000 caracteres. Reduzca el alcance antes de preguntar."
+  },
+  "설명할 주의 조항을 먼저 선택해주세요.": {
+    "zh": "请先选择需要解释的条款。",
+    "es": "Seleccione primero la cláusula que desea aclarar."
+  },
+  "실제로 있었던 일을 20자 이상 입력해주세요.": {
+    "zh": "请用至少20个字符描述实际发生的事情。",
+    "es": "Describa los hechos reales con al menos 20 caracteres."
+  },
+  "암호화되지 않은 20페이지 이하의 PDF를 사용해주세요.": {
+    "zh": "请使用未加密且不超过20页的PDF。",
+    "es": "Use un PDF sin cifrar de hasta 20 páginas."
+  },
+  "여러 파일은 사진만 가능합니다. TXT·PDF는 하나씩 등록해주세요.": {
+    "zh": "仅照片支持多文件上传。TXT或PDF请逐个上传。",
+    "es": "Solo las fotos pueden subirse juntas. Añada TXT y PDF de uno en uno."
+  },
+  "이미지로 읽는 스캔 페이지는 최대 5페이지입니다. 문서를 나눠주세요.": {
+    "zh": "最多识别5页扫描件，请拆分文件。",
+    "es": "Se pueden leer hasta 5 páginas escaneadas. Divida el documento."
+  },
+  "인용 문구가 제공 원문과 다릅니다. 실제 사용한 원문의 짧은 문구만 정확히 복사하세요.": {
+    "zh": "引文与原文不一致。",
+    "es": "La cita no coincide con el original."
+  },
+  "읽기 방식을 확인해주세요.": {
+    "zh": "请检查读取方式。",
+    "es": "Compruebe el modo de lectura."
+  },
+  "읽기 안내가 너무 깁니다.": {
+    "zh": "读取提示过长。",
+    "es": "El aviso de lectura es demasiado largo."
+  },
+  "읽을 수 있는 PDF 파일이 아닙니다.": {
+    "zh": "无法读取此PDF。",
+    "es": "No se puede leer este PDF."
+  },
+  "읽을 수 있는 사진 파일이 아닙니다.": {
+    "zh": "无法读取此图片。",
+    "es": "No se puede leer esta imagen."
+  },
+  "읽을 수 있는 텍스트가 부족합니다. 선명한 문서를 올리거나 내용을 직접 입력해주세요.": {
+    "zh": "可识别文字不足，请上传清晰文件或手动输入。",
+    "es": "No hay suficiente texto legible. Suba un archivo más claro o escríbalo."
+  },
+  "임차인에게 새 세입자를 구하라고 권하거나 당사자 의무를 뒤집은 답변입니다. 반환 조건의 수정·서면 확인·지급 기록과 종료·인도 계획을 설명하세요.": {
+    "zh": "回答混淆了当事人义务，未通过验证。",
+    "es": "La respuesta confundió las obligaciones de las partes y no superó la validación."
+  },
+  "자유 질문은 현재 6,000자 이내 문서에서 지원합니다. 주의 조항을 선택해 해당 조항에 관해 질문해주세요.": {
+    "zh": "本地自由提问支持6000字符以内的合同。请选择具体条款。",
+    "es": "Las preguntas locales admiten contratos de hasta 6.000 caracteres. Seleccione una cláusula."
+  },
+  "파일은 장당 5MB, 전체 25MB까지 등록할 수 있습니다.": {
+    "zh": "每个文件最大5MB，总计25MB。",
+    "es": "Máximo 5 MB por archivo y 25 MB en total."
+  },
+  "파일은 장당 5MB까지 업로드할 수 있습니다.": {
+    "zh": "每个文件最大5MB。",
+    "es": "Cada archivo puede tener hasta 5 MB."
+  },
+  "페이지 순서를 확인해주세요.": {
+    "zh": "请检查页面顺序。",
+    "es": "Compruebe el orden de las páginas."
+  },
+  "한 번에 OCR로 읽는 스캔 페이지는 5페이지까지입니다. 문서를 나눠주세요.": {
+    "zh": "每次OCR最多读取5页扫描件，请拆分文件。",
+    "es": "El OCR admite hasta 5 páginas escaneadas por solicitud. Divida el archivo."
+  },
+  "한국어 OCR이 준비되지 않았습니다. scripts/setup_ocr.py를 실행하거나 텍스트를 직접 입력해주세요.": {
+    "zh": "韩文OCR尚未准备好。请运行scripts/setup_ocr.py或手动输入。",
+    "es": "El OCR coreano no está instalado. Ejecute scripts/setup_ocr.py o escriba el texto."
+  },
+  "화면 빌드가 없습니다. 프로젝트 루트에서 ./run_app.sh를 실행해주세요.": {
+    "zh": "界面尚未构建，请在项目根目录运行./run_app.sh。",
+    "es": "Falta la interfaz compilada. Ejecute ./run_app.sh desde la raíz del proyecto."
+  },
+  "확인한 페이지와 검토할 원문이 일치하지 않습니다.": {
+    "zh": "已确认页面与待审核原文不一致。",
+    "es": "Las páginas confirmadas no coinciden con el texto de revisión."
+  },
+  "사진·스캔 판독 결과의 금액·날짜·누락을 원본과 대조하고 모든 페이지를 확인해주세요.": {
+    "zh": "请对照原件核对识别结果中的金额、日期和遗漏，并确认所有页面。",
+    "es": "Compare importes, fechas y omisiones con el original y confirme todas las páginas."
+  },
+  "읽은 텍스트가 부족합니다. 사진을 다시 등록하거나 원문을 직접 입력해주세요.": {
+    "zh": "识别文字不足。请重新上传或手动输入原文。",
+    "es": "Falta texto legible. Suba otra foto o escriba el original."
+  },
+  "OpenAI 검토를 완료하지 못했습니다. 모델 설정·사용량·연결을 확인하고 다시 시도해주세요. 긴 조항은 줄바꿈으로 나눠주세요.": {
+    "zh": "OpenAI审核未完成。请检查模型、用量和连接后重试。过长条款请换行分段。",
+    "es": "OpenAI no completó la revisión. Compruebe modelo, consumo y conexión. Divida las cláusulas largas con saltos de línea."
+  },
+  "사진이 변경되었습니다. 현재 순서로 다시 읽어주세요.": {
+    "zh": "照片已更改，请按当前顺序重新读取。",
+    "es": "Las fotos cambiaron. Vuelva a leerlas en el orden actual."
+  },
+  "사진 판독": {
+    "zh": "图片识别",
+    "es": "Lectura de foto"
+  },
+  "텍스트 읽기": {
+    "zh": "文本读取",
+    "es": "Lectura de texto"
+  },
+  "PDF 텍스트": {
+    "zh": "PDF文本",
+    "es": "Texto del PDF"
+  },
+  "직접 수정": {
+    "zh": "直接修改",
+    "es": "Editar"
+  },
+  "작성자": {
+    "zh": "编写人",
+    "es": "Autor"
+  },
+  "수신인": {
+    "zh": "收件人",
+    "es": "Destinatario"
+  },
+  "작성일": {
+    "zh": "撰写日期",
+    "es": "Fecha de redacción"
+  },
+  "수신 기관·수신인": {
+    "zh": "收件机构或个人",
+    "es": "Entidad o persona destinataria"
+  },
+  "작성자 연락처·주소": {
+    "zh": "编写人联系方式和地址",
+    "es": "Contacto y dirección del autor"
+  },
+  "서명": {
+    "zh": "签名",
+    "es": "Firma"
+  },
+  "사건 시점": {
+    "zh": "事情发生时间",
+    "es": "Fecha de los hechos"
+  },
+  "사건 장소": {
+    "zh": "事情发生地点",
+    "es": "Lugar de los hechos"
+  },
+  "사건 경위": {
+    "zh": "事情经过",
+    "es": "Relato de los hechos"
+  },
+  "사용자가 주장하는 피해": {
+    "zh": "用户陈述的损失",
+    "es": "Daños alegados"
+  },
+  "보유 자료": {
+    "zh": "持有的资料",
+    "es": "Documentos disponibles"
+  },
+  "요청하는 도움": {
+    "zh": "请求的帮助",
+    "es": "Ayuda solicitada"
+  },
+  "임금": {
+    "zh": "工资",
+    "es": "Salario"
+  },
+  "지급일": {
+    "zh": "支付日期",
+    "es": "Día de pago"
+  },
+  "근로시간": {
+    "zh": "工作时间",
+    "es": "Horario"
+  },
+  "주당 근로시간": {
+    "zh": "每周工时",
+    "es": "Horas semanales"
+  },
+  "휴게시간": {
+    "zh": "休息时间",
+    "es": "Descanso"
+  },
+  "계약기간": {
+    "zh": "合同期限",
+    "es": "Duración del contrato"
+  },
+  "근무장소": {
+    "zh": "工作地点",
+    "es": "Lugar de trabajo"
+  },
+  "휴일": {
+    "zh": "休息日",
+    "es": "Días de descanso"
+  },
+  "업무내용": {
+    "zh": "工作内容",
+    "es": "Funciones"
+  },
+  "임금 지급방법": {
+    "zh": "工资支付方式",
+    "es": "Método de pago"
+  },
+  "연차유급휴가": {
+    "zh": "带薪年假",
+    "es": "Vacaciones anuales pagadas"
+  },
+  "근무일": {
+    "zh": "工作日",
+    "es": "Días de trabajo"
+  },
+  "보증금": {
+    "zh": "押金",
+    "es": "Depósito"
+  },
+  "월세": {
+    "zh": "月租",
+    "es": "Alquiler mensual"
+  },
+  "임대차기간": {
+    "zh": "租赁期限",
+    "es": "Duración del alquiler"
+  },
+  "목적물": {
+    "zh": "标的物",
+    "es": "Inmueble"
+  },
+  "보증금 반환 조건": {
+    "zh": "押金返还条件",
+    "es": "Condiciones de devolución del depósito"
+  },
+  "매매대금": {
+    "zh": "买卖价款",
+    "es": "Precio"
+  },
+  "잔금 지급일": {
+    "zh": "尾款支付日期",
+    "es": "Fecha del pago restante"
+  },
+  "소유권 이전 조건": {
+    "zh": "所有权转移条件",
+    "es": "Condiciones de transmisión de propiedad"
+  },
+  "검토 버전 {0} 기준": {
+    "zh": "基于审核版本{0}",
+    "es": "Basado en la revisión {0}"
+  },
+  "작성 시 확인할 정보 {0}개": {
+    "zh": "需要确认{0}项信息",
+    "es": "Datos por completar: {0}"
+  },
+  "검토를 보완할 질문 {0}개가 있습니다.": {
+    "zh": "还有{0}个问题需要补充。",
+    "es": "Hay {0} preguntas para completar la revisión."
+  },
+  "{0}페이지 · {1}": {
+    "zh": "第{0}页 · {1}",
+    "es": "Página {0} · {1}"
+  },
+  "{0}페이지 원문 보기": {
+    "zh": "查看第{0}页原文",
+    "es": "Ver página {0} del original"
+  },
+  "· 버전 {0}": {
+    "zh": "· 版本{0}",
+    "es": "· Versión {0}"
+  },
+  "한국어 계약서 원문을 입력하세요.": {
+    "zh": "请输入韩文合同原文。",
+    "es": "Introduzca el texto original del contrato en coreano."
+  },
+  "질문과 답변은 한국어로 제공됩니다.": {
+    "zh": "请用韩语提问，回答也将以韩语提供。",
+    "es": "Escriba su pregunta en coreano. La respuesta también será en coreano."
+  },
+  "사건 경위는 한국어로 입력해주세요.": {
+    "zh": "请用韩语填写事件经过。",
+    "es": "Describa los hechos en coreano."
+  },
+  "AI 답변": {
+    "zh": "AI 回答",
+    "es": "Respuesta de IA"
+  },
+  "네트워크 연결을 확인하고 다시 시도해주세요.": {
+    "zh": "请检查网络连接后重试。",
+    "es": "Compruebe la conexión de red e inténtelo de nuevo."
+  },
+  "계약서와 질문을 살펴보고 있습니다.": {
+    "zh": "正在查看合同和问题。",
+    "es": "Revisando el contrato y su pregunta."
+  },
+  "답변을 작성하고 있습니다.": {
+    "zh": "正在撰写回答。",
+    "es": "Redactando la respuesta."
+  },
+  "원문과 근거를 확인하고 있습니다.": {
+    "zh": "正在核对原文和依据。",
+    "es": "Comprobando el texto original y las fuentes."
+  },
+  "근거에 맞게 답변을 다듬고 있습니다.": {
+    "zh": "正在根据依据修正回答。",
+    "es": "Ajustando la respuesta a las fuentes."
+  },
+  "답변을 표시하고 있습니다.": {
+    "zh": "正在显示回答。",
+    "es": "Mostrando la respuesta."
+  },
+  "답변을 받지 못했습니다. 다시 시도해주세요.": {
+    "zh": "未能收到回答，请重试。",
+    "es": "No se recibió la respuesta. Inténtelo de nuevo."
+  },
+  "답변 수신이 중단되었습니다. 다시 시도해주세요.": {
+    "zh": "回答接收中断，请重试。",
+    "es": "Se interrumpió la respuesta. Inténtelo de nuevo."
+  },
+  "답변 시간이 초과되었습니다. 질문을 유지했으니 다시 시도해주세요.": {
+    "zh": "回答超时，问题已保留，请重试。",
+    "es": "Se agotó el tiempo. Su pregunta se conserva; inténtelo de nuevo."
+  },
+  "답변이 길어 생성을 완료하지 못했습니다. 질문을 짧게 나누어주세요.": {
+    "zh": "回答过长，未能完成。请将问题分成短问题。",
+    "es": "La respuesta es demasiado larga. Divida la pregunta en partes más breves."
+  },
+  "모델 응답이 허용 크기를 넘었습니다.": {
+    "zh": "模型回答超出大小限制。",
+    "es": "La respuesta del modelo superó el límite de tamaño."
+  },
+  "모델 응답 형식을 확인하지 못했습니다.": {
+    "zh": "无法验证模型回答的格式。",
+    "es": "No se pudo validar el formato de la respuesta."
+  },
+  "불리할 수 있는 조항": {
+    "zh": "可能不利的条款",
+    "es": "Cláusula posiblemente desfavorable"
+  },
+  "서로 다른 내용": {
+    "zh": "内容不一致",
+    "es": "Contenido contradictorio"
+  },
+  "확인이 필요한 부분": {
+    "zh": "需要确认的部分",
+    "es": "Parte por confirmar"
+  },
+  "문서 전체 확인": {
+    "zh": "需确认整份文件",
+    "es": "Revisar todo el documento"
+  },
+  "{0}번 표시: {1}": {
+    "zh": "标记{0}：{1}",
+    "es": "Marca {0}: {1}"
+  },
+  "{0}페이지 원본": {
+    "zh": "第{0}页原件",
+    "es": "Original, página {0}"
+  },
+  "{0}페이지": {
+    "zh": "第{0}页",
+    "es": "Página {0}"
+  },
+  "계약서 표시와 설명": {
+    "zh": "合同标记与说明",
+    "es": "Marcas y explicaciones del contrato"
+  },
+  "문서 보기": {
+    "zh": "查看文件",
+    "es": "Ver documento"
+  },
+  "원본 문서": {
+    "zh": "原始文件",
+    "es": "Documento original"
+  },
+  "읽은 텍스트": {
+    "zh": "读取的文本",
+    "es": "Texto leído"
+  },
+  "이전 항목": {
+    "zh": "上一项",
+    "es": "Elemento anterior"
+  },
+  "다음 항목": {
+    "zh": "下一项",
+    "es": "Elemento siguiente"
+  },
+  "원본 이미지에서 위치를 찾지 못했습니다. 읽은 텍스트 보기에서 확인하세요.": {
+    "zh": "未能在原始图像中找到位置。请在读取的文本视图中确认。",
+    "es": "No se encontró la ubicación en la imagen original. Compruébela en la vista de texto leído."
+  },
+  "판독 결과로 찾은 근사 위치입니다. 원본과 대조하세요.": {
+    "zh": "这是根据识别结果得到的大致位置，请与原件核对。",
+    "es": "Ubicación aproximada según la lectura. Compárela con el original."
+  },
+  "원문·검토·대화와 문서 표시용 페이지 이미지는 이 컴퓨터에 저장되며, 검토 기록을 삭제하면 함께 삭제됩니다.": {
+    "zh": "原文、审查结果、对话和用于显示文件的页面图像保存在这台电脑上，删除审查记录时会一并删除。",
+    "es": "El texto, la revisión, las conversaciones y las imágenes de página para mostrar el documento se guardan en este equipo y se eliminan junto con el registro de revisión."
+  },
+  "계약서 원문, 페이지 이미지, 검토 결과, 대화가 함께 삭제됩니다. 삭제한 내용은 복구할 수 없습니다.": {
+    "zh": "合同原文、页面图像、审查结果和对话将一并删除。删除后无法恢复。",
+    "es": "Se eliminarán el texto del contrato, las imágenes de página, la revisión y las conversaciones. No se podrá recuperar."
+  },
+  "PNG 저장": {
+    "zh": "保存PNG",
+    "es": "Guardar PNG"
+  },
+  "이해한 만큼, 다음 단계를 준비하세요.": {
+    "zh": "理解之后，准备下一步。",
+    "es": "Una vez entendido, prepare el siguiente paso."
+  },
+  "계약 수정 요청서": {
+    "zh": "合同修改请求书",
+    "es": "Solicitud de modificación del contrato"
+  },
+  "불리한 조항의 현재 문구와 제안 문구를 상대방에게 전달합니다.": {
+    "zh": "向对方提出不利条款的现有文字和修改建议。",
+    "es": "Envía a la otra parte el texto actual y la redacción propuesta de las cláusulas desfavorables."
+  },
+  "문서 기본 정보": {
+    "zh": "文件基本信息",
+    "es": "Datos básicos del documento"
+  },
+  "받는 사람": {
+    "zh": "收件人",
+    "es": "Destinatario"
+  },
+  "회신 희망일": {
+    "zh": "希望答复日期",
+    "es": "Fecha de respuesta deseada"
+  },
+  "문서에 넣을 조항": {
+    "zh": "纳入文件的条款",
+    "es": "Cláusulas que se incluirán"
+  },
+  "수정을 요청할 조항을 하나 이상 선택해주세요.": {
+    "zh": "请至少选择一项要修改的条款。",
+    "es": "Seleccione al menos una cláusula para modificar."
+  },
+  "빈칸 {0}개가 남아 있습니다. 그대로 저장할까요?": {
+    "zh": "还有{0}处空白。仍要保存吗？",
+    "es": "Quedan {0} campos en blanco. ¿Desea guardar de todos modos?"
+  },
+  "PDF를 저장했습니다.": {
+    "zh": "已保存PDF。",
+    "es": "PDF guardado."
+  },
+  "PDF를 만들지 못했습니다. 다시 시도해주세요.": {
+    "zh": "无法生成PDF，请重试。",
+    "es": "No se pudo crear el PDF. Inténtelo de nuevo."
+  },
+  "채워야 할 빈칸 {0}개": {
+    "zh": "需填写的空白{0}处",
+    "es": "{0} campos por completar"
+  },
+  "빈칸을 모두 채웠습니다.": {
+    "zh": "空白已全部填写。",
+    "es": "Todos los campos están completos."
+  },
+  "미리보기": {
+    "zh": "预览",
+    "es": "Vista previa"
+  },
+  "복사하지 못했습니다. 문서 내용을 선택해 복사하거나 PDF로 저장해주세요.": {
+    "zh": "复制失败。请选择文件内容复制或保存为PDF。",
+    "es": "No se pudo copiar. Seleccione el contenido para copiarlo o guárdelo en PDF."
+  },
+  "입력과 편집 내용은 현재 브라우저 탭에 임시 저장됩니다. 보관할 문서는 PDF로 저장하세요.": {
+    "zh": "输入和编辑内容临时保存在当前浏览器标签页。需要保留的文件请保存为PDF。",
+    "es": "Lo introducido y editado se guarda temporalmente en esta pestaña. Guarde en PDF los documentos que quiera conservar."
+  },
+  "두 언어 PDF 저장": {
+    "zh": "保存双语PDF",
+    "es": "Guardar PDF bilingüe"
+  },
+  "이 초안은 계약서와 입력한 내용을 정리한 자료입니다. 사실·날짜·수신인을 확인하고 수정하세요. 조항의 법적 효력을 확정한 내용은 아닙니다.": {
+    "zh": "此草稿整理了合同和您输入的内容。请确认事实、日期和收件人。这并非对条款法律效力的确定。",
+    "es": "Este borrador reúne el contrato y lo que ha indicado. Compruebe hechos, fechas y destinatario. No determina la validez legal de las cláusulas."
+  },
+  "사건 경위는 입력한 설명이며, 계약 문구만으로 피해 발생이나 범죄를 확인하지 않았습니다. 빈칸과 인적 사항을 확인한 뒤 사용하세요.": {
+    "zh": "事件经过是您输入的说明，未仅凭合同文字确认损害或犯罪。请确认空白和个人信息后使用。",
+    "es": "Los hechos son los que usted describió; el contrato por sí solo no confirma daños ni delitos. Revise los campos y datos personales antes de usarlo."
+  },
+  "계약서와 설명을 번역하고 있습니다. ({0}/{1})": {
+    "zh": "正在翻译合同和说明。（{0}/{1}）",
+    "es": "Traduciendo el contrato y las explicaciones. ({0}/{1})"
+  },
+  "이 컴퓨터의 AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.": {
+    "zh": "这是本机AI生成的参考译文。合同效力请以韩文原文为准。",
+    "es": "Traducción de referencia generada por la IA de este equipo. La validez del contrato se determina por el original coreano."
+  },
+  "검증을 통과하지 못한 {0}줄은 한국어로 표시합니다.": {
+    "zh": "未通过校验的{0}行以韩文显示。",
+    "es": "{0} líneas que no superaron la verificación se muestran en coreano."
+  },
+  "문서 확대": {
+    "zh": "文件缩放",
+    "es": "Zoom del documento"
+  },
+  "축소": {
+    "zh": "缩小",
+    "es": "Reducir"
+  },
+  "확대": {
+    "zh": "放大",
+    "es": "Ampliar"
+  },
+  "원래 크기로": {
+    "zh": "恢复原始大小",
+    "es": "Tamaño original"
+  },
+  "로컬 번역 모델에 연결하지 못했습니다. Ollama 실행 여부를 확인하고 다시 시도해주세요.": {
+    "zh": "无法连接本地翻译模型。请确认Ollama正在运行后重试。",
+    "es": "No se pudo conectar con el modelo local. Compruebe que Ollama esté en ejecución e inténtelo de nuevo."
+  },
+  "번역을 완료하지 못했습니다. 다시 시도해주세요.": {
+    "zh": "翻译未完成，请重试。",
+    "es": "No se completó la traducción. Inténtelo de nuevo."
+  },
+  "번역을 준비하고 있습니다.": {
+    "zh": "正在准备翻译。",
+    "es": "Preparando la traducción."
+  },
+  "선택한 언어로 답변을 번역하고 있습니다.": {
+    "zh": "正在将回答翻译成所选语言。",
+    "es": "Traduciendo la respuesta al idioma seleccionado."
+  },
+  "선택한 언어로 답변을 번역하지 못했습니다. 다시 시도해주세요.": {
+    "zh": "未能将回答翻译成所选语言，请重试。",
+    "es": "No se pudo traducir la respuesta al idioma seleccionado. Inténtelo de nuevo."
+  },
+  "답변 번역을 완료하지 못했습니다. 잠시 후 다시 시도해주세요.": {
+    "zh": "未能完成回答翻译，请稍后重试。",
+    "es": "No se pudo completar la traducción de la respuesta. Inténtelo de nuevo más tarde."
+  },
+  "대화를 찾을 수 없습니다.": {
+    "zh": "找不到该对话。",
+    "es": "No se encontró la conversación."
+  }
+}

@@ -1,174 +1,173 @@
 #!/usr/bin/env python3
-"""Create six fully synthetic contract fixtures and matching, extractable PDFs."""
+"""Create the contracts shown on the samples page. All parties are fictional."""
 import json
-import re
+import os
 from pathlib import Path
-from xml.sax.saxutils import escape
 
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_LEFT
+import fitz
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.pdfgen.canvas import Canvas
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def employment(employer, address, ceo, phone, worker, worker_address, worker_phone, signed, period, place, job, hours, days, weekly, wage, extras):
+    return [
+        ("title", "근 로 계 약 서"),
+        ("text", f"{employer}(이하 “사업주”라 함)과 {worker}(이하 “근로자”라 함)은"),
+        ("text", "다음과 같이 근로계약을 체결한다."),
+        ("gap", ""),
+        ("text", f"1. 근로계약기간 : {period}"),
+        ("text", f"2. 근무장소 : {place}"),
+        ("text", f"3. 업무의 내용 : {job}"),
+        ("text", f"4. 소정근로시간 : {hours}"),
+        ("text", f"5. 근무일/휴일 : {days}"),
+        ("text", f"   주당 {weekly}시간 근무"),
+        ("text", "6. 임금"),
+        ("text", f"   - 월급 : {wage}"),
+        ("text", "   - 임금지급일 : 매월 25일(휴일의 경우는 전일 지급)"),
+        ("text", "   - 지급방법 : 근로자 명의 예금통장에 입금"),
+        ("text", "7. 연차유급휴가 : 연차유급휴가는 근로기준법에서 정하는 바에 따라 부여함"),
+        ("text", "8. 사회보험 적용여부 : 고용보험, 산재보험, 국민연금, 건강보험 모두 가입"),
+        ("text", "9. 근로계약서 교부 : 사업주는 계약 체결과 동시에 사본을 근로자에게 교부함"),
+        ("text", "10. 기타 사항"),
+        *[("text", f"   - {line}") for line in extras],
+        ("gap", ""),
+        ("center", signed),
+        ("gap", ""),
+        ("text", f"(사업주) 사업체명 : {employer}      전화 : {phone}"),
+        ("text", f"         주    소 : {address}"),
+        ("text", f"         대 표 자 : {ceo}   (인)"),
+        ("gap", ""),
+        ("text", f"(근로자) 주    소 : {worker_address}"),
+        ("text", f"         연 락 처 : {worker_phone}"),
+        ("text", f"         성    명 : {worker}   (서명)"),
+    ]
+
+
+LEASE = [
+    ("title", "주 택 임 대 차 계 약 서"),
+    ("text", "임대인과 임차인은 아래 부동산에 관하여 다음과 같이 임대차계약을 체결한다."),
+    ("gap", ""),
+    ("heading", "1. 부동산의 표시"),
+    ("text", "   소재지 : 서울특별시 은평구 연서로 214-7, 3층 302호"),
+    ("text", "   구조·용도 : 철근콘크리트 / 다세대주택, 전용면적 39.6㎡"),
+    ("gap", ""),
+    ("heading", "2. 계약 내용"),
+    ("text", "   보증금 : 금 50,000,000원"),
+    ("text", "   월세 : 금 450,000원 (매월 5일 지급)"),
+    ("text", "   계약금 : 금 5,000,000원은 계약 시 지급하고 영수함"),
+    ("text", "   잔금 : 금 45,000,000원은 2026년 12월 5일 지급함"),
+    ("text", "   임대차기간 : 2026년 12월 5일부터 2028년 12월 4일까지"),
+    ("gap", ""),
+    ("heading", "3. 일반 조항"),
+    ("text", "   제1조 임차인은 임대인의 동의 없이 주택을 전대하거나 임차권을 양도하지 못한다."),
+    ("text", "   제2조 관리비와 수도·전기·가스 요금은 임차인이 사용량에 따라 납부한다."),
+    ("text", "   제3조 계약이 종료되면 임차인은 주택을 원상으로 회복하여 임대인에게 반환한다."),
+    ("gap", ""),
+    ("heading", "4. 특약사항"),
+    ("text", "   1) 임대인은 새 임차인이 구해진 후 보증금을 반환한다."),
+    ("text", "   2) 건물 노후로 인한 누수 등 모든 수리비는 임차인이 부담한다."),
+    ("text", "   3) 임차인은 전입신고 및 확정일자 취득을 하지 못한다."),
+    ("text", "   4) 임대인은 퇴거 시 보증금에서 수리비를 일방적으로 공제한다."),
+    ("gap", ""),
+    ("center", "2026년 11월 20일"),
+    ("gap", ""),
+    ("text", "임대인  주소 : 서울특별시 은평구 연서로 214-7, 1층      연락처 : 010-****-6204"),
+    ("text", "        성명 : 이정숙   (인)"),
+    ("gap", ""),
+    ("text", "임차인  주소 : 서울특별시 서대문구 증가로 88, 201호      연락처 : 010-****-1837"),
+    ("text", "        성명 : 박지훈   (인)"),
+]
+
 CASES = [
-    {"id": "employment-basic", "title": "기본 항목이 있는 근로계약", "contract_type": "employment", "tag": "기본 항목", "description": "월급·시간·휴일을 원문과 대조해보세요.",
-     "context": {"document_complete": True, "event_date": "2026-10-10"},
-     "lines": ["근로계약서 / 가상 시연 문서", "사용자: 가상회사 A / 근로자: 가상근로자 A", "계약기간: 2026-10-10 ~ 2027-10-09", "근무장소: 가상회사 A 사무실", "업무: 사무 보조", "월급: 2,500,000원", "지급일: 매월 25일, 근로자 명의 계좌로 지급", "근로시간: 09:00 ~ 18:00, 월요일부터 금요일까지", "주당 40시간 근무", "휴게시간: 1시간, 근로시간 도중 자유롭게 이용", "휴일: 매주 일요일 유급휴일, 토요일 휴무", "변경된 근로조건은 별도 서면으로 확인한다."],
-     "expected": {"wage": 2500000, "wage_status": "found", "issue_types": ["review_scope"]}},
-    {"id": "employment-missing", "title": "종료일·지급방법·휴게·연차가 빈 계약", "contract_type": "employment", "tag": "정보 누락", "description": "작성되지 않은 항목과 확인할 내용을 살펴보세요.", "context": {},
-     "lines": ["아르바이트 근로계약서 / 가상 시연 문서", "사용자: 가상매장 B / 근로자: 가상근로자 B", "계약기간: 2026-10-10 ~ 2027-01-09", "근무장소: 가상매장 B", "업무: 매장 보조", "시급: 12,000원", "근로시간: 10:00 ~ 16:00", "주당 30시간 근무", "기타 조건은 추후 협의한다."],
-     "expected": {"wage": 12000, "wage_status": "found", "issue_types": ["missing_terms", "break_time"]}},
-    {"id": "employment-conflict", "title": "월급이 서로 다른 계약", "contract_type": "employment", "tag": "조항 충돌", "description": "본문과 특약의 금액을 함께 확인해보세요.", "context": {"document_complete": True, "event_date": "2026-10-10"},
-     "lines": ["근로계약서 / 가상 시연 문서", "사용자: 가상회사 C / 근로자: 가상근로자 C", "계약기간: 2026-10-10 ~ 2027-10-09", "근무장소: 가상회사 C 사무실", "본문 월급: 250만원", "특약 월급: 230만원", "지급일: 매월 25일", "근로시간: 09:00 ~ 18:00", "주당 40시간 근무", "휴게시간: 1시간", "휴일: 매주 일요일 유급휴일"],
-     "expected": {"wage_status": "conflict", "issue_types": ["conflicting_terms"]}},
-    {"id": "employment-attention", "title": "수당·퇴사 배상 특약이 있는 계약", "contract_type": "employment", "tag": "주의 특약", "description": "법령 근거와 사업장 규모에 따른 질문을 확인하세요.", "context": {"document_complete": True},
-     "lines": ["근로계약서 / 가상 시연 문서", "사용자: 가상회사 D / 근로자: 가상근로자 D", "계약기간: 2026-10-10 ~ 2027-10-09", "근무장소: 가상회사 D 작업장", "월급: 250만원", "지급일: 매월 25일", "근로시간: 09:00 ~ 19:00", "주당 45시간 근무", "휴게시간: 1시간", "휴일: 매주 일요일", "특약: 연장·야간·휴일근로 수당은 월급에 모두 포함한다.", "특약: 계약기간 중 퇴사하면 위약금 300만원을 지급한다."],
-     "expected": {"wage": 2500000, "wage_status": "found", "issue_types": ["penalty", "included_allowance", "work_hours"]}},
-    {"id": "lease-basic", "title": "처음 확인하는 주택 임대차계약", "contract_type": "lease", "tag": "주거 확인", "description": "보증금·월세와 입주·전입신고를 확인하세요.", "context": {"document_complete": True},
-     "lines": ["주택 임대차계약서 / 가상 시연 문서", "임대인: 가상임대인 E / 임차인: 가상임차인 E", "목적물: 가상시 가상구 가상로 10, 101호", "보증금: 1,000만원", "월세: 50만원", "임대차기간: 2026-10-10 ~ 2028-10-09", "월세는 매월 10일에 지급한다.", "보증금 반환 조건: 계약 종료와 주택 인도 시 반환한다.", "수선 및 관리비는 별도 서면 합의로 정한다."],
-     "expected": {"deposit": 10000000, "issue_types": ["lease_registration"]}},
-    {"id": "lease-return", "title": "보증금 반환을 준비하는 계약", "contract_type": "lease", "tag": "반환 상담", "description": "미반환 상황을 입력하고 상담 요약을 만들어보세요.", "context": {"document_complete": True},
-     "lines": ["주택 임대차계약서 / 가상 시연 문서", "임대인: 가상임대인 F / 임차인: 가상임차인 F", "목적물: 가상시 가상구 가상로 20, 202호", "보증금: 1억원", "월세: 0원", "임대차기간: 2026-10-10 ~ 2028-10-09", "특약: 새 임차인이 구해지면 보증금을 반환한다.", "특약: 반환 지연에 관한 사항은 별도 협의한다."],
-     "expected": {"deposit": 100000000, "issue_types": ["lease_registration", "deposit_return"]}},
+    {"id": "employment-cafe", "title": "카페 직원 근로계약서", "contract_type": "employment", "tag": "불리한 조항", "description": "수습 무급, 임금 공제, 퇴사 위약금이 들어 있는 계약입니다.",
+     "context": {"document_complete": True, "event_date": "2026-11-16"}, "pages": employment(
+        "카페 모래내길", "서울특별시 마포구 성산로 148-2, 1층", "정민호", "02-****-7714", "김서연", "서울특별시 마포구 월드컵로 31길 9, 202호", "010-****-3921", "2026년 11월 9일",
+        "2026년 11월 16일부터 2027년 11월 15일까지", "카페 모래내길 매장 (서울특별시 마포구 성산로 148-2, 1층)", "음료 제조, 매장 관리 및 고객 응대",
+        "09시 00분부터 18시 00분까지 (휴게시간 : 12시 00분 ~ 13시 00분)", "매주 5일(화요일~토요일) 근무, 주휴일 매주 일요일", 40, "2,300,000원",
+        ["수습기간 1개월은 교육 기간으로 보아 무급으로 한다.", "근로자의 실수로 발생한 손해 및 재고 부족분은 월급에서 공제한다.", "계약기간 중 퇴사하는 경우 위약금으로 월급 1개월분을 지급한다.", "이 계약에 정함이 없는 사항은 근로기준법령에 의함"]),
+     "expected": {"wage": 2300000, "wage_status": "found", "finding_types": ["penalty", "wage_deduction", "unpaid_trial"]},
+     "translations": {"zh": {"title": "咖啡店员工劳动合同", "tag": "不利条款", "description": "包含试用期无薪、工资扣款和离职违约金。"}, "es": {"title": "Contrato de empleado de cafetería", "tag": "Cláusulas desfavorables", "description": "Incluye prueba sin sueldo, deducciones salariales y penalización por renuncia."}}},
+    {"id": "employment-office", "title": "디자인 회사 근로계약서", "contract_type": "employment", "tag": "불리한 조항", "description": "수당 포함, 연차 포기, 퇴사 후 이직 제한이 들어 있는 계약입니다.",
+     "context": {"document_complete": True, "event_date": "2026-11-16", "workplace_size": "5plus"}, "pages": employment(
+        "주식회사 세움디자인랩", "서울특별시 성동구 왕십리로 58, 5층", "한지원", "02-****-3380", "최민재", "경기도 성남시 분당구 정자일로 72, 806호", "010-****-5512", "2026년 11월 13일",
+        "2026년 11월 16일부터 2027년 11월 15일까지", "본사 사무실 (서울특별시 성동구 왕십리로 58, 5층)", "브랜드 및 웹 디자인 업무",
+        "09시 30분부터 18시 30분까지 (휴게시간 : 12시 30분 ~ 13시 30분)", "매주 5일(월요일~금요일) 근무, 주휴일 매주 일요일", 40, "3,100,000원",
+        ["월급에는 연장·야간·휴일근로 수당이 모두 포함된 것으로 본다.", "근로자는 연차휴가 사용 권리를 포기하고 회사 일정에 따른다.", "퇴사 후 2년간 동종 업계 취업을 금지하며 위반 시 책임을 진다.", "이 계약에 정함이 없는 사항은 근로기준법령에 의함"]),
+     "expected": {"wage": 3100000, "wage_status": "found", "finding_types": ["included_allowance", "leave_waiver", "noncompete"]},
+     "translations": {"zh": {"title": "设计公司劳动合同", "tag": "不利条款", "description": "包含工资含加班费、放弃年假和离职后就业限制。"}, "es": {"title": "Contrato de empresa de diseño", "tag": "Cláusulas desfavorables", "description": "Incluye horas extra en el salario, renuncia a vacaciones y restricción de empleo."}}},
+    {"id": "employment-logistics", "title": "물류센터 근로계약서", "contract_type": "employment", "tag": "불리한 조항", "description": "파손 공제, 중도 퇴사 배상, 서로 다른 월급, 긴 근무시간을 확인해보세요.",
+     "context": {"document_complete": True, "event_date": "2026-11-16", "workplace_size": "5plus"}, "pages": employment(
+        "주식회사 다온물류서비스", "인천광역시 서구 봉수대로 412", "오세훈", "032-****-9021", "정태윤", "인천광역시 서구 검단로 233, 1104호", "010-****-7746", "2026년 11월 12일",
+        "2026년 11월 16일부터 2027년 11월 15일까지", "다온물류 인천센터 (인천광역시 서구 봉수대로 412)", "입출고 관리 및 상품 분류",
+        "08시 00분부터 18시 00분까지 (휴게시간 : 12시 00분 ~ 13시 00분)", "매주 6일(월요일~토요일) 근무, 주휴일 매주 일요일", 54, "2,800,000원",
+        ["특약 월급 : 2,600,000원 (입사 후 6개월간 적용)", "화물 파손 또는 분실로 인한 손해는 해당 금액을 임금에서 공제한다.", "중도 퇴사 시 교육비 명목으로 배상액 200만원을 지급한다.", "이 계약에 정함이 없는 사항은 근로기준법령에 의함"]),
+     "expected": {"wage_status": "conflict", "finding_types": ["penalty", "wage_deduction"], "issue_types": ["conflicting_terms", "work_hours"]},
+     "translations": {"zh": {"title": "物流中心劳动合同", "tag": "不利条款", "description": "请确认损坏扣款、中途离职赔偿、不一致的月薪和较长工时。"}, "es": {"title": "Contrato de centro logístico", "tag": "Cláusulas desfavorables", "description": "Revise deducciones por daños, indemnización por renuncia, salarios distintos y jornada larga."}}},
+    {"id": "employment-fair", "title": "불리한 조항이 없는 근로계약서", "contract_type": "employment", "tag": "비교용", "description": "같은 양식에 불리한 특약이 없는 계약입니다. 위 계약과 비교해보세요.",
+     "context": {"document_complete": True, "event_date": "2026-11-16", "workplace_size": "5plus"}, "pages": employment(
+        "주식회사 한결소프트", "서울특별시 금천구 가산디지털2로 101, 9층", "서유진", "02-****-4196", "윤하늘", "서울특별시 관악구 신림로 59, 403호", "010-****-2268", "2026년 11월 13일",
+        "2026년 11월 16일부터 2027년 11월 15일까지", "본사 사무실 (서울특별시 금천구 가산디지털2로 101, 9층)", "고객 지원 및 사무 행정",
+        "09시 00분부터 18시 00분까지 (휴게시간 : 12시 00분 ~ 13시 00분)", "매주 5일(월요일~금요일) 근무, 주휴일 매주 일요일", 40, "2,900,000원",
+        ["연장·야간·휴일근로 수당은 근로기준법에 따라 별도 산정하여 지급한다.", "근로조건을 변경할 때에는 양 당사자가 서면으로 합의한다.", "이 계약에 정함이 없는 사항은 근로기준법령에 의함"]),
+     "expected": {"wage": 2900000, "wage_status": "found", "finding_types": []},
+     "translations": {"zh": {"title": "没有不利条款的劳动合同", "tag": "对照用", "description": "相同格式但没有不利特约，可与上面的合同比较。"}, "es": {"title": "Contrato sin cláusulas desfavorables", "tag": "Comparación", "description": "Mismo formato sin condiciones desfavorables. Compárelo con los anteriores."}}},
+    {"id": "lease-villa", "title": "다세대주택 임대차계약서", "contract_type": "lease", "tag": "부동산", "description": "보증금 반환 조건, 수리비 전가, 전입신고 제한이 들어 있는 계약입니다.",
+     "context": {"document_complete": True, "event_date": "2026-11-20"}, "pages": LEASE,
+     "expected": {"deposit": 50000000, "finding_types": ["deposit_return", "repair_burden", "registration_waiver", "deposit_deduction"]},
+     "translations": {"zh": {"title": "多户住宅租赁合同", "tag": "房地产", "description": "包含押金返还条件、转嫁维修费和限制迁入登记。"}, "es": {"title": "Contrato de alquiler de vivienda", "tag": "Inmueble", "description": "Incluye condiciones de devolución del depósito, reparaciones y límite al registro."}}},
 ]
 
 
-def employment_lines(case):
-    """Filled synthetic versions of the supplied MOEL numbered form."""
-    code = {"employment-basic": "A", "employment-missing": "B", "employment-conflict": "C", "employment-attention": "D"}[case["id"]]
-    missing = case["id"] == "employment-missing"
-    attention = case["id"] == "employment-attention"
-    company, worker = f"가상회사 {code}", f"가상근로자 {code}"
-    end = "    년    월    일" if missing else "2027년 10월 09일"
-    wage = "12,000원" if missing else "2,500,000원" if code == "A" else "250만원"
-    unit = "시간급" if missing else "월급"
-    rest = "   시   분 ~   시   분" if missing else "12시 00분 ~ 13시 00분"
-    lines = [
-        "표준근로계약서(기간의 정함이 있는 경우)",
-        f'{company}(이하 “사업주”라 함)과 {worker}(이하 “근로자”라 함)은',
-        "다음과 같이 근로계약을 체결한다.",
-        f"1. 근로계약기간 : 2026년 10월 10일부터 {end}까지",
-        f"2. 근 무 장 소 : {company} 사무실 (가상시 가상구 가상로 10)",
-        "3. 업무의 내용 : 사무 보조",
-        f"4. 소정근로시간 : 09시 00분부터 {'19' if attention else '18'}시 00분까지 (휴게시간 : {rest})",
-        "5. 근무일/휴일 : 매주 5일(월요일~금요일) 근무, 주휴일 매주 일요일",
-        f"   주당 {'45' if attention else '40'}시간 근무",
-        "6. 임  금",
-        f"   - {unit} : {wage}",
-        "   - 상여금 : 있음 (    )                  원, 없음 ( O )",
-        "   - 기타급여(제수당 등) : 있음 (    ), 없음 ( O )",
-        "     · __________________ 원, __________________ 원",
-        "     · __________________ 원, __________________ 원",
-        "   - 임금지급일 : " + ("매월      일" if missing else "매월 25일(휴일의 경우는 전일 지급)"),
-        "   - 지급방법 : 근로자에게 직접지급(    ), 근로자 명의 예금통장에 입금(" + ("    " if missing else " O ") + ")",
-        "7. 연차유급휴가",
-        "   - " + ("__________________________________________________" if missing else "연차유급휴가는 근로기준법에서 정하는 바에 따라 부여함"),
-        "8. 사회보험 적용여부(해당란에 체크)",
-        "   ☑ 고용보험    ☑ 산재보험    ☑ 국민연금    ☑ 건강보험",
-        "9. 근로계약서 교부",
-        "   - 사업주는 근로계약을 체결함과 동시에 본 계약서를 사본하여 근로자의",
-        "     교부요구와 관계없이 근로자에게 교부함(근로기준법 제17조 이행)",
-        "10. 근로계약, 취업규칙 등의 성실한 이행의무",
-        "   - 사업주와 근로자는 각자가 근로계약, 취업규칙, 단체협약을 지키고",
-        "     성실하게 이행하여야 함",
-        "11. 기  타",
-        "   - 이 계약에 정함이 없는 사항은 근로기준법령에 의함",
-    ]
-    if code == "C":
-        lines.append("   - 특약 월급 : 230만원")
-    if attention:
-        lines += ["   - 특약: 연장·야간·휴일근로 수당은 월급에 모두 포함한다.",
-                  "   - 특약: 계약기간 중 퇴사하면 위약금 300만원을 지급한다."]
-    lines += ["2026년 10월 10일", f"(사업주) 사업체명 : {company}          (전화 : [가상 연락처])",
-              "         주    소 : 가상시 가상구 가상로 10",
-              f"         대 표 자 : 가상대표 {code}                    (서명)",
-              "(근로자) 주    소 : 가상시 가상구 가상로 20",
-              "         연 락 처 : [가상 연락처]",
-              f"         성    명 : {worker}                    (서명)"]
-    return lines
-
-
-def employment_pdf(path, lines, title):
+def write_pdf(path, case):
     canvas = Canvas(str(path), pagesize=A4)
-    canvas.setTitle(title)
-    canvas.setAuthor("권리ON / 합성 시연 문서")
-    width = A4[0] - 100
-    canvas.setLineWidth(.6)
-    canvas.rect(50, 769, width, 30)
-    canvas.setFont("Form", 16)
-    canvas.drawCentredString(A4[0] / 2, 779, lines[0])
-    body = ParagraphStyle("form", fontName="Form", fontSize=10.4, leading=14.3, wordWrap="CJK")
-    y = 751
-    for line in lines[1:]:
-        if re.match(r"\d+\.", line):
-            y -= 4
-        if line == "2026년 10월 10일":
+    canvas.setTitle(case["title"])
+    width, height = A4
+    y = height - 70
+    for kind, text in case["pages"]:
+        if kind == "title":
+            canvas.setFont("Contract", 19)
+            canvas.drawCentredString(width / 2, y, text)
+            y -= 36
+        elif kind == "gap":
             y -= 9
-            canvas.setFont("Form", 11)
-            canvas.drawCentredString(A4[0] / 2, y - 10, line)
-            y -= 25
-            continue
-        indent = 12 if line.startswith(" ") else 0
-        content = escape(line.strip()).replace("☑", '<font name="Korean">☑</font>')
-        content = re.sub(r" {2,}", lambda match: "&nbsp;" * len(match[0]), content)
-        paragraph = Paragraph(content, body)
-        _, height = paragraph.wrap(width - indent, 1000)
-        y -= height
-        if y < 57:
-            raise ValueError(f"Employment form exceeds one page: {path}")
-        paragraph.drawOn(canvas, 50 + indent, y)
-    canvas.setFont("Korean", 7.5)
-    canvas.setFillColor(colors.HexColor("#666666"))
-    canvas.drawString(50, 32, "고용노동부 제공 서식 참고 / 기능 테스트용 가상 문서 / 실제 계약서가 아닙니다.")
-    canvas.drawRightString(A4[0] - 50, 32, "1 / 1")
+        elif kind == "center":
+            canvas.setFont("Contract", 11)
+            canvas.drawCentredString(width / 2, y, text)
+            y -= 19
+        else:
+            canvas.setFont("Contract", 11 if kind == "heading" else 10.3)
+            if canvas.stringWidth(text.strip(), canvas._fontname, canvas._fontsize) + 110 > width:
+                raise ValueError(f"Line would wrap and split a clause: {text}")
+            indent = len(text) - len(text.lstrip())
+            canvas.drawString(55 + indent * 3.2, y, text.strip())
+            y -= 19 if kind != "heading" else 20
+        if y < 45:
+            raise ValueError(f"Contract exceeds one page: {case['id']}")
     canvas.save()
 
 
 def main():
-    font = Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf")
-    import os
-    font = Path(os.environ.get("GWOLLION_PDF_FONT", font))
+    font = Path(os.environ.get("GWOLLION_FORM_FONT", "/System/Library/Fonts/Supplemental/Arial Unicode.ttf"))
     if not font.exists():
-        raise SystemExit("한국어 TTF 글꼴 경로를 GWOLLION_PDF_FONT에 설정해주세요.")
-    pdfmetrics.registerFont(TTFont("Korean", str(font)))
-    serif = Path(os.environ.get("GWOLLION_FORM_FONT", "/System/Library/Fonts/Supplemental/AppleMyungjo.ttf"))
-    pdfmetrics.registerFont(TTFont("Form", str(serif if serif.exists() else font)))
+        raise SystemExit("한국어 TTF 글꼴 경로를 GWOLLION_FORM_FONT에 설정해주세요.")
+    pdfmetrics.registerFont(TTFont("Contract", str(font)))
     samples = ROOT / "samples"
-    output = ROOT / "samples/pdf"
-    samples.mkdir(exist_ok=True)
-    output.mkdir(parents=True, exist_ok=True)
-    manifest = []
-    body = ParagraphStyle("body", fontName="Korean", fontSize=11, leading=19, textColor=colors.HexColor("#25334a"), wordWrap="CJK", spaceAfter=9)
-    heading = ParagraphStyle("heading", parent=body, fontSize=20, leading=29, spaceAfter=22)
-    note = ParagraphStyle("note", parent=body, fontSize=9, leading=15, textColor=colors.HexColor("#546174"))
+    (samples / "pdf").mkdir(parents=True, exist_ok=True)
+    (samples / "images").mkdir(exist_ok=True)
     for case in CASES:
-        lines = employment_lines(case) if case["contract_type"] == "employment" else case["lines"]
-        text = "\n".join(lines) + "\n\n이 문서는 기능 테스트를 위해 만든 합성 샘플이며 실제 계약서가 아닙니다.\n"
-        (samples / f"{case['id']}.txt").write_text(text, encoding="utf-8")
-        manifest.append({k: v for k, v in case.items() if k != "lines"})
-        if case["contract_type"] == "employment":
-            employment_pdf(output / f"{case['id']}.pdf", lines, case["title"])
-            continue
-        doc = SimpleDocTemplate(str(output / f"{case['id']}.pdf"), pagesize=A4, rightMargin=48, leftMargin=48, topMargin=45, bottomMargin=50, title=case["title"], author="권리ON MVP")
-        story = [Paragraph("권리ON  /  SAMPLE DOCUMENT", note), Spacer(1, 12), Paragraph(escape(lines[0].split(" / ")[0]), heading),
-                 HRFlowable(width="100%", thickness=1, color=colors.HexColor("#c8d3df")), Spacer(1, 18)]
-        story += [Paragraph(escape(line), body) for line in lines]
-        story += [Spacer(1, 20), Paragraph("이 문서는 기능 테스트를 위해 만든 합성 샘플이며 실제 계약서가 아닙니다.", note)]
-
-        def footer(canvas, doc):
-            canvas.setFont("Korean", 9)
-            canvas.setFillColor(colors.HexColor("#546174"))
-            canvas.drawString(48, 30, "권리ON 1차 MVP · 합성 데이터")
-            canvas.drawRightString(A4[0] - 48, 30, str(doc.page))
-
-        doc.build(story, onFirstPage=footer, onLaterPages=footer)
+        lines = [text.strip() if kind in {"title", "center"} else text for kind, text in case["pages"] if kind != "gap"]
+        (samples / f"{case['id']}.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+        pdf = samples / "pdf" / f"{case['id']}.pdf"
+        write_pdf(pdf, case)
+        with fitz.open(pdf) as document:
+            document[0].get_pixmap(matrix=fitz.Matrix(2.5, 2.5), alpha=False).save(samples / "images" / f"{case['id']}.png")
+    manifest = [{k: v for k, v in case.items() if k != "pages"} for case in CASES]
     (samples / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
-    print(f"Created {len(manifest)} synthetic TXT/PDF sample pairs.")
+    print(f"Created {len(CASES)} sample contracts as TXT, PDF and PNG.")
 
 
 if __name__ == "__main__":

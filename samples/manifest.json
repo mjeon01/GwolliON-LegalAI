@@ -1,105 +1,163 @@
 [
   {
-    "id": "employment-basic",
-    "title": "기본 항목이 있는 근로계약",
+    "id": "employment-cafe",
+    "title": "카페 직원 근로계약서",
     "contract_type": "employment",
-    "tag": "기본 항목",
-    "description": "월급·시간·휴일을 원문과 대조해보세요.",
+    "tag": "불리한 조항",
+    "description": "수습 무급, 임금 공제, 퇴사 위약금이 들어 있는 계약입니다.",
     "context": {
       "document_complete": true,
-      "event_date": "2026-10-10"
+      "event_date": "2026-11-16"
     },
     "expected": {
-      "wage": 2500000,
+      "wage": 2300000,
       "wage_status": "found",
-      "issue_types": [
-        "review_scope"
+      "finding_types": [
+        "penalty",
+        "wage_deduction",
+        "unpaid_trial"
       ]
+    },
+    "translations": {
+      "zh": {
+        "title": "咖啡店员工劳动合同",
+        "tag": "不利条款",
+        "description": "包含试用期无薪、工资扣款和离职违约金。"
+      },
+      "es": {
+        "title": "Contrato de empleado de cafetería",
+        "tag": "Cláusulas desfavorables",
+        "description": "Incluye prueba sin sueldo, deducciones salariales y penalización por renuncia."
+      }
     }
   },
   {
-    "id": "employment-missing",
-    "title": "종료일·지급방법·휴게·연차가 빈 계약",
+    "id": "employment-office",
+    "title": "디자인 회사 근로계약서",
     "contract_type": "employment",
-    "tag": "정보 누락",
-    "description": "작성되지 않은 항목과 확인할 내용을 살펴보세요.",
-    "context": {},
-    "expected": {
-      "wage": 12000,
-      "wage_status": "found",
-      "issue_types": [
-        "missing_terms",
-        "break_time"
-      ]
-    }
-  },
-  {
-    "id": "employment-conflict",
-    "title": "월급이 서로 다른 계약",
-    "contract_type": "employment",
-    "tag": "조항 충돌",
-    "description": "본문과 특약의 금액을 함께 확인해보세요.",
+    "tag": "불리한 조항",
+    "description": "수당 포함, 연차 포기, 퇴사 후 이직 제한이 들어 있는 계약입니다.",
     "context": {
       "document_complete": true,
-      "event_date": "2026-10-10"
+      "event_date": "2026-11-16",
+      "workplace_size": "5plus"
+    },
+    "expected": {
+      "wage": 3100000,
+      "wage_status": "found",
+      "finding_types": [
+        "included_allowance",
+        "leave_waiver",
+        "noncompete"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "设计公司劳动合同",
+        "tag": "不利条款",
+        "description": "包含工资含加班费、放弃年假和离职后就业限制。"
+      },
+      "es": {
+        "title": "Contrato de empresa de diseño",
+        "tag": "Cláusulas desfavorables",
+        "description": "Incluye horas extra en el salario, renuncia a vacaciones y restricción de empleo."
+      }
+    }
+  },
+  {
+    "id": "employment-logistics",
+    "title": "물류센터 근로계약서",
+    "contract_type": "employment",
+    "tag": "불리한 조항",
+    "description": "파손 공제, 중도 퇴사 배상, 서로 다른 월급, 긴 근무시간을 확인해보세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-11-16",
+      "workplace_size": "5plus"
     },
     "expected": {
       "wage_status": "conflict",
-      "issue_types": [
-        "conflicting_terms"
-      ]
-    }
-  },
-  {
-    "id": "employment-attention",
-    "title": "수당·퇴사 배상 특약이 있는 계약",
-    "contract_type": "employment",
-    "tag": "주의 특약",
-    "description": "법령 근거와 사업장 규모에 따른 질문을 확인하세요.",
-    "context": {
-      "document_complete": true
-    },
-    "expected": {
-      "wage": 2500000,
-      "wage_status": "found",
-      "issue_types": [
+      "finding_types": [
         "penalty",
-        "included_allowance",
+        "wage_deduction"
+      ],
+      "issue_types": [
+        "conflicting_terms",
         "work_hours"
       ]
+    },
+    "translations": {
+      "zh": {
+        "title": "物流中心劳动合同",
+        "tag": "不利条款",
+        "description": "请确认损坏扣款、中途离职赔偿、不一致的月薪和较长工时。"
+      },
+      "es": {
+        "title": "Contrato de centro logístico",
+        "tag": "Cláusulas desfavorables",
+        "description": "Revise deducciones por daños, indemnización por renuncia, salarios distintos y jornada larga."
+      }
     }
   },
   {
-    "id": "lease-basic",
-    "title": "처음 확인하는 주택 임대차계약",
-    "contract_type": "lease",
-    "tag": "주거 확인",
-    "description": "보증금·월세와 입주·전입신고를 확인하세요.",
+    "id": "employment-fair",
+    "title": "불리한 조항이 없는 근로계약서",
+    "contract_type": "employment",
+    "tag": "비교용",
+    "description": "같은 양식에 불리한 특약이 없는 계약입니다. 위 계약과 비교해보세요.",
     "context": {
-      "document_complete": true
+      "document_complete": true,
+      "event_date": "2026-11-16",
+      "workplace_size": "5plus"
     },
     "expected": {
-      "deposit": 10000000,
-      "issue_types": [
-        "lease_registration"
-      ]
+      "wage": 2900000,
+      "wage_status": "found",
+      "finding_types": []
+    },
+    "translations": {
+      "zh": {
+        "title": "没有不利条款的劳动合同",
+        "tag": "对照用",
+        "description": "相同格式但没有不利特约，可与上面的合同比较。"
+      },
+      "es": {
+        "title": "Contrato sin cláusulas desfavorables",
+        "tag": "Comparación",
+        "description": "Mismo formato sin condiciones desfavorables. Compárelo con los anteriores."
+      }
     }
   },
   {
-    "id": "lease-return",
-    "title": "보증금 반환을 준비하는 계약",
+    "id": "lease-villa",
+    "title": "다세대주택 임대차계약서",
     "contract_type": "lease",
-    "tag": "반환 상담",
-    "description": "미반환 상황을 입력하고 상담 요약을 만들어보세요.",
+    "tag": "부동산",
+    "description": "보증금 반환 조건, 수리비 전가, 전입신고 제한이 들어 있는 계약입니다.",
     "context": {
-      "document_complete": true
+      "document_complete": true,
+      "event_date": "2026-11-20"
     },
     "expected": {
-      "deposit": 100000000,
-      "issue_types": [
-        "lease_registration",
-        "deposit_return"
+      "deposit": 50000000,
+      "finding_types": [
+        "deposit_return",
+        "repair_burden",
+        "registration_waiver",
+        "deposit_deduction"
       ]
+    },
+    "translations": {
+      "zh": {
+        "title": "多户住宅租赁合同",
+        "tag": "房地产",
+        "description": "包含押金返还条件、转嫁维修费和限制迁入登记。"
+      },
+      "es": {
+        "title": "Contrato de alquiler de vivienda",
+        "tag": "Inmueble",
+        "description": "Incluye condiciones de devolución del depósito, reparaciones y límite al registro."
+      }
     }
   }
 ]

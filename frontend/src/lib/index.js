@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { t, language } from "../i18n/index.js";
 
 export const params = new URLSearchParams(window.location.search);
 export const analysisId = params.get("id");
@@ -26,6 +26,7 @@ export async function api(path, options = {}) {
           : "요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.",
     );
     error.status = response.status;
+    error.code = data.code;
     throw error;
   }
   return data;
@@ -36,56 +37,8 @@ export const post = (path, body) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-export function useLoad(path) {
-  const [state, setState] = useState({ data: null, error: "", loading: true });
-  useEffect(() => {
-    const controller = new AbortController();
-    setState({ data: null, error: "", loading: true });
-    if (!path) {
-      setState({ data: null, error: "", loading: false });
-      return;
-    }
-    api(path, { signal: controller.signal })
-      .then((data) => setState({ data, error: "", loading: false }))
-      .catch((error) => {
-        if (error.name !== "AbortError")
-          setState({ data: null, error: error.message, loading: false });
-      });
-    return () => controller.abort();
-  }, [path]);
-  return state;
-}
-export function useAnalysis(id) {
-  const [state, setState] = useState({ data: null, error: "", loading: true });
-  useEffect(() => {
-    const controller = new AbortController();
-    let timer;
-    async function poll() {
-      try {
-        const data = await api("/api/analyses/" + encodeURIComponent(id), {
-          signal: controller.signal,
-        });
-        if (data.status === "failed")
-          throw new Error(
-            data.error || "검토를 완료하지 못했습니다. 다시 등록해주세요.",
-          );
-        const loading = ["queued", "running"].includes(data.status);
-        setState({ data, loading, error: "" });
-        if (loading) timer = setTimeout(poll, 1400);
-      } catch (error) {
-        if (error.name !== "AbortError")
-          setState({ data: null, error: error.message, loading: false });
-      }
-    }
-    if (id) poll();
-    else setState({ data: null, error: "", loading: false });
-    return () => {
-      controller.abort();
-      clearTimeout(timer);
-    };
-  }, [id]);
-  return state;
-}
+
+
 export function readSession(key, fallback) {
   try {
     return JSON.parse(sessionStorage.getItem("veritas:" + key)) ?? fallback;
@@ -100,27 +53,31 @@ export function saveSession(key, value) {
     /* Storage can be disabled. */
   }
 }
-export function useSession(key, initial) {
-  const [value, setValue] = useState(() => readSession(key, initial));
-  useEffect(() => saveSession(key, value), [key, value]);
-  return [value, setValue];
-}
-export function download(text, name) {
-  const url = URL.createObjectURL(
-    new Blob(["\uFEFF", text], { type: "text/plain;charset=utf-8" }),
-  );
+
+export async function downloadPdf(text, name) {
+  const response = await fetch("/api/documents/pdf", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title: name.slice(0, 200), text }),
+  });
+  if (!response.ok)
+    throw new Error("PDF를 만들지 못했습니다. 다시 시도해주세요.");
+  const url = URL.createObjectURL(await response.blob());
   const link = document.createElement("a");
   link.href = url;
-  link.download = name.replace(/[\\/:*?"<>|]/g, "_") + ".txt";
+  link.download = name.replace(/[\\/:*?"<>|]/g, "_") + ".pdf";
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export const dateLabel = (value) =>
-  new Date(value).toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  new Date(value).toLocaleDateString(
+    { ko: "ko-KR", zh: "zh-CN", es: "es-ES" }[language()],
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    },
+  );
 export const statusLabel = (status) =>
   ({
     completed: "검토 완료",

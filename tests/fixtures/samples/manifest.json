@@ -1,0 +1,315 @@
+[
+  {
+    "id": "employment-basic",
+    "title": "기본 항목이 있는 근로계약",
+    "contract_type": "employment",
+    "tag": "기본 항목",
+    "description": "월급·시간·휴일을 원문과 대조해보세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-10-10"
+    },
+    "expected": {
+      "wage": 2500000,
+      "wage_status": "found",
+      "issue_types": [
+        "review_scope"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "基本劳动合同",
+        "tag": "基本项目",
+        "description": "核对工资、工时和休息日。"
+      },
+      "es": {
+        "title": "Contrato laboral básico",
+        "tag": "Datos básicos",
+        "description": "Compare salario, horario y descansos con el original."
+      }
+    }
+  },
+  {
+    "id": "employment-missing",
+    "title": "종료일·지급방법·휴게·연차가 빈 계약",
+    "contract_type": "employment",
+    "tag": "정보 누락",
+    "description": "작성되지 않은 항목과 확인할 내용을 살펴보세요.",
+    "context": {},
+    "expected": {
+      "wage": 12000,
+      "wage_status": "found",
+      "issue_types": [
+        "missing_terms",
+        "break_time"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "缺少信息的劳动合同",
+        "tag": "信息缺失",
+        "description": "检查空白项目和需要确认的信息。"
+      },
+      "es": {
+        "title": "Contrato con datos pendientes",
+        "tag": "Datos ausentes",
+        "description": "Revise los campos vacíos y lo que debe confirmar."
+      }
+    }
+  },
+  {
+    "id": "employment-conflict",
+    "title": "월급이 서로 다른 계약",
+    "contract_type": "employment",
+    "tag": "조항 충돌",
+    "description": "본문과 특약의 금액을 함께 확인해보세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-10-10"
+    },
+    "expected": {
+      "wage_status": "conflict",
+      "issue_types": [
+        "conflicting_terms"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "工资金额冲突的合同",
+        "tag": "条款冲突",
+        "description": "核对正文和特别条款中的不同工资。"
+      },
+      "es": {
+        "title": "Contrato con salarios distintos",
+        "tag": "Contradicciones",
+        "description": "Compare los importes del texto y de las condiciones especiales."
+      }
+    }
+  },
+  {
+    "id": "employment-attention",
+    "title": "수당·퇴사 배상 특약이 있는 계약",
+    "contract_type": "employment",
+    "tag": "주의 특약",
+    "description": "법령 근거와 사업장 규모에 따른 질문을 확인하세요.",
+    "context": {
+      "document_complete": true
+    },
+    "expected": {
+      "wage": 2500000,
+      "wage_status": "found",
+      "issue_types": [
+        "penalty",
+        "included_allowance",
+        "work_hours"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "津贴与离职赔偿条款",
+        "tag": "特别条款",
+        "description": "查看法律依据及单位规模等适用条件。"
+      },
+      "es": {
+        "title": "Complementos e indemnización",
+        "tag": "Condiciones especiales",
+        "description": "Revise las fuentes y las condiciones de aplicación."
+      }
+    }
+  },
+  {
+    "id": "lease-basic",
+    "title": "처음 확인하는 주택 임대차계약",
+    "contract_type": "lease",
+    "tag": "주거 확인",
+    "description": "보증금·월세와 입주·전입신고를 확인하세요.",
+    "context": {
+      "document_complete": true
+    },
+    "expected": {
+      "deposit": 10000000,
+      "issue_types": [
+        "lease_registration"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "基本住房租赁合同",
+        "tag": "住房核对",
+        "description": "核对押金、月租、入住和迁入登记。"
+      },
+      "es": {
+        "title": "Alquiler de vivienda básico",
+        "tag": "Vivienda",
+        "description": "Revise depósito, alquiler, entrega y registro de residencia."
+      }
+    }
+  },
+  {
+    "id": "lease-return",
+    "title": "보증금 반환을 준비하는 계약",
+    "contract_type": "lease",
+    "tag": "반환 상담",
+    "description": "미반환 상황을 입력하고 상담 요약을 만들어보세요.",
+    "context": {
+      "document_complete": true
+    },
+    "expected": {
+      "deposit": 100000000,
+      "issue_types": [
+        "lease_registration",
+        "deposit_return"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "准备请求退还押金",
+        "tag": "押金咨询",
+        "description": "说明未返还情况并准备咨询文件。"
+      },
+      "es": {
+        "title": "Devolución del depósito",
+        "tag": "Consulta",
+        "description": "Describa la falta de devolución y prepare la consulta."
+      }
+    }
+  },
+  {
+    "id": "employment-rights",
+    "title": "근로 권리 제한",
+    "contract_type": "employment",
+    "tag": "권리 제한",
+    "description": "임금 공제·연차 포기·동종업계 취업 제한을 확인하세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-10-10",
+      "workplace_size": "5plus"
+    },
+    "expected": {
+      "wage": 2500000,
+      "wage_status": "found",
+      "issue_types": [
+        "missing_terms",
+        "wage_deduction",
+        "leave_waiver",
+        "noncompete"
+      ],
+      "finding_types": [
+        "wage_deduction",
+        "leave_waiver",
+        "noncompete"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "劳动权利限制",
+        "tag": "权利限制",
+        "description": "核对工资扣款、放弃年假和同业就业限制。"
+      },
+      "es": {
+        "title": "Restricciones laborales",
+        "tag": "Derechos",
+        "description": "Revise deducciones, renuncia a vacaciones y restricciones de empleo."
+      }
+    }
+  },
+  {
+    "id": "lease-burden",
+    "title": "임대차 부담 전가",
+    "contract_type": "lease",
+    "tag": "비용·절차 제한",
+    "description": "노후 수리비·전입신고 제한·일방적인 보증금 공제를 살펴보세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-10-10"
+    },
+    "expected": {
+      "deposit": 10000000,
+      "issue_types": [
+        "lease_registration",
+        "repair_burden",
+        "registration_waiver",
+        "deposit_deduction"
+      ],
+      "finding_types": [
+        "repair_burden",
+        "registration_waiver",
+        "deposit_deduction"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "转嫁租赁负担",
+        "tag": "费用与手续",
+        "description": "检查老化维修费、迁入登记限制和单方扣除押金。"
+      },
+      "es": {
+        "title": "Cargas del alquiler",
+        "tag": "Costes y trámites",
+        "description": "Revise reparaciones por antigüedad, registro y deducciones unilaterales."
+      }
+    }
+  },
+  {
+    "id": "sale-risk",
+    "title": "매매 위험 특약",
+    "contract_type": "sale",
+    "tag": "선지급·면책",
+    "description": "소유권 이전 전 선지급과 하자 책임 일괄 면제를 확인하세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-10-10"
+    },
+    "expected": {
+      "issue_types": [
+        "sale_advance",
+        "sale_defect_waiver"
+      ],
+      "finding_types": [
+        "sale_advance",
+        "sale_defect_waiver"
+      ]
+    },
+    "translations": {
+      "zh": {
+        "title": "买卖风险条款",
+        "tag": "预付款与免责",
+        "description": "核对过户前付款及全面免除瑕疵责任。"
+      },
+      "es": {
+        "title": "Riesgos en la compraventa",
+        "tag": "Anticipo y exención",
+        "description": "Revise el pago previo a la transmisión y la exención por defectos."
+      }
+    }
+  },
+  {
+    "id": "sale-basic",
+    "title": "매매 기본 조건",
+    "contract_type": "sale",
+    "tag": "비교 사례",
+    "description": "잔금과 이전 서류의 동시 이행·하자 확인 조건을 비교하세요.",
+    "context": {
+      "document_complete": true,
+      "event_date": "2026-10-10"
+    },
+    "expected": {
+      "issue_types": [
+        "review_scope"
+      ],
+      "finding_types": []
+    },
+    "translations": {
+      "zh": {
+        "title": "买卖基本条件",
+        "tag": "对照案例",
+        "description": "比较同时履行付款和过户义务及瑕疵检查条件。"
+      },
+      "es": {
+        "title": "Compraventa básica",
+        "tag": "Comparación",
+        "description": "Compare el pago y la transmisión simultáneos y la revisión de defectos."
+      }
+    }
+  }
+]

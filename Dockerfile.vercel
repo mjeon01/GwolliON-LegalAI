@@ -1,0 +1,19 @@
+FROM node:24-slim AS frontend
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+FROM python:3.14-slim
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-kor tesseract-ocr-eng && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY backend/ backend/
+COPY scripts/check_law_api.py scripts/build_law_index.py scripts/
+COPY resources/ resources/
+COPY samples/ samples/
+COPY --from=frontend /app/frontend/dist frontend/dist
+ENV GWOLLION_ALLOWED_HOSTS=*.vercel.app GWOLLION_DB=/tmp/gwollion/analyses.sqlite3 GWOLLION_INLINE_ANALYSIS=1
+CMD ["sh", "-c", "export GWOLLION_TESSDATA=$(dirname $(find /usr/share/tesseract-ocr -name kor.traineddata)) && exec uvicorn backend.app:app --host 0.0.0.0 --port ${PORT:-80}"]

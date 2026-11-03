@@ -1,11 +1,14 @@
+import { useLanguage, t } from "./i18n/index.js";
 import { Component, lazy, Suspense, useEffect } from "react";
-import { analysisId, page, useAnalysis } from "./lib.js";
+import { analysisId, page, saveSession } from "./lib/index.js";
+import useAnalysis from "./hooks/useAnalysis.js";
 import {
   ButtonLink,
   Empty,
   ErrorNotice,
   Header,
   Loading,
+  Logo,
 } from "./components/UI.jsx";
 import Upload from "./pages/Upload.jsx";
 import Review, { Confirm, Original, Sources } from "./pages/Review.jsx";
@@ -40,16 +43,27 @@ function AnalysisPage() {
         }
       />
     );
-  if (loading) return <Loading text="계약서를 검토하고 있습니다." />;
+  if (loading) return <Loading text={t("계약서를 검토하고 있습니다.")} />;
   if (error)
     return (
       <>
         <ErrorNotice message={error} />
+        {data?.request && (
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              saveSession("upload", data.request);
+              window.location.assign("/upload/");
+            }}
+          >
+            {t("입력 복원 후 다시 검토")}
+          </button>
+        )}
         <Empty
-          title="이 계약서를 불러오지 못했습니다."
-          action={<ButtonLink to="/history/">검토 기록으로</ButtonLink>}
+          title={t("이 계약서를 불러오지 못했습니다.")}
+          action={<ButtonLink to="/history/">{t("검토 기록으로")}</ButtonLink>}
         >
-          기록에서 다른 계약서를 선택하거나 다시 등록해주세요.
+          {t("기록에서 다른 계약서를 선택하거나 다시 등록해주세요.")}
         </Empty>
       </>
     );
@@ -65,15 +79,23 @@ function AnalysisPage() {
   return View && data ? <View result={data} /> : null;
 }
 class ErrorBoundary extends Component {
-  state = { failed: false };
+  state = {
+    failed: false,
+  };
   static getDerivedStateFromError() {
-    return { failed: true };
+    return {
+      failed: true,
+    };
   }
   render() {
     return this.state.failed ? (
       <div className="workspace">
-        <ErrorNotice message="화면을 표시하지 못했습니다. 다시 불러오거나 검토 기록으로 이동해주세요." />
-        <ButtonLink to="/history/">검토 기록</ButtonLink>
+        <ErrorNotice
+          message={t(
+            "화면을 표시하지 못했습니다. 다시 불러오거나 검토 기록으로 이동해주세요.",
+          )}
+        />
+        <ButtonLink to="/history/">{t("검토 기록")}</ButtonLink>
       </div>
     ) : (
       this.props.children
@@ -81,9 +103,10 @@ class ErrorBoundary extends Component {
   }
 }
 export default function App() {
+  const lang = useLanguage();
   useEffect(() => {
-    document.title = `${titles[page] || "작업 공간"} · 권리ON`;
-  }, []);
+    document.title = t("{0} · 권리ON", titles[page] || "작업 공간");
+  }, [lang]);
   return (
     <ErrorBoundary>
       {page === "home" ? (
@@ -112,21 +135,18 @@ export default function App() {
               <AnalysisPage />
             ) : (
               <Empty
-                title="이 페이지는 현재 작업 공간에 없습니다."
-                action={<ButtonLink to="/">메인화면으로</ButtonLink>}
+                title={t("이 페이지는 현재 작업 공간에 없습니다.")}
+                action={<ButtonLink to="/">{t("메인화면으로")}</ButtonLink>}
               >
-                상단 메뉴에서 필요한 작업을 선택해주세요.
+                {t("상단 메뉴에서 필요한 작업을 선택해주세요.")}
               </Empty>
             )}
           </main>
           <footer className="workspace-footer">
-            <a href="/" className="footer-brand">
-              권리
-              <span className="brand-on" lang="en">
-                ON
-              </span>
+            <a href="/" className="footer-brand brand">
+              <Logo />
             </a>
-            <p>계약을 이해하고, 다음을 준비하는 공간.</p>
+            <p>{t("계약을 이해하고, 다음을 준비하는 공간.")}</p>
             <span>LOCAL WORKSPACE</span>
           </footer>
         </div>

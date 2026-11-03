@@ -1,5 +1,13 @@
+import { language, useLanguage, t } from "../i18n/index.js";
+import { CLOUD_AI_ENABLED } from "../config/features.js";
+import useTranslatedReview from "../hooks/useTranslatedReview.js";
 import { useEffect, useRef, useState } from "react";
-import { href, params, post, useLoad, useSession } from "../lib.js";
+import { api, href, params } from "../lib/index.js";
+import useLoad from "../hooks/useLoad.js";
+import useSession from "../hooks/useSession.js";
+import { streamChat } from "../lib/streamChat.js";
+import useTypewriter from "../hooks/useTypewriter.js";
+import useChatTranslations from "../hooks/useChatTranslations.js";
 import {
   ButtonLink,
   ErrorNotice,
@@ -7,9 +15,10 @@ import {
   Field,
   Icon,
   PageHead,
+  PrivacyNote,
+  EngineSelect,
   Workflow,
 } from "../components/UI.jsx";
-
 const prompts = [
   ["explain", "쉽게 설명해줘"],
   ["scenario", "어떤 상황에서 불리해?"],
@@ -17,18 +26,36 @@ const prompts = [
   ["prepare", "상담 때 무엇을 준비할까?"],
 ];
 export default function Chat({ result: r }) {
-  const findings = r.review.findings;
+  const lang = useLanguage();
+  const translated = useTranslatedReview(r);
+  const findings = translated.result.review.findings;
+  const [engine, setEngine] = useState(CLOUD_AI_ENABLED ? "openai" : "ollama");
   const initial = findings.some((f) => f.finding_id === params.get("finding"))
     ? params.get("finding")
     : findings[0]?.finding_id || "";
   const [findingId, setFindingId] = useState(initial);
   const [question, setQuestion] = useSession(
-    `question:${r.analysis_id}:${r.analysis_revision}`,
+    `question:${r.analysis_id}:${r.analysis_revision}:${lang}`,
     "",
   );
   const [added, setAdded] = useState([]);
   const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [live, setLive] = useState(null);
+  const requestRef = useRef(null);
+  const committed = useRef(null);
+  const log = useRef(null);
+  const followOutput = useRef(true);
+  const busy = !!live;
+  const typedText = useTypewriter(live?.text || "", live?.id);
+  const phaseText =
+    {
+      preparing: "계약서와 질문을 살펴보고 있습니다.",
+      generating: "답변을 작성하고 있습니다.",
+      verifying: "원문과 근거를 확인하고 있습니다.",
+      retrying: "근거에 맞게 답변을 다듬고 있습니다.",
+      translating: "선택한 언어로 답변을 번역하고 있습니다.",
+      typing: "답변을 표시하고 있습니다.",
+    }[live?.phase] || "답변을 준비하고 있습니다.";
   const {
     data,
     error: loadError,
@@ -38,136 +65,286 @@ export default function Chat({ result: r }) {
   );
   const end = useRef();
   const turns = [...(data?.turns || []), ...added];
+  const localizedChat = useChatTranslations(r, turns, lang);
   const finding = findings.find((f) => f.finding_id === findingId);
+  useEffect(() => () => requestRef.current?.abort(), []);
+  useEffect(() => {
+    if (followOutput.current && log.current)
+      log.current.scrollTop = log.current.scrollHeight;
+  }, [typedText, live?.phase]);
+  useEffect(() => {
+    if (!live?.turn || typedText !== live.text || committed.current === live.id)
+      return;
+    committed.current = live.id;
+    setAdded((old) => [...old, live.turn]);
+    if (live.intent === "custom" && language() === live.language)
+      setQuestion("");
+    setLive(null);
+  }, [live, typedText]);
   useEffect(() => {
     if (added.length)
-      end.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      end.current?.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
   }, [added.length]);
   async function ask(intent, text) {
-    if (busy || loading) return;
-    setBusy(true);
+    if (busy || loading || requestRef.current) return;
+    const controller = new AbortController();
+    requestRef.current = controller;
+    let timedOut = false;
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 210000);
+    const snapshot = {
+      id: crypto.randomUUID(),
+      question: text,
+      text: "",
+      phase: "preparing",
+      intent,
+      language: lang,
+      turn: null,
+    };
+    followOutput.current = true;
+    setLive(snapshot);
     setError("");
     try {
-      const result = await post(`/api/analyses/${r.analysis_id}/chat`, {
-        analysis_revision: r.analysis_revision,
-        finding_id: findingId || null,
-        question: text,
-        intent,
-      });
-      setAdded((old) => [...old, result.turn]);
-      if (intent === "custom") setQuestion("");
+      const result = await streamChat(
+        `/api/analyses/${r.analysis_id}/chat/stream`,
+        {
+          analysis_revision: r.analysis_revision,
+          finding_id: findingId || null,
+          question: text,
+          intent,
+          language: lang,
+          engine: CLOUD_AI_ENABLED ? engine : "ollama",
+        },
+        (event, data) => {
+          if (event === "status")
+            setLive((old) =>
+              old?.id === snapshot.id ? { ...old, phase: data.phase } : old,
+            );
+          if (event === "delta" && typeof data.text === "string")
+            setLive((old) =>
+              old?.id === snapshot.id
+                ? { ...old, text: old.text + data.text, phase: "typing" }
+                : old,
+            );
+        },
+        controller.signal,
+      );
+      setLive((old) =>
+        old?.id === snapshot.id
+          ? {
+              ...old,
+              text: result.turn.answer.text,
+              turn: result.turn,
+              phase: "typing",
+            }
+          : old,
+      );
     } catch (e) {
-      setError(e.message);
+      if (controller.signal.aborted && !timedOut) return;
+      // A disconnect can occur after the server has saved the answer. Recover it
+      // before offering retry so the same question is not accidentally sent twice.
+      const history = await api(
+        `/api/analyses/${r.analysis_id}/chat?analysis_revision=${r.analysis_revision}`,
+      ).catch(() => null);
+      const recovered =
+        history?.turns.length === turns.length + 1 &&
+        history.turns[turns.length];
+      if (
+        recovered &&
+        recovered.question === text &&
+        recovered.finding_id === (findingId || null)
+      ) {
+        setLive({
+          ...snapshot,
+          text: recovered.answer.text,
+          turn: recovered,
+          phase: "typing",
+        });
+      } else {
+        setLive(null);
+        setError(
+          timedOut
+            ? "답변 시간이 초과되었습니다. 질문을 유지했으니 다시 시도해주세요."
+            : e.message,
+        );
+      }
     } finally {
-      setBusy(false);
+      clearTimeout(timeout);
+      requestRef.current = null;
     }
   }
   return (
     <>
       <PageHead
         eyebrow="02 / Understand your contract"
-        title="어떤 조항이 궁금한가요?"
-        description={r.title}
+        title={t("어떤 조항이 궁금한가요?")}
+        description={t(r.title)}
         action={
           <ButtonLink to={href("draft", r.analysis_id)} icon="pen">
-            문서 작성으로
+            {t("문서 작성으로")}
           </ButtonLink>
         }
       />
       <Workflow result={r} />
+      <ErrorNotice message={translated.error} />
       <div className="chat-layout">
         <aside className="panel clause-sidebar">
           <p className="eyebrow">Focus on a clause</p>
-          <Field label="질문할 범위">
+          <Field label={t("질문할 범위")}>
             <select
               value={findingId}
               onChange={(e) => setFindingId(e.target.value)}
               disabled={busy}
             >
-              <option value="">계약서 전체</option>
+              <option value="">{t("계약서 전체")}</option>
               {findings.map((f) => (
                 <option key={f.finding_id} value={f.finding_id}>
-                  {f.title}
+                  {t(f.title)}
                 </option>
               ))}
             </select>
           </Field>
           {finding ? (
             <>
-              <span className="badge">선택한 주의 조항</span>
-              <h2>{finding.title}</h2>
+              <span className="badge">{t("선택한 주의 조항")}</span>
+              <h2>{t(finding.title)}</h2>
               <Evidence id={r.analysis_id} evidence={finding.evidence} />
               <a
                 className="text-link"
-                href={href("sources", r.analysis_id, { finding: findingId })}
+                href={href("sources", r.analysis_id, {
+                  finding: findingId,
+                })}
               >
-                관련 근거 보기 <Icon />
+                {t("관련 근거 보기")}
+                <Icon />
               </a>
             </>
           ) : (
             <>
-              <h2>계약서 전체에 대해 질문합니다.</h2>
+              <h2>{t("계약서 전체에 대해 질문합니다.")}</h2>
               <p className="muted">
-                긴 계약서는 주의 조항을 선택하면 해당 범위에 집중해 질문할 수
-                있습니다.
+                {t(
+                  "긴 계약서는 주의 조항을 선택하면 해당 범위에 집중해 질문할 수 있습니다.",
+                )}
               </p>
               <a className="text-link" href={href("original", r.analysis_id)}>
-                계약서 원문 <Icon />
+                {t("계약서 원문")}
+                <Icon />
               </a>
             </>
           )}
         </aside>
         <section
           className="panel conversation-panel"
-          aria-label="계약서 질문과 답변"
+          aria-label={t("계약서 질문과 답변")}
         >
           <div className="conversation-heading">
             <div className="document-icon">
               <Icon name="chat" />
             </div>
             <div>
-              <h2>계약서 이해하기</h2>
-              <p>원문과 검토 결과를 바탕으로 답합니다.</p>
+              <h2>{t("계약서 이해하기")}</h2>
+              <p>{t("원문과 검토 결과를 바탕으로 답합니다.")}</p>
             </div>
-            <span className="badge">버전 {r.analysis_revision}</span>
+            <span className="badge">
+              {t("버전")}
+              {r.analysis_revision}
+            </span>
           </div>
           <ErrorNotice message={loadError} />
           <div
+            ref={log}
             className="conversation-log"
             aria-live="polite"
+            aria-busy={busy}
             aria-relevant="additions"
             role="log"
+            onScroll={() => {
+              const node = log.current;
+              followOutput.current =
+                node.scrollHeight - node.scrollTop - node.clientHeight < 80;
+            }}
           >
-            {!turns.length && (
+            {!turns.length && !live && (
               <div className="chat-welcome">
                 <span className="mini-brand">ON</span>
-                <h3>어려운 문구, 하나씩 짚어볼까요?</h3>
+                <h3>{t("어려운 문구, 하나씩 짚어볼까요?")}</h3>
                 <p>
-                  {finding
-                    ? "아래 질문을 선택해 조항의 의미와 수정 방향을 확인하세요."
-                    : "궁금한 내용을 입력하거나 왼쪽에서 주의 조항을 선택하세요."}
+                  {t(
+                    finding
+                      ? "아래 질문을 선택해 조항의 의미와 수정 방향을 확인하세요."
+                      : "궁금한 내용을 입력하거나 왼쪽에서 주의 조항을 선택하세요.",
+                  )}
                 </p>
               </div>
             )}
-            {turns.map((turn, i) => (
+            {localizedChat.turns.map((turn, i) => (
               <div className="chat-turn" key={i}>
                 <div className="user-message">
-                  <span>나의 질문</span>
+                  <span>{t("나의 질문")}</span>
                   <p>{turn.question}</p>
+                  {turn.question_ko && turn.language !== "ko" && (
+                    <details>
+                      <summary>{t("질문의 한국어 해석")}</summary>
+                      <p lang="ko">{turn.question_ko}</p>
+                    </details>
+                  )}
                 </div>
                 <div className="assistant-message">
                   <span className="answer-label">
-                    권리ON{" "}
+                    {t("권리ON")}
+                    {t(" ")}
                     <span>
-                      {turn.answer.method === "ollama"
-                        ? "로컬 AI 답변"
-                        : "조항 해설"}
+                      {t(
+                        turn.answer.method === "ollama" ||
+                          turn.answer.method === "openai"
+                          ? "AI 답변"
+                          : "조항 해설",
+                      )}
                     </span>
                   </span>
-                  <p>{turn.answer.text}</p>
+                  {turn.translationPending && (
+                    <p className="inline-status" role="status">
+                      <span className="spinner" />
+                      {t("선택한 언어로 답변을 번역하고 있습니다.")}
+                    </p>
+                  )}
+                  {turn.translationError && (
+                    <div className="notice" role="alert">
+                      <p>{t(turn.translationError)}</p>
+                      <button
+                        className="text-link"
+                        onClick={localizedChat.retry}
+                      >
+                        {t("번역 다시 시도")}
+                      </button>
+                    </div>
+                  )}
+                  {turn.answer.text && (
+                    <p
+                      lang={
+                        turn.displayLanguage === "zh"
+                          ? "zh-Hans"
+                          : turn.displayLanguage || "ko"
+                      }
+                    >
+                      {turn.answer.text}
+                    </p>
+                  )}
+                  {turn.answer.text_ko && turn.displayLanguage !== "ko" && (
+                    <details>
+                      <summary>{t("한국어 답변")}</summary>
+                      <p lang="ko">{turn.answer.text_ko}</p>
+                    </details>
+                  )}
                   {turn.answer.evidence?.length > 0 && (
                     <details>
-                      <summary>답변에 사용한 계약서 원문</summary>
+                      <summary>{t("답변에 사용한 계약서 원문")}</summary>
                       <Evidence
                         id={r.analysis_id}
                         evidence={turn.answer.evidence}
@@ -180,42 +357,75 @@ export default function Chat({ result: r }) {
                       href={href(
                         "sources",
                         r.analysis_id,
-                        turn.finding_id ? { finding: turn.finding_id } : {},
+                        turn.finding_id
+                          ? {
+                              finding: turn.finding_id,
+                            }
+                          : {},
                       )}
                     >
-                      참고 근거 확인 <Icon />
+                      {t("참고 근거 확인")}
+                      <Icon />
                     </a>
                   )}
                 </div>
               </div>
             ))}
-            {busy && (
-              <p className="inline-status" role="status">
-                <span className="spinner" />
-                답변을 준비하고 있습니다.
-              </p>
+            {live && (
+              <div className="chat-turn streaming-turn" aria-hidden="true">
+                <div className="user-message">
+                  <span>{t("나의 질문")}</span>
+                  <p>{live.question}</p>
+                </div>
+                <div className="assistant-message">
+                  <span className="answer-label">{t("권리ON")}</span>
+                  {typedText ? (
+                    <p
+                      className="streaming-text"
+                      lang={live.language === "zh" ? "zh-Hans" : live.language}
+                    >
+                      {typedText}
+                      <span className="typing-caret" />
+                    </p>
+                  ) : (
+                    <div className="typing-status">
+                      <span className="typing-dots">
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                      <span>{t(phaseText)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
             <div ref={end} />
           </div>
+          <p className="visually-hidden" role="status">
+            {busy ? t(phaseText) : ""}
+          </p>
           <div className="composer">
             <div className="quick-prompts">
               {prompts.map(([intent, text]) => (
                 <button
                   key={intent}
                   disabled={!finding || busy || loading || !!loadError}
-                  onClick={() => ask(intent, text)}
+                  onClick={() => ask(intent, t(text))}
                 >
-                  {text}
+                  {t(text)}
                 </button>
               ))}
             </div>
+            <EngineSelect value={engine} onChange={setEngine} />
+            {(engine === "openai" || lang !== "ko") && <PrivacyNote />}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 ask("custom", question.trim());
               }}
             >
-              <Field label="직접 질문하기">
+              <Field label={t("직접 질문하기")}>
                 <textarea
                   rows={3}
                   minLength={2}
@@ -224,12 +434,12 @@ export default function Chat({ result: r }) {
                   value={question}
                   disabled={busy}
                   onChange={(e) => setQuestion(e.target.value)}
-                  placeholder="이 계약서에서 궁금한 내용을 적어주세요."
+                  placeholder={t("이 계약서에서 궁금한 내용을 적어주세요.")}
                 />
               </Field>
               <div className="composer-bottom">
                 <span className="small muted">
-                  자유 질문은 이 컴퓨터의 Ollama 모델을 사용합니다.
+                  {t("한국어·중국어·스페인어로 질문할 수 있습니다.")}
                 </span>
                 <button
                   className="btn btn-primary btn-sm"
@@ -237,7 +447,8 @@ export default function Chat({ result: r }) {
                     busy || loading || !!loadError || question.trim().length < 2
                   }
                 >
-                  질문 보내기 <Icon />
+                  {t("질문 보내기")}
+                  <Icon />
                 </button>
               </div>
             </form>

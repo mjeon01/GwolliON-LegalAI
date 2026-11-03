@@ -26,15 +26,15 @@ def review(text, contract_type="employment", role=None, complete=True, reading=N
 
 class ReviewTests(unittest.TestCase):
     def test_normal_complete_contract_is_clear_but_blank_form_is_not(self):
-        good = review((ROOT / "samples/employment-basic.txt").read_text())
-        missing = review((ROOT / "samples/employment-missing.txt").read_text())
+        good = review((ROOT / "tests/fixtures/samples/employment-basic.txt").read_text())
+        missing = review((ROOT / "tests/fixtures/samples/employment-missing.txt").read_text())
         self.assertEqual(good["review"]["verdict"], "clear")
         self.assertEqual(good["review"]["findings"], [])
         self.assertEqual(missing["review"]["verdict"], "needs_information")
 
     def test_ordinary_deposit_return_is_not_a_warning(self):
-        normal = review((ROOT / "samples/lease-basic.txt").read_text(), "lease")
-        conditional = review((ROOT / "samples/lease-return.txt").read_text(), "lease")
+        normal = review((ROOT / "tests/fixtures/samples/lease-basic.txt").read_text(), "lease")
+        conditional = review((ROOT / "tests/fixtures/samples/lease-return.txt").read_text(), "lease")
         self.assertEqual(normal["review"]["verdict"], "clear")
         self.assertEqual(conditional["review"]["verdict"], "warning")
         finding = conditional["review"]["findings"][0]
@@ -44,51 +44,51 @@ class ReviewTests(unittest.TestCase):
         self.assertIn("새 임차인", finding["evidence"][0]["quote"])
 
     def test_same_lease_is_reviewed_from_the_selected_party(self):
-        text = (ROOT / "samples/lease-return.txt").read_text()
+        text = (ROOT / "tests/fixtures/samples/lease-return.txt").read_text()
         result = review(text, "lease", "landlord")
         self.assertNotIn("deposit_return", [f["issue_type"] for f in result["review"]["findings"]])
         with self.assertRaises(ValueError):
             AnalyzeRequest(text=text, contract_type="lease", user_role="worker")
 
     def test_repair_registration_and_noncompete_burdens_have_original_evidence(self):
-        text = (ROOT / "samples/lease-basic.txt").read_text() + "\n특약: 노후로 인한 모든 수리비는 임차인이 부담한다.\n특약: 임차인은 전입신고를 하지 않는다."
+        text = (ROOT / "tests/fixtures/samples/lease-basic.txt").read_text() + "\n특약: 노후로 인한 모든 수리비는 임차인이 부담한다.\n특약: 임차인은 전입신고를 하지 않는다."
         result = review(text, "lease")
         self.assertTrue({"repair_burden", "registration_waiver"} <= {f["issue_type"] for f in result["review"]["findings"]})
         for finding in result["review"]["findings"]:
             for e in finding["evidence"]:
                 b = next(b for b in result["blocks"] if b["block_id"] == e["block_id"])
                 self.assertEqual(b["text"][e["start"]:e["end"]], e["quote"])
-        work = review((ROOT / "samples/employment-basic.txt").read_text() + "\n퇴사 후 동종 업계에 취업을 금지한다.")
+        work = review((ROOT / "tests/fixtures/samples/employment-basic.txt").read_text() + "\n퇴사 후 동종 업계에 취업을 금지한다.")
         self.assertIn("noncompete", [f["issue_type"] for f in work["review"]["findings"]])
 
     def test_negations_and_mixed_sentences_do_not_hide_a_separate_burden(self):
-        text = (ROOT / "samples/employment-basic.txt").read_text() + "\n위약금은 정하지 않는다. 실수로 발생한 손해는 급여에서 공제한다."
+        text = (ROOT / "tests/fixtures/samples/employment-basic.txt").read_text() + "\n위약금은 정하지 않는다. 실수로 발생한 손해는 급여에서 공제한다."
         result = review(text)
         types = [f["issue_type"] for f in result["review"]["findings"]]
         self.assertNotIn("penalty", types)
         self.assertIn("wage_deduction", types)
-        lease = review((ROOT / "samples/lease-basic.txt").read_text()+"\n전입신고를 금지하지 않는다. 모든 수리비를 임차인이 부담하지 않는다.", "lease")
+        lease = review((ROOT / "tests/fixtures/samples/lease-basic.txt").read_text()+"\n전입신고를 금지하지 않는다. 모든 수리비를 임차인이 부담하지 않는다.", "lease")
         self.assertEqual(lease["review"]["findings"], [])
 
     def test_ocr_and_partial_document_cannot_get_a_clean_summary(self):
-        text = (ROOT / "samples/employment-basic.txt").read_text()
+        text = (ROOT / "tests/fixtures/samples/employment-basic.txt").read_text()
         for args in ({"complete": False}, {"reading": {"methods": ["ocr"], "ocr_used": True}}):
             self.assertEqual(review(text, **args)["review"]["verdict"], "needs_information")
 
     def test_special_employment_form_is_not_clear_before_additional_validation(self):
-        text = (ROOT / "samples/employment-basic.txt").read_text().replace("표준근로계약서", "단시간 근로계약서")
+        text = (ROOT / "tests/fixtures/samples/employment-basic.txt").read_text().replace("표준근로계약서", "단시간 근로계약서")
         result = review(text)
         self.assertEqual(result["review"]["verdict"], "needs_information")
         self.assertTrue(any("근로일별" in reason for reason in result["review"]["pending_reasons"]))
 
     def test_separately_paid_allowances_are_not_flagged_as_included(self):
-        text = (ROOT / "samples/employment-basic.txt").read_text()+"\n연장근로수당은 월급에 포함하지 않고 별도로 지급한다."
+        text = (ROOT / "tests/fixtures/samples/employment-basic.txt").read_text()+"\n연장근로수당은 월급에 포함하지 않고 별도로 지급한다."
         result = review(text)
         self.assertNotIn("included_allowance", [i["issue_type"] for i in result["issues"]])
         self.assertEqual(result["review"]["verdict"], "clear")
 
     def test_commercial_lease_cannot_be_declared_clear_under_housing_criteria(self):
-        text = (ROOT / "samples/lease-basic.txt").read_text().replace("주택 임대차계약서", "상가 임대차계약서")
+        text = (ROOT / "tests/fixtures/samples/lease-basic.txt").read_text().replace("주택 임대차계약서", "상가 임대차계약서")
         result = review(text, "lease")
         self.assertEqual(result["review"]["verdict"], "needs_information")
         self.assertFalse(any(s.get("law_title") == "주택임대차보호법" for s in result["sources"]))
@@ -118,14 +118,14 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(output["rejected_candidates"], 1)
 
     def test_consultation_letter_uses_the_problem_clause_and_stated_goal(self):
-        result = review((ROOT / "samples/lease-return.txt").read_text(), "lease")
+        result = review((ROOT / "tests/fixtures/samples/lease-return.txt").read_text(), "lease")
         document = draft(result, "lawyer_request", IncidentFacts(summary="계약 종료가 다가와서 보증금 반환일을 서면으로 확인하고 싶습니다.", desired_outcome="특약 삭제 협의를 도와주세요."))
         self.assertIn("새 임차인", document["draft_text"])
         self.assertIn("특약 삭제 협의", document["draft_text"])
         self.assertTrue(any(f["origin"] == "user_reported" for f in document["facts_used"]))
 
     def test_complaint_does_not_turn_contract_sum_into_an_actual_loss(self):
-        result = review((ROOT / "samples/lease-return.txt").read_text(), "lease")
+        result = review((ROOT / "tests/fixtures/samples/lease-return.txt").read_text(), "lease")
         document = draft(result, "complaint", IncidentFacts(summary="계약 종료 전에 반환 계획을 물었지만 상대방이 답변하지 않고 있습니다."))
         self.assertNotIn("1억원", document["draft_text"])
         self.assertIn("현재 미확정", document["draft_text"])
@@ -135,14 +135,14 @@ class ReviewTests(unittest.TestCase):
             DraftRequest(analysis_revision=1, kind="complaint")
 
     def test_custom_chat_rejects_fabricated_sources(self):
-        result = review((ROOT / "samples/lease-return.txt").read_text(), "lease")
+        result = review((ROOT / "tests/fixtures/samples/lease-return.txt").read_text(), "lease")
         body = ChatRequest(analysis_revision=1, question="정확히 어떤 뜻이야?", finding_id="R001")
         with patch("backend.chat.generate", return_value=({"answer": "이해를 돕는 답변입니다.", "evidence_ids": ["B9999"], "source_ids": []}, "fixture")):
             with self.assertRaises(ValueError):
                 answer_question(result, body, [])
 
     def test_uncited_known_ids_do_not_become_ai_citations(self):
-        result = review((ROOT / "samples/lease-return.txt").read_text(), "lease")
+        result = review((ROOT / "tests/fixtures/samples/lease-return.txt").read_text(), "lease")
         body = ChatRequest(analysis_revision=1, question="무엇을 준비할까?")
         source_id = result["sources"][0]["source_id"]
         with patch("backend.chat.generate", return_value=({"answer": "반환 요청과 지급 내역을 서면으로 정리하세요.", "evidence_ids": [], "source_ids": [source_id], "citations": []}, "fixture")):
@@ -156,6 +156,9 @@ class ConversationAPITests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.path = Path(self.temp.name)/"db.sqlite3"
+        samples = patch("backend.app.SAMPLES_DIR", ROOT/"tests/fixtures/samples")
+        samples.start()
+        self.addCleanup(samples.stop)
         self.client = TestClient(create_app(self.path))
         self.client.__enter__()
         sample = self.client.get("/api/samples/lease-return").json()

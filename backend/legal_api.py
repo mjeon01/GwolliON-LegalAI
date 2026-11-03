@@ -9,9 +9,9 @@ import re
 import time
 import uuid
 
-from scripts.check_law_api import (load_env, check_endpoint, fetch_json, sanitize,
-                                   DEFAULT_SEARCH, DEFAULT_SERVICE, public_law_link)
-from scripts.build_law_index import flatten
+from backend.config import load_env
+from backend.law_client import (check_endpoint, fetch_json, sanitize, DEFAULT_SEARCH,
+                                DEFAULT_SERVICE, public_law_link, flatten)
 
 ROOT = Path(__file__).resolve().parents[1]
 

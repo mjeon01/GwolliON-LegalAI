@@ -1,6 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { analysisId, href, page } from "../lib.js";
-
+import logoSrc from "../assets/logo.webp";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useId,
+  cloneElement,
+  isValidElement,
+} from "react";
+import { t } from "../i18n/index.js";
+import { CLOUD_AI_ENABLED } from "../config/features.js";
+import LanguagePicker from "./LanguagePicker.jsx";
+import { analysisId, href, page } from "../lib/index.js";
 export function Icon({ name = "arrow", ...props }) {
   const paths = {
     arrow: "M4 12h16m-6-6 6 6-6 6",
@@ -21,6 +31,9 @@ export function Icon({ name = "arrow", ...props }) {
       <path d={paths[name] || paths.arrow} />
     </svg>
   );
+}
+export function Logo() {
+  return <img src={logoSrc} alt="" className="logo-image" />;
 }
 export function Header({ home = false }) {
   const [open, setOpen] = useState(false);
@@ -53,22 +66,14 @@ export function Header({ home = false }) {
   return (
     <header className={`nav ${home ? "" : "workspace-nav"}`}>
       <a className="skip-link" href="#main">
-        본문으로 건너뛰기
+        {t("본문으로 건너뛰기")}
       </a>
-      <a href="/" className="brand" aria-label="권리ON 홈">
-        <svg viewBox="0 0 32 32" aria-hidden="true" className="logo-mark">
-          <path d="M16 4v22M9 26h14M6 9h20M16 5.5l-10 3.5M16 5.5l10 3.5M6 9l-3.5 8h7zM26 9l-3.5 8h7zM2.5 17a3.5 2 0 0 0 7 0M22.5 17a3.5 2 0 0 0 7 0" />
-        </svg>
-        <span className="brand-wordmark">
-          권리
-          <span className="brand-on" lang="en">
-            ON
-          </span>
-        </span>
+      <a href="/" className="brand" aria-label={t("권리ON 홈")}>
+        <Logo />
       </a>
       <nav
         id="primary-nav"
-        aria-label="주 메뉴"
+        aria-label={t("주 메뉴")}
         className={`links ${open ? "open" : ""}`}
       >
         {nav.map(([key, label]) => (
@@ -81,17 +86,19 @@ export function Header({ home = false }) {
             className={selected === key ? "active" : ""}
             aria-current={selected === key ? "page" : undefined}
           >
-            {label}
+            {t(label)}
           </a>
         ))}
         <a href="/upload/" className="btn btn-sm btn-primary nav-cta">
-          새 계약서 검토 <Icon />
+          {t("새 계약서 검토")}
+          <Icon />
         </a>
       </nav>
+      <LanguagePicker onOpen={() => setOpen(false)} />
       <button
         ref={burger}
         className={`burger ${open ? "x" : ""}`}
-        aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
+        aria-label={t(open ? "메뉴 닫기" : "메뉴 열기")}
         aria-controls="primary-nav"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
@@ -108,12 +115,12 @@ export function PageHead({ eyebrow, title, description, action }) {
       <div>
         <p className="eyebrow" lang="en">
           <span className="rule" />
-          {eyebrow}
+          {t(eyebrow)}
         </p>
-        <h1>{title}</h1>
-        {description && <p className="page-description">{description}</p>}
+        <h1>{t(title)}</h1>
+        {description && <p className="page-description">{t(description)}</p>}
       </div>
-      {action}
+      {t(action)}
     </div>
   );
 }
@@ -130,7 +137,7 @@ export function ButtonLink({
       href={to}
       {...props}
     >
-      {children}
+      {t(children)}
       {icon && <Icon name={icon} />}
     </a>
   );
@@ -141,14 +148,14 @@ export function ErrorNotice({ message }) {
     <div className="notice error-notice" role="alert">
       <Icon name="alert" />
       <div>
-        {message}
+        {t(message)}
         <div className="error-action">
           <button
             type="button"
             className="text-link"
             onClick={() => window.location.reload()}
           >
-            최신 화면 다시 불러오기
+            {t("최신 화면 다시 불러오기")}
           </button>
         </div>
       </div>
@@ -159,8 +166,8 @@ export function Loading({ text = "내용을 불러오는 중입니다." }) {
   return (
     <div className="loading-state" role="status">
       <span className="spinner" />
-      <h2>{text}</h2>
-      <p>잠시만 기다려주세요.</p>
+      <h2>{t(text)}</h2>
+      <p>{t("잠시만 기다려주세요.")}</p>
     </div>
   );
 }
@@ -168,15 +175,15 @@ export function Empty({ title, children, action, icon = "file" }) {
   return (
     <div className="empty-state panel">
       <Icon name={icon} />
-      <h2>{title}</h2>
-      <p>{children}</p>
-      {action}
+      <h2>{t(title)}</h2>
+      <p>{t(children)}</p>
+      {t(action)}
     </div>
   );
 }
 export function Workflow({ result }) {
   return (
-    <div className="workflow" aria-label="계약서 작업 단계">
+    <div className="workflow" aria-label={t("계약서 작업 단계")}>
       {[
         ["review", "검토 결과"],
         ["chat", "조항 질문"],
@@ -188,8 +195,8 @@ export function Workflow({ result }) {
           aria-current={page === name ? "step" : undefined}
           href={href(name, result.analysis_id)}
         >
-          <span>0{i + 1}</span>
-          {title}
+          <span>0{t(i + 1)}</span>
+          {t(title)}
           <Icon />
         </a>
       ))}
@@ -202,29 +209,80 @@ export function Back({ result }) {
       className="text-link back-link"
       href={href("review", result.analysis_id)}
     >
-      <Icon name="back" /> 검토 결과로
+      <Icon name="back" />
+      {t("검토 결과로")}
     </a>
   );
 }
 export function Field({ label, hint, children }) {
+  const generatedId = useId();
+  const id = children?.props?.id || generatedId;
   return (
-    <label className="field">
-      <span className="field-label">{label}</span>
-      {children}
-      {hint && <span className="field-hint">{hint}</span>}
-    </label>
+    <div className="field">
+      <label className="field-label" htmlFor={id}>
+        {t(label)}
+      </label>
+      {isValidElement(children)
+        ? cloneElement(children, {
+            id,
+            "aria-describedby": hint
+              ? id + "-hint"
+              : children.props["aria-describedby"],
+          })
+        : children}
+      {hint && (
+        <span id={id + "-hint"} className="field-hint">
+          {t(hint)}
+        </span>
+      )}
+    </div>
   );
 }
 export function Evidence({ evidence = [], id }) {
   return evidence.map((e, i) => (
     <blockquote className="evidence" key={i}>
-      <p>{e.quote}</p>
+      <p lang="ko">{e.quote}</p>
       <a
         className="text-link"
-        href={href("original", id, { block: e.block_id })}
+        href={href("original", id, {
+          block: e.block_id,
+        })}
       >
-        {e.page}페이지 원문 보기 <Icon />
+        {t("{0}페이지 원문 보기", e.page)}
+        <Icon />
       </a>
     </blockquote>
   ));
+}
+export function PrivacyNote() {
+  if (!CLOUD_AI_ENABLED) return null;
+  return (
+    <p className="privacy-note">
+      {t(
+        "이미지·텍스트가 OpenAI로 전송됩니다. 응답 저장은 끄지만 완전한 무보관은 아닙니다.",
+      )}
+      <a
+        href="https://developers.openai.com/api/docs/guides/your-data"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {t("OpenAI 데이터 보관 정책 ↗")}
+      </a>
+    </p>
+  );
+}
+export function EngineSelect({ value, onChange, rules = false }) {
+  if (!CLOUD_AI_ENABLED) return null;
+  return (
+    <Field label={t("검토·답변 방식")}>
+      <select value={value} onChange={(e) => onChange(e.target.value)}>
+        <option value="openai">OpenAI AI</option>
+        {rules ? (
+          <option value="rules">{t("로컬 규칙 검토")}</option>
+        ) : (
+          <option value="ollama">{t("로컬 Ollama")}</option>
+        )}
+      </select>
+    </Field>
+  );
 }

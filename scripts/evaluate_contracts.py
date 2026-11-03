@@ -108,7 +108,7 @@ CASES = [
 def clause_benchmark(engine="rules"):
     totals, cases = Counter(), []
     for identifier, kind, role, clause, expected in CASES:
-        base = (ROOT / ("samples/employment-basic.txt" if kind == "employment" else "samples/lease-basic.txt")).read_text() if kind != "sale" else "부동산 매매계약서\n목적물: 가상시 가상로 10\n매매대금: 3억원\n잔금 지급일: 2026-11-01\n소유권 이전: 잔금 지급과 등기서류 제공은 동시에 이행한다."
+        base = (ROOT / ("tests/fixtures/samples/employment-basic.txt" if kind == "employment" else "tests/fixtures/samples/lease-basic.txt")).read_text() if kind != "sale" else "부동산 매매계약서\n목적물: 가상시 가상로 10\n매매대금: 3억원\n잔금 지급일: 2026-11-01\n소유권 이전: 잔금 지급과 등기서류 제공은 동시에 이행한다."
         request = AnalyzeRequest(text=base + "\n" + clause, contract_type=kind, user_role=role, engine=engine, context={"document_complete": True, "event_date": "2026-10-11"})
         blocks, terms, metadata = extract(request)
         result = evaluate(request, blocks, terms, metadata, identifier, 1)
