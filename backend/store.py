@@ -1,4 +1,5 @@
 import json
+import re
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
@@ -10,22 +11,69 @@ class StaleRevision(Exception):
     pass
 
 
+CURRENT_ANALYSIS = "SELECT revision,status FROM analyses WHERE id=?"
+INTERRUPTED = "UPDATE analyses SET status='failed', error='서버가 재시작되어 분석이 중단됐습니다. 새 분석을 실행해주세요.' WHERE status IN ('queued','running')"
+UTC_NOW = "to_char(now() AT TIME ZONE 'utc', 'YYYY-MM-DD HH24:MI:SS')"
+SCHEMA_LOCK = 7264019
+
 DOCUMENTS_IN_USE = "SELECT json_extract(request,'$.document_id') FROM analyses WHERE json_extract(request,'$.document_id') IS NOT NULL"
+
+
+
+def postgres_sql(sql):
+    """Rewrite this module's SQLite statements for Postgres; the store's queries stay in one dialect."""
+    if sql == CURRENT_ANALYSIS:
+        sql += " FOR UPDATE"  # Stands in for BEGIN IMMEDIATE: serializes writers of one analysis.
+    if sql.startswith("CREATE TABLE"):
+        sql = sql.replace("BLOB", "BYTEA").replace("DEFAULT CURRENT_TIMESTAMP", f"DEFAULT {UTC_NOW}")
+    sql = re.sub(r"json_extract\(request,'\$\.(\w+)'\)", r"(request::jsonb->>'\1')", sql)
+    sql = sql.replace("datetime('now','-1 day')", "to_char(now() AT TIME ZONE 'utc' - interval '1 day', 'YYYY-MM-DD HH24:MI:SS')")
+    return sql.replace(", rowid DESC", ", id DESC").replace("?", "%s")
+
+
+class PostgresConnection:
+    """The small part of sqlite3.Connection that Store uses."""
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    def execute(self, sql, params=()):
+        if sql == "BEGIN IMMEDIATE":  # psycopg has already opened a transaction.
+            return None
+        return self.connection.execute(postgres_sql(sql), params)
+
+    def executemany(self, sql, rows):
+        with self.connection.cursor() as cursor:
+            cursor.executemany(postgres_sql(sql), rows)
 
 
 class Store:
     def __init__(self, path=None):
-        self.path = Path(path or ROOT / "var/mvp/analyses.sqlite3")
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.url = str(path) if str(path or "").startswith(("postgres://", "postgresql://")) else None
+        if not self.url:
+            self.path = Path(path or ROOT / "var/mvp/analyses.sqlite3")
+            self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.connect() as db:
+            if self.url:
+                # Instances start concurrently, and CREATE TABLE IF NOT EXISTS can still collide.
+                db.execute(f"SELECT pg_advisory_xact_lock({SCHEMA_LOCK})")
             db.execute("CREATE TABLE IF NOT EXISTS analyses (id TEXT PRIMARY KEY, revision INTEGER NOT NULL, status TEXT NOT NULL, request TEXT NOT NULL, result TEXT, error TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP)")
             db.execute("CREATE TABLE IF NOT EXISTS chats (analysis_id TEXT NOT NULL, revision INTEGER NOT NULL, turn INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY (analysis_id, revision, turn))")
             db.execute("CREATE TABLE IF NOT EXISTS translations (analysis_id TEXT NOT NULL, revision INTEGER NOT NULL, language TEXT NOT NULL, purpose TEXT NOT NULL, source_hash TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY (analysis_id,revision,language,purpose,source_hash))")
             db.execute("CREATE TABLE IF NOT EXISTS document_pages (document_id TEXT NOT NULL, page INTEGER NOT NULL, width INTEGER NOT NULL, height INTEGER NOT NULL, image BLOB NOT NULL, words TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (document_id, page))")
-            db.execute("UPDATE analyses SET status='failed', error='서버가 재시작되어 분석이 중단됐습니다. 새 분석을 실행해주세요.' WHERE status IN ('queued','running')")
+            # A shared database has other live instances, whose running jobs are not ours to fail.
+            if not self.url:
+                db.execute(INTERRUPTED)
 
     @contextmanager
     def connect(self):
+        if self.url:
+            import psycopg
+            from psycopg.rows import dict_row
+            # prepare_threshold=None: Neon's pooled endpoint cannot keep prepared statements.
+            with psycopg.connect(self.url, row_factory=dict_row, prepare_threshold=None) as connection:
+                yield PostgresConnection(connection)
+            return
         db = sqlite3.connect(self.path, timeout=10)
         db.row_factory = sqlite3.Row
         db.execute("PRAGMA secure_delete=ON")
@@ -110,8 +158,8 @@ class Store:
     def append_chat(self, id, revision, previous_count, turn):
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            current = db.execute("SELECT revision,status FROM analyses WHERE id=?", (id,)).fetchone()
-            count = db.execute("SELECT COUNT(*) FROM chats WHERE analysis_id=? AND revision=?", (id, revision)).fetchone()[0]
+            current = db.execute(CURRENT_ANALYSIS, (id,)).fetchone()
+            count = db.execute("SELECT COUNT(*) AS n FROM chats WHERE analysis_id=? AND revision=?", (id, revision)).fetchone()["n"]
             if not current or current["revision"] != revision or current["status"] not in {"completed", "awaiting_input"} or count != previous_count:
                 raise StaleRevision()
             db.execute("INSERT INTO chats VALUES (?,?,?,?)", (id, revision, count+1, json.dumps(turn, ensure_ascii=False)))
@@ -125,7 +173,7 @@ class Store:
     def save_translation(self, id, revision, language, purpose, source_hash, payload):
         with self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            current = db.execute("SELECT revision,status FROM analyses WHERE id=?", (id,)).fetchone()
+            current = db.execute(CURRENT_ANALYSIS, (id,)).fetchone()
             if not current or current["revision"] != revision or current["status"] not in {"completed", "awaiting_input"}:
                 raise StaleRevision()
-            db.execute("INSERT OR REPLACE INTO translations VALUES (?,?,?,?,?,?)", (id, revision, language, purpose, source_hash, json.dumps(payload, ensure_ascii=False)))
+            db.execute("INSERT INTO translations VALUES (?,?,?,?,?,?) ON CONFLICT (analysis_id,revision,language,purpose,source_hash) DO UPDATE SET payload=excluded.payload", (id, revision, language, purpose, source_hash, json.dumps(payload, ensure_ascii=False)))

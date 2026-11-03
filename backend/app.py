@@ -37,7 +37,7 @@ SAMPLES_DIR = ROOT / "samples"
 def create_app(db_path=None):
     @asynccontextmanager
     async def lifespan(app):
-        app.state.store = Store(db_path or os.environ.get("GWOLLION_DB"))
+        app.state.store = Store(db_path or os.environ.get("DATABASE_URL") or os.environ.get("GWOLLION_DB"))
         app.state.executor = ThreadPoolExecutor(max_workers=1)
         app.state.translator = ThreadPoolExecutor(max_workers=1)
         app.state.translation_jobs = {}

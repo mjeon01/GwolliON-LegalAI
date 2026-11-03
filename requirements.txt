@@ -7,3 +7,4 @@ httpx==0.28.1
 reportlab==5.0.1
 PyMuPDF==1.27.2.2
 Pillow==12.1.1
+psycopg[binary]==3.3.7
