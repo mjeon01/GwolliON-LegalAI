@@ -26,6 +26,7 @@ from backend.auto_translation import TranslationUnavailable, translate_analysis
 from backend.pdf_export import render_pdf
 from backend.pages import highlights, ocr_words, snapshot
 from starlette.concurrency import run_in_threadpool
+from backend.sample_translations import sample_translation
 from backend.openai_client import OpenAIError, settings as openai_settings, require_key
 from backend.translation import content_hash, translate_review, translate_document, translate_incident
 
@@ -326,6 +327,9 @@ def create_app(db_path=None):
         cached = app.state.store.translation(id, body.analysis_revision, body.language, "auto_review", digest)
         if cached:
             return {"status": "complete", **cached}
+        bundled = sample_translation(source, body.language)
+        if bundled:
+            return {"status": "complete", **bundled}
         key, jobs = (id, body.analysis_revision, body.language), app.state.translation_jobs
         job = jobs.get(key)
         if job is None:

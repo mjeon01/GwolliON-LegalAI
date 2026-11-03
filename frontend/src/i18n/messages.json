@@ -1895,6 +1895,10 @@
     "zh": "正在翻译合同和说明。（{0}/{1}）",
     "es": "Traduciendo el contrato y las explicaciones. ({0}/{1})"
   },
+  "샘플 계약서용으로 AI가 미리 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.": {
+    "zh": "这是AI为示例合同预先生成的参考译文。合同效力请以韩文原文为准。",
+    "es": "Traducción de referencia generada de antemano por IA para este contrato de ejemplo. La validez del contrato se determina por el original coreano."
+  },
   "이 컴퓨터의 AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.": {
     "zh": "这是本机AI生成的参考译文。合同效力请以韩文原文为准。",
     "es": "Traducción de referencia generada por la IA de este equipo. La validez del contrato se determina por el original coreano."

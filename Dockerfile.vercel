@@ -11,7 +11,6 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ backend/
-COPY scripts/check_law_api.py scripts/build_law_index.py scripts/
 COPY resources/ resources/
 COPY samples/ samples/
 COPY --from=frontend /app/frontend/dist frontend/dist

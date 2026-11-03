@@ -3,10 +3,6 @@
 !/Dockerfile.vercel
 !/requirements.txt
 !/backend
-!/scripts
-scripts/*
-!scripts/check_law_api.py
-!scripts/build_law_index.py
 !/resources
 !/samples
 !/frontend

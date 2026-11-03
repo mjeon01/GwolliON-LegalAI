@@ -20,6 +20,7 @@ export default function Review({ result: original }) {
     done,
     total,
     untranslated,
+    bundled,
     busy,
     error,
     retry,
@@ -52,7 +53,9 @@ export default function Review({ result: original }) {
                 : t("번역을 준비하고 있습니다.")
               : translated
                 ? t(
-                    "이 컴퓨터의 AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.",
+                    bundled
+                      ? "샘플 계약서용으로 AI가 미리 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요."
+                      : "이 컴퓨터의 AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.",
                   )
                 : t("한국어 원문을 표시합니다. 번역을 다시 시도해주세요.")}
             {translated &&

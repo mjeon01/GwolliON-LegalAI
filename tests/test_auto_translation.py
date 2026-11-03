@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 from backend.app import create_app
 from backend.auto_translation import is_faithful, lock, restore, translate_texts
 from backend.knowledge import ROOT
+from backend.sample_translations import sample_translation
 
 
 def replies(mapping):
@@ -77,8 +78,32 @@ class IntegrityTests(unittest.TestCase):
         self.assertEqual(list(output), ["좋은 문장을 번역한다"])
 
 
+class SampleCatalogTests(unittest.TestCase):
+    RESULT = {"blocks": [{"block_id": "b1", "text": "근로자 임금"}, {"block_id": "b2", "text": "2026"}, {"block_id": "b3", "text": "제1조"}],
+              "review": {"headline": "주의", "scope_note": "범위", "role_label": "근로자", "findings": []},
+              "issues": [], "terms": [], "coverage": {"limitations": []}}
+
+    def test_sample_is_served_without_a_model_and_keeps_missing_lines_korean(self):
+        table = {"lines": ["근로자 임금", "제1조"], "es": {"근로자 임금": "Salario del trabajador", "주의": "Atención"}}
+        with patch("backend.sample_translations.catalog", return_value=table), patch("backend.auto_translation.generate") as model:
+            data = sample_translation(self.RESULT, "es")
+        model.assert_not_called()
+        self.assertTrue(data["bundled"])
+        self.assertEqual(data["blocks"], {"b1": "Salario del trabajador"})
+        self.assertEqual(data["untranslated_lines"], 1)
+        self.assertEqual(data["result"]["review"]["headline"], "Atención")
+        self.assertEqual(self.RESULT["review"]["headline"], "주의")
+
+    def test_other_contracts_are_not_treated_as_samples(self):
+        with patch("backend.sample_translations.catalog", return_value={"lines": ["근로자 임금"], "es": {}}):
+            self.assertIsNone(sample_translation(self.RESULT, "es"))
+
+
 class ApiTests(unittest.TestCase):
     def setUp(self):
+        catalog = patch("backend.app.sample_translation", return_value=None)
+        catalog.start()
+        self.addCleanup(catalog.stop)
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
         self.client = TestClient(create_app(Path(folder.name) / "t.sqlite3"))

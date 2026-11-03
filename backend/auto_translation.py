@@ -154,9 +154,14 @@ def read_path(root, path):
 
 
 def translate_analysis(result, language, on_progress=None):
-    paths = review_strings(result)
     block_texts = [b["text"] for b in result["blocks"]]
-    translations = translate_texts([*block_texts, *(read_path(result, p) for p in paths)], language, on_progress)
+    strings = [read_path(result, p) for p in review_strings(result)]
+    return apply_translations(result, language, translate_texts([*block_texts, *strings], language, on_progress))
+
+
+def apply_translations(result, language, translations):
+    """Overlay {text: translation} on a result; anything absent stays in Korean."""
+    paths = review_strings(result)
     translated = copy.deepcopy(result)
     for path in paths:
         text = read_path(result, path)

@@ -40,6 +40,7 @@ export default function useTranslatedReview(original) {
             result: data.result,
             blocks: data.blocks,
             untranslated: data.untranslated_lines,
+            bundled: !!data.bundled,
           });
         }
       } catch (e) {
@@ -60,6 +61,7 @@ export default function useTranslatedReview(original) {
     done: active ? state.done : 0,
     total: active ? state.total : 0,
     untranslated: active ? state.untranslated || 0 : 0,
+    bundled: active && !!state.bundled,
     busy: active && state.busy,
     error: active ? state.error : "",
     retry: () => setRetry((n) => n + 1),
