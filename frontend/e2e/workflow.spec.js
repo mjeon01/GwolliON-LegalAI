@@ -131,11 +131,6 @@ test("photos → review → question → edited TXT with multilingual UI", async
   await page
     .getByLabel("Qué ocurrió realmente")
     .fill("상대방에게 서류 제공일을 요청했지만 아직 답변을 받지 못했습니다.");
-  await expect(page.locator(".incident-translation")).toHaveCount(1);
-  await page.getByRole("button", { name: "Interpretar en coreano" }).click();
-  await page
-    .getByLabel("La interpretación coreana coincide con mi relato.")
-    .check();
   await page
     .getByRole("button", { name: "Crear borrador", exact: true })
     .click();
@@ -143,6 +138,8 @@ test("photos → review → question → edited TXT with multilingual UI", async
     "변호사 상담 요청문",
   );
   await expect(page.locator(".document-translation")).toHaveCount(1);
+  await expect(page.getByLabel("Documento traducido")).toHaveValue(/./);
+  await expect(page.locator(".document-translation .notice")).toContainText("La traducción corresponde");
   await page.locator(".blank-chips button").first().click();
   await expect(page.locator("#draft-editor")).toBeFocused();
   const edited = await page.locator("#draft-editor").inputValue();

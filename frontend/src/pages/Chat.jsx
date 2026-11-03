@@ -30,7 +30,7 @@ export default function Chat({ result: r }) {
   const findings = translated.result.review.findings;
   const initial = findings.some((f) => f.finding_id === params.get("finding"))
     ? params.get("finding")
-    : findings[0]?.finding_id || "";
+    : "";
   const [findingId, setFindingId] = useState(initial);
   const [question, setQuestion] = useSession(
     `question:${r.analysis_id}:${r.analysis_revision}:${lang}`,
@@ -88,6 +88,10 @@ export default function Chat({ result: r }) {
   }, [added.length]);
   async function ask(intent, text) {
     if (busy || loading || requestRef.current) return;
+    // Typed questions keep the chosen scope; clause prompts need a clause, so they fall back to the first.
+    const target =
+      intent === "custom" ? findingId : findingId || findings[0]?.finding_id || "";
+    if (target !== findingId) setFindingId(target);
     const controller = new AbortController();
     requestRef.current = controller;
     let timedOut = false;
@@ -112,7 +116,7 @@ export default function Chat({ result: r }) {
         `/api/analyses/${r.analysis_id}/chat/stream`,
         {
           analysis_revision: r.analysis_revision,
-          finding_id: findingId || null,
+          finding_id: target || null,
           question: text,
           intent,
           language: lang,
@@ -155,7 +159,7 @@ export default function Chat({ result: r }) {
       if (
         recovered &&
         recovered.question === text &&
-        recovered.finding_id === (findingId || null)
+        recovered.finding_id === (target || null)
       ) {
         setLive({
           ...snapshot,
@@ -408,7 +412,7 @@ export default function Chat({ result: r }) {
               {prompts.map(([intent, text]) => (
                 <button
                   key={intent}
-                  disabled={!finding || busy || loading || !!loadError}
+                  disabled={!findings.length || busy || loading || !!loadError}
                   onClick={() => ask(intent, t(text))}
                 >
                   {t(text)}

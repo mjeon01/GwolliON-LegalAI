@@ -1954,5 +1954,77 @@
   "대화를 찾을 수 없습니다.": {
     "zh": "找不到该对话。",
     "es": "No se encontró la conversación."
+  },
+  "계약서·별첨 등 실제 첨부할 자료": {
+    "zh": "合同、附件等实际附上的资料",
+    "es": "Documentos que adjuntará (contrato, anexos, etc.)"
+  },
+  "계약서·이체내역·메시지 등 실제 보유 자료 입력": {
+    "zh": "输入实际持有的资料（合同、转账记录、消息等）",
+    "es": "Indique lo que tiene (contrato, transferencias, mensajes, etc.)"
+  },
+  "관련 계약서나 합의가 있으면 자료를 첨부하고 조항을 입력": {
+    "zh": "如有相关合同或协议，请附上资料并输入条款",
+    "es": "Si hay contrato o acuerdo, adjúntelo e indique la cláusula"
+  },
+  "관할 경찰관서 직접 확인 후 입력": {
+    "zh": "确认管辖警察机关后输入",
+    "es": "Confirme la comisaría competente e indíquela"
+  },
+  "구체적인 사실과 법률 검토 후 입력 — 현재 미확정": {
+    "zh": "确认具体事实并经法律审查后输入——目前未确定",
+    "es": "Indíquelo tras revisar hechos y ley: aún sin confirmar"
+  },
+  "도움을 요청할 사람·기관": {
+    "zh": "求助的人或机构",
+    "es": "Persona o entidad a la que pide ayuda"
+  },
+  "변호사·상담기관": {
+    "zh": "律师或咨询机构",
+    "es": "Abogado o entidad de asesoría"
+  },
+  "보유 중인 자료만 이름·날짜와 함께 입력": {
+    "zh": "仅输入持有的资料及其名称和日期",
+    "es": "Indique solo lo que tiene, con nombre y fecha"
+  },
+  "수사기관에 설명하고 싶은 내용 입력": {
+    "zh": "输入想向调查机关说明的内容",
+    "es": "Indique lo que desea explicar a las autoridades"
+  },
+  "실제로 발생한 피해와 앞으로 우려되는 부담을 구분해 입력": {
+    "zh": "分别输入实际损失和今后担心的负担",
+    "es": "Separe los daños reales de las cargas que teme"
+  },
+  "실제로 지급하거나 잃은 금액·피해 내용과 계산 근거 입력": {
+    "zh": "输入实际支付或损失的金额、损害内容及计算依据",
+    "es": "Indique importes pagados o perdidos, daños y su cálculo"
+  },
+  "알고 있는 정보 입력": {
+    "zh": "输入已知信息",
+    "es": "Indique lo que sepa"
+  },
+  "알고 있는 정보만 입력": {
+    "zh": "仅输入已知信息",
+    "es": "Indique solo lo que sepa"
+  },
+  "현재 상황과 상대방의 구체적인 말·행동을 입력": {
+    "zh": "输入目前情况及对方的具体言行",
+    "es": "Indique la situación y lo que dijo o hizo la otra parte"
+  },
+  "회신 연락처": {
+    "zh": "回复联系方式",
+    "es": "Contacto para respuesta"
+  },
+  "시점": {
+    "zh": "时间",
+    "es": "Momento"
+  },
+  "장소": {
+    "zh": "地点",
+    "es": "Lugar"
+  },
+  "AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.": {
+    "zh": "这是AI生成的参考译文。合同效力请以韩文原文为准。",
+    "es": "Traducción de referencia generada por IA. La validez del contrato se determina por el original coreano."
   }
 }

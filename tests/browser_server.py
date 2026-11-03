@@ -48,6 +48,7 @@ if __name__ == '__main__':
          patch('backend.app.SAMPLES_DIR', ROOT/'tests/fixtures/samples'), \
          patch('backend.openai_client.settings', return_value=('browser-test-only', 'browser-mock')), \
          patch('backend.openai_client.generate', side_effect=model), \
+         patch('backend.auto_translation.use_openai', return_value=False), \
          patch('backend.translation.generate', side_effect=model), \
          patch('backend.auto_translation.generate', side_effect=auto_model), \
          patch('backend.chat.generate', side_effect=model), \

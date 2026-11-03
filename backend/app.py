@@ -317,8 +317,8 @@ def create_app(db_path=None):
             payload = translate_analysis(source, language, progress)
             app.state.store.save_translation(id, revision, language, "auto_review", digest, payload)
             job.update(status="complete", payload=payload)
-        except TranslationUnavailable:
-            job.update(status="failed", error="로컬 번역 모델에 연결하지 못했습니다. Ollama 실행 여부를 확인하고 다시 시도해주세요.")
+        except TranslationUnavailable as exc:
+            job.update(status="failed", error=str(exc) or "로컬 번역 모델에 연결하지 못했습니다. Ollama 실행 여부를 확인하고 다시 시도해주세요.")
         except Exception:
             job.update(status="failed", error="번역을 완료하지 못했습니다. 다시 시도해주세요.")
 
@@ -337,7 +337,11 @@ def create_app(db_path=None):
         job = jobs.get(key)
         if job is None:
             job = jobs[key] = {"status": "running", "done": 0, "total": 0, "blocks": {}}
-            app.state.translator.submit(run_translation, key, source, digest)
+            # Serverless hosts freeze threads between requests, and polls can reach another instance.
+            if os.environ.get("GWOLLION_INLINE_ANALYSIS"):
+                run_translation(key, source, digest)
+            else:
+                app.state.translator.submit(run_translation, key, source, digest)
         if job["status"] == "running":
             return {k: job[k] for k in ("status", "done", "total")} | {"blocks": dict(job["blocks"])}
         del jobs[key]

@@ -23,6 +23,13 @@ def replies(mapping):
     return fake
 
 
+def setUpModule():
+    # These tests drive the local path; a developer's .env must not send them to OpenAI.
+    local = patch("backend.auto_translation.use_openai", return_value=False)
+    local.start()
+    unittest.addModuleCleanup(local.stop)
+
+
 class IntegrityTests(unittest.TestCase):
     def test_values_are_locked_and_restored_exactly(self):
         text = "계약기간 2026년 11월 16일, 09시 00분, 월급 2,300,000원, 서울특별시 마포구 성산로 148-2, 1층"

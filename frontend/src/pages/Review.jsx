@@ -55,7 +55,7 @@ export default function Review({ result: original }) {
                 ? t(
                     bundled
                       ? "샘플 계약서용으로 AI가 미리 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요."
-                      : "이 컴퓨터의 AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.",
+                      : "AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.",
                   )
                 : t("한국어 원문을 표시합니다. 번역을 다시 시도해주세요.")}
             {translated &&
@@ -74,24 +74,6 @@ export default function Review({ result: original }) {
         </div>
       )}
       <ErrorNotice message={error} />
-      {original.extraction?.semantic_review?.ranges?.some(
-        (v) => v.status !== "complete",
-      ) && (
-        <div className="notice" role="alert">
-          <strong>{t("일부 범위의 AI 검토가 완료되지 않았습니다.")}</strong>
-          <ul>
-            {original.extraction.semantic_review.ranges
-              .filter((v) => v.status !== "complete")
-              .map((v, i) => (
-                <li key={i}>
-                  {t(v.block_ids.join(", "))} · {t(v.status)} ·{" "}
-                  {v.error_code || ""}
-                </li>
-              ))}
-          </ul>
-          <ButtonLink to="/upload/">{t("원문 확인 후 다시 검토")}</ButtonLink>
-        </div>
-      )}
       <section className="verdict-panel">
         <div className="verdict-copy">
           <span className="badge">

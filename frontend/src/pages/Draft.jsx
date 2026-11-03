@@ -1,6 +1,7 @@
 import { useLanguage, t } from "../i18n/index.js";
 import { CLOUD_AI_ENABLED } from "../config/features.js";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import useTranslatedReview from "../hooks/useTranslatedReview.js";
 import { downloadPdf, href, post } from "../lib/index.js";
 import useSession from "../hooks/useSession.js";
 import {
@@ -112,7 +113,6 @@ export default function Draft({ result: r }) {
     translations: {},
     incidentKo: null,
     incidentSource: "",
-    incidentConfirmed: false,
     writtenOn: today(),
     replyBy: "",
     clauses: null,
@@ -120,7 +120,8 @@ export default function Draft({ result: r }) {
     note: "",
   });
   const editor = useRef();
-  const findings = r.review.findings;
+  // Clause names follow the page language; the Korean document keeps the original result.
+  const findings = useTranslatedReview(r).result.review.findings;
   const chosen = state.clauses ?? findings.map((f) => f.finding_id);
   const blanks = findBlanks(state.text);
   const toCounterparty = ["revision_request", "request"].includes(state.kind);
@@ -170,34 +171,32 @@ export default function Draft({ result: r }) {
     state.incidentSource === JSON.stringify(state.incident);
   const localizedDraft = state.translations?.[lang];
   const translationCurrent = localizedDraft?.original_text === state.text;
-  async function interpret() {
-    setBusy(true);
-    setError("");
-    try {
-      const data = await post(
-        `/api/analyses/${r.analysis_id}/incident-translations`,
-        {
-          analysis_revision: r.analysis_revision,
-          language: lang,
-          incident: state.incident,
-        },
-      );
-      setState((old) => ({
-        ...old,
-        incidentKo: data.incident,
-        incidentSource: JSON.stringify(state.incident),
-        incidentConfirmed: false,
-      }));
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(false);
-    }
+  /** Korean facts for the document, interpreting what the person wrote in another language. */
+  async function koreanIncident() {
+    if (!foreignIncident) return state.incident;
+    if (incidentCurrent && state.incidentKo) return state.incidentKo;
+    const data = await post(
+      `/api/analyses/${r.analysis_id}/incident-translations`,
+      {
+        analysis_revision: r.analysis_revision,
+        language: lang,
+        incident: state.incident,
+      },
+    );
+    setState((old) => ({
+      ...old,
+      incidentKo: data.incident,
+      incidentSource: JSON.stringify(state.incident),
+    }));
+    return data.incident;
   }
+  const [translating, setTranslating] = useState(false);
+  const [translationFailed, setTranslationFailed] = useState("");
+  const translationKey = `${lang}:${state.text}`;
   async function updateTranslation() {
     const snapshot = state.text;
-    setBusy(true);
-    setError("");
+    setTranslating(true);
+    setTranslationFailed("");
     try {
       const data = await post(
         `/api/analyses/${r.analysis_id}/document-translations`,
@@ -214,13 +213,33 @@ export default function Draft({ result: r }) {
           [lang]: data,
         },
       }));
-      setNotice("번역을 갱신했습니다. 한국어 원문과 대조해주세요.");
     } catch (e) {
+      // A failed text is not retried until it changes, so errors cannot burn the daily limit.
+      setTranslationFailed(`${lang}:${snapshot}`);
       setError(e.message);
     } finally {
-      setBusy(false);
+      setTranslating(false);
     }
   }
+  // Keeps the translation in step with the Korean text; the delay lets typing finish first.
+  useEffect(() => {
+    if (
+      !CLOUD_AI_ENABLED ||
+      lang === "ko" ||
+      !state.generated ||
+      !state.text.trim() ||
+      translationCurrent ||
+      busy ||
+      translating ||
+      translationFailed === translationKey
+    )
+      return;
+    const timer = setTimeout(
+      updateTranslation,
+      state.view === "edit" ? 3000 : 0,
+    );
+    return () => clearTimeout(timer);
+  }, [translationKey, translationCurrent, busy, translating, translationFailed]);
   const exportText = (both) =>
     both
       ? t(
@@ -238,15 +257,6 @@ export default function Draft({ result: r }) {
       foreignIncident
     ) {
       setError("사건 경위는 한국어로 입력해주세요.");
-      return;
-    }
-    if (
-      needsInterpretation &&
-      state.kind === "lawyer_request" &&
-      Object.values(state.incident).some(Boolean) &&
-      (!incidentCurrent || !state.incidentConfirmed)
-    ) {
-      setError("사건 경위의 한국어 해석을 확인한 뒤 문서에 반영해주세요.");
       return;
     }
     if (state.kind === "revision_request" && !chosen.length) {
@@ -269,9 +279,7 @@ export default function Draft({ result: r }) {
         kind: state.kind,
         incident:
           state.kind === "lawyer_request"
-            ? !needsInterpretation
-              ? state.incident
-              : state.incidentKo || {}
+            ? await koreanIncident()
             : {
                 writer: state.incident.writer || "",
                 counterparty: state.incident.counterparty || "",
@@ -284,10 +292,7 @@ export default function Draft({ result: r }) {
           needsInterpretation && state.kind === "lawyer_request"
             ? state.incident
             : null,
-        incident_confirmed:
-          state.kind !== "lawyer_request" ||
-          !needsInterpretation ||
-          (incidentCurrent && !!state.incidentConfirmed),
+        incident_confirmed: true,
       });
       setState((old) => ({
         ...old,
@@ -455,68 +460,7 @@ export default function Draft({ result: r }) {
                     )}
                   </Field>
                 ))}
-                {needsInterpretation && (
-                  <div className="incident-translation">
-                    <PrivacyNote />
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={interpret}
-                    >
-                      {t("한국어로 해석하기")}
-                    </button>
-                    {state.incidentKo && (
-                      <>
-                        <p className="notice">
-                          {t("한국어 해석을 확인·수정한 뒤 문서에 반영하세요.")}
-                        </p>
-                        {fields.map(([name, label, max]) => (
-                          <Field key={name} label={t(label)}>
-                            <textarea
-                              rows={name === "summary" ? 4 : 2}
-                              lang="ko"
-                              maxLength={max}
-                              value={state.incidentKo[name] || ""}
-                              onChange={(e) =>
-                                setState((old) => ({
-                                  ...old,
-                                  incidentKo: {
-                                    ...old.incidentKo,
-                                    [name]: e.target.value,
-                                  },
-                                  incidentConfirmed: false,
-                                }))
-                              }
-                            />
-                          </Field>
-                        ))}
-                        <label className="check-label">
-                          <input
-                            type="checkbox"
-                            checked={
-                              !!state.incidentConfirmed && incidentCurrent
-                            }
-                            disabled={!incidentCurrent}
-                            onChange={(e) =>
-                              setState((old) => ({
-                                ...old,
-                                incidentConfirmed: e.target.checked,
-                              }))
-                            }
-                          />
-                          {t("한국어 해석이 실제 설명과 일치합니다.")}
-                        </label>
-                        {!incidentCurrent && (
-                          <p className="notice">
-                            {t(
-                              "사건 설명이 바뀌었습니다. 한국어 해석을 다시 확인해주세요.",
-                            )}
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
+                {needsInterpretation && <PrivacyNote />}
               </>
             )}
           </fieldset>
@@ -621,16 +565,27 @@ export default function Draft({ result: r }) {
                     {t(
                       translationCurrent
                         ? "현재 한국어 편집본과 연결된 번역입니다."
-                        : "한국어 편집본이 변경되었거나 번역이 없습니다. 번역을 갱신해주세요.",
+                        : translationFailed === translationKey
+                          ? "번역을 완료하지 못했습니다. 다시 시도해주세요."
+                          : "번역 중…",
                     )}
+                    {translationCurrent &&
+                      localizedDraft.untranslated_lines > 0 &&
+                      " " +
+                        t(
+                          "검증을 통과하지 못한 {0}줄은 한국어로 표시합니다.",
+                          localizedDraft.untranslated_lines,
+                        )}
                   </p>
-                  <button
-                    className="btn btn-ghost"
-                    disabled={busy || !state.text.trim()}
-                    onClick={updateTranslation}
-                  >
-                    {t(busy ? "번역 중…" : "편집본 번역 갱신")}
-                  </button>
+                  {translationFailed === translationKey && (
+                    <button
+                      className="btn btn-ghost"
+                      disabled={translating}
+                      onClick={updateTranslation}
+                    >
+                      {t("번역 다시 시도")}
+                    </button>
+                  )}
                   {localizedDraft && (
                     <textarea
                       className="paper translation-paper"

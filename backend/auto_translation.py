@@ -10,6 +10,7 @@ import re
 from urllib.error import URLError
 
 from backend.extraction import MONEY, generate
+from backend import openai_client
 from backend.translation import FOREIGN_ROLES, LANGUAGES
 
 ADDRESS = r"[가-힣]+(?:특별시|광역시|특별자치시|특별자치도|도)\s+[가-힣]+(?:시|군|구)(?:(?!\s{2})[^()\n])*"
@@ -84,11 +85,19 @@ def restore(text, values):
     return text
 
 
+def use_openai():
+    return bool(openai_client.settings()[0])
+
+
 def ask(batch, language):
     schema = {"type": "object", "properties": {k: {"type": "string"} for k in batch}, "required": list(batch)}
     prompt = PROMPT.format(language=LANGUAGES[language], roles=GLOSSARY[language]) + json.dumps(batch, ensure_ascii=False)
     try:
+        if use_openai():
+            return openai_client.generate(schema, prompt, num_predict=2400)[0]
         return generate(schema, prompt, timeout=180, num_predict=2400)[0]
+    except openai_client.OpenAIError as exc:
+        raise TranslationUnavailable(str(exc)) from exc
     except (URLError, ConnectionError, TimeoutError) as exc:
         raise TranslationUnavailable() from exc
     except (ValueError, KeyError):

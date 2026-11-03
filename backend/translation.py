@@ -155,9 +155,17 @@ def translate_review(result, language):
 
 
 def translate_document(text, language):
-    value = translated_fields({'document': text}, language)['document']
+    """Translate line by line: one line failing the checks stays Korean instead of failing the document."""
+    from backend.auto_translation import TranslationUnavailable, translate_texts
+    lines = text.split('\n')
+    try:
+        translations = translate_texts(lines, language)
+    except TranslationUnavailable as exc:
+        raise OpenAIError('translation_unavailable', str(exc) or '번역을 완료하지 못했습니다. 다시 시도해주세요.') from exc
+    value = '\n'.join(translations.get(line, line) for line in lines)
     return {'text': value, 'language': language, 'source_hash': content_hash(text), 'original_text': text,
-            'method': 'openai', 'validation': {'locked_values_preserved': True, 'model_meaning_checked': True, 'expert_reviewed': False}}
+            'untranslated_lines': sum(bool(re.search(r'[가-힣]', line)) and line not in translations for line in lines),
+            'method': 'openai', 'validation': {'locked_values_preserved': True, 'model_meaning_checked': False, 'expert_reviewed': False}}
 
 
 def translate_incident(incident):
