@@ -14,10 +14,10 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from mvp.analysis import extract, evaluate
-from mvp.corpus import DEFAULT_DB
-from mvp.extraction import LABELS as FIELD_PATTERNS, blocks_from_text, rules_extract
-from mvp.schemas import AnalyzeRequest
+from backend.analysis import extract, evaluate
+from backend.corpus import DEFAULT_DB
+from backend.extraction import LABELS as FIELD_PATTERNS, blocks_from_text, rules_extract
+from backend.schemas import AnalyzeRequest
 from scripts.inspect_downloaded_data import json_members, read_json
 
 LABELS = {"임금액": "wage", "임금지급일": "payment_date", "임금지급방법": "payment_method", "근로시간": "work_hours", "근로계약기간": "period", "근무장소": "workplace", "담당업무": "job_description", "휴일": "holiday", "휴가": "annual_leave", "휴게시간": "break_time", "근로일": "work_days"}

@@ -4,14 +4,14 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from mvp.analysis import extract, evaluate
-from mvp.corpus import Corpus
-from mvp.extraction import blocks_from_text
-from mvp.knowledge import Knowledge
-from mvp.legal_api import LegalAPI, EvidenceError
-from mvp.retrieval import plan, retrieve, validate_citations
-from mvp.review import semantic_review, role_reversal, RULES, rule_matches, priority_blocks, clean_revision, unsupported_contract_claim, unsafe_revision
-from mvp.schemas import AnalyzeRequest
+from backend.analysis import extract, evaluate
+from backend.corpus import Corpus
+from backend.extraction import blocks_from_text
+from backend.knowledge import Knowledge
+from backend.legal_api import LegalAPI, EvidenceError
+from backend.retrieval import plan, retrieve, validate_citations
+from backend.review import semantic_review, role_reversal, RULES, rule_matches, priority_blocks, clean_revision, unsupported_contract_claim, unsafe_revision
+from backend.schemas import AnalyzeRequest
 from scripts.build_reference_index import build
 
 
@@ -73,7 +73,7 @@ class OfficialEvidenceTests(unittest.TestCase):
     def test_live_failure_uses_explicit_fallback_and_prevents_clear(self):
         text = (Path(__file__).resolve().parents[1] / "samples/employment-basic.txt").read_text()
         request = AnalyzeRequest(text=text, evidence_mode="live", context={"document_complete": True})
-        with patch("mvp.retrieval.LegalAPI", side_effect=EvidenceError("credential_missing")):
+        with patch("backend.retrieval.LegalAPI", side_effect=EvidenceError("credential_missing")):
             blocks, terms, metadata = extract(request)
             result = evaluate(request, blocks, terms, metadata, "fixture", 1)
         self.assertTrue(result["grounding"]["failures"])
@@ -106,7 +106,7 @@ class GroundedReviewTests(unittest.TestCase):
         source = {"source_id": "law-test", "kind": "law", "title": "확인된 근거", "text": "임대차는 임차인이 보증금을 반환받을 때까지 존속하는 것으로 본다.", "version_applicable": True}
         row = {"block_id": "B0001", "quote": text, "title": "반환일 변경", "why_unfavorable": "이사를 계획한 날짜에 보증금을 받지 못할 수 있습니다.", "scenario": "상대방이 날짜를 미루면 반환이 늦어질 수 있습니다.", "revision_suggestion": "반환일은 상호 합의로 변경한다.", "burdened_party": "tenant", "obligation_party": "landlord", "obligation_quote": text, "basis_type": "legal_comparison", "citations": [{"source_id": "law-test", "quote": source["text"]}], "applicability_questions": ["계약 종료일이 언제인가요?"]}
         wrong_party = {**row, "burdened_party": "landlord"}
-        with patch("mvp.review.generate", side_effect=[({"complete": True, "findings": [row]}, "fixture"), ({"complete": True, "findings": [row, wrong_party, {**row, "citations": [{"source_id": "law-test", "quote": "원문에 없는 법률 문구"}]}]}, "fixture")]):
+        with patch("backend.review.generate", side_effect=[({"complete": True, "findings": [row]}, "fixture"), ({"complete": True, "findings": [row, wrong_party, {**row, "citations": [{"source_id": "law-test", "quote": "원문에 없는 법률 문구"}]}]}, "fixture")]):
             result = semantic_review(blocks, "lease", "tenant", {"sources": [source]})
         self.assertEqual(len(result["findings"]), 1)
         self.assertEqual(result["rejected_candidates"], 2)
@@ -119,7 +119,7 @@ class GroundedReviewTests(unittest.TestCase):
         self.assertEqual(validate_citations([{"source_id": "dataset", "quote": supplied[0]["text"]}], supplied)[0]["kind"], "dataset")
         text = "임대인은 임차인의 동의 없이 보증금 반환일을 변경할 수 있다."
         row = {"block_id": "B0001", "quote": text, "title": "반환일의 일방 변경", "why_unfavorable": "반환 날짜를 계획하기 어렵습니다.", "scenario": "반환일이 늦어질 수 있습니다.", "revision_suggestion": "반환일 변경은 서면 합의로 한다.", "burdened_party": "tenant", "obligation_party": "landlord", "obligation_quote": text, "basis_type": "legal_comparison", "citations": [{"source_id": "dataset", "quote": supplied[0]["text"]}], "applicability_questions": []}
-        with patch("mvp.review.generate", return_value=({"complete": True, "findings": [row]}, "fixture")):
+        with patch("backend.review.generate", return_value=({"complete": True, "findings": [row]}, "fixture")):
             result = semantic_review(blocks_from_text(text), "lease", "tenant", {"sources": supplied})
         self.assertEqual(result["findings"], [])
         self.assertFalse(result["complete"])
@@ -160,7 +160,7 @@ class GroundedReviewTests(unittest.TestCase):
     def test_failed_replacement_does_not_turn_an_unresolved_risk_into_clear(self):
         text = "임대인은 임차인의 동의 없이 보증금 반환 예정일을 변경할 수 있다."
         row = {"block_id": "B0001", "quote": text, "title": "반환일 변경", "why_unfavorable": "반환이 늦어져 이사 계획에 부담이 생길 수 있습니다.", "scenario": "예정된 이사일에 보증금을 받지 못할 수 있습니다.", "revision_suggestion": "보증금 반환 시기는 임대인이 결정한다."}
-        with patch("mvp.review.generate", side_effect=[({"complete": True, "findings": [row]}, "fixture"), ({"complete": True, "findings": []}, "fixture")]):
+        with patch("backend.review.generate", side_effect=[({"complete": True, "findings": [row]}, "fixture"), ({"complete": True, "findings": []}, "fixture")]):
             result = semantic_review(blocks_from_text(text), "lease", "tenant")
         self.assertEqual(result["findings"], [])
         self.assertFalse(result["complete"])
@@ -169,20 +169,20 @@ class GroundedReviewTests(unittest.TestCase):
     def test_invented_power_is_rechecked_once_and_never_shown(self):
         text = "계약 해지 기간 : 2026년 10월 10일부터 2027년 10월 09일까지"
         row = {"block_id": "B0001", "quote": text, "title": "계약기간의 일방 변경", "why_unfavorable": "사업주에게 변경 권한이 있어 계획을 세우기 어렵습니다.", "scenario": "사업주가 기간을 변경할 수 있습니다.", "revision_suggestion": "상호 합의로 정한다."}
-        with patch("mvp.review.generate", side_effect=[({"complete": True, "findings": [row]}, "fixture"), ({"complete": True, "findings": []}, "fixture")]) as generator:
+        with patch("backend.review.generate", side_effect=[({"complete": True, "findings": [row]}, "fixture"), ({"complete": True, "findings": []}, "fixture")]) as generator:
             result = semantic_review(blocks_from_text(text), "employment", "worker")
         self.assertEqual(generator.call_count, 2)
         self.assertEqual(result["findings"], [])
         self.assertTrue(result["complete"])
         self.assertEqual(result["correction_passes"], 1)
-        with patch("mvp.review.generate", return_value=({"complete": True, "findings": [row]}, "fixture")) as generator:
+        with patch("backend.review.generate", return_value=({"complete": True, "findings": [row]}, "fixture")) as generator:
             result = semantic_review(blocks_from_text(text), "employment", "worker")
         self.assertEqual(generator.call_count, 2)
         self.assertEqual(result["findings"], [])
         self.assertFalse(result["complete"])
 
     def test_no_semantic_candidates_is_a_completed_screen_without_model_call(self):
-        with patch("mvp.review.generate") as generator:
+        with patch("backend.review.generate") as generator:
             result = semantic_review(blocks_from_text("근로계약기간 : 2026년 10월 10일부터 2027년 10월 09일까지\n임금지급일 : 매월 25일"), "employment", "worker")
         generator.assert_not_called()
         self.assertEqual(result["method"], "candidate_screen")

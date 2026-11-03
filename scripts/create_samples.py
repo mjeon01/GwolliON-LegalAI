@@ -139,7 +139,7 @@ def main():
     serif = Path(os.environ.get("GWOLLION_FORM_FONT", "/System/Library/Fonts/Supplemental/AppleMyungjo.ttf"))
     pdfmetrics.registerFont(TTFont("Form", str(serif if serif.exists() else font)))
     samples = ROOT / "samples"
-    output = ROOT / "output/pdf"
+    output = ROOT / "samples/pdf"
     samples.mkdir(exist_ok=True)
     output.mkdir(parents=True, exist_ok=True)
     manifest = []

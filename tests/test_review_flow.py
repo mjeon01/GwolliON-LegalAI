@@ -7,13 +7,13 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from mvp.analysis import extract, evaluate
-from mvp.app import create_app
-from mvp.chat import answer_question
-from mvp.documents import draft
-from mvp.review import semantic_review
-from mvp.schemas import AnalyzeRequest, ChatRequest, DraftRequest, IncidentFacts
-from mvp.store import Store, StaleRevision
+from backend.analysis import extract, evaluate
+from backend.app import create_app
+from backend.chat import answer_question
+from backend.documents import draft
+from backend.review import semantic_review
+from backend.schemas import AnalyzeRequest, ChatRequest, DraftRequest, IncidentFacts
+from backend.store import Store, StaleRevision
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -111,7 +111,7 @@ class ReviewTests(unittest.TestCase):
     def test_semantic_review_accepts_source_bound_burden_and_rejects_invention(self):
         blocks = [{"block_id": "B0001", "page": 1, "text": "특약: 계약 상대방은 임차인의 동의 없이 보증금 반환일을 변경할 수 있다."}]
         row = {"block_id": "B0001", "quote": blocks[0]["text"], "title": "반환일을 일방 변경", "why_unfavorable": "임차인이 돈을 받는 날짜를 계획하기 어렵습니다.", "scenario": "이사 전에 돈을 못 받을 수 있습니다.", "revision_suggestion": "반환일 변경은 양측 서면 합의로 한다."}
-        with patch("mvp.review.generate", return_value=({"complete": True, "findings": [row, {**row, "quote": "없는 문구를 새로 만든 것"}]}, "fixture")):
+        with patch("backend.review.generate", return_value=({"complete": True, "findings": [row, {**row, "quote": "없는 문구를 새로 만든 것"}]}, "fixture")):
             output = semantic_review(blocks, "lease", "tenant")
         self.assertEqual(len(output["findings"]), 1)
         self.assertFalse(output["complete"])
@@ -137,7 +137,7 @@ class ReviewTests(unittest.TestCase):
     def test_custom_chat_rejects_fabricated_sources(self):
         result = review((ROOT / "samples/lease-return.txt").read_text(), "lease")
         body = ChatRequest(analysis_revision=1, question="정확히 어떤 뜻이야?", finding_id="R001")
-        with patch("mvp.chat.generate", return_value=({"answer": "이해를 돕는 답변입니다.", "evidence_ids": ["B9999"], "source_ids": []}, "fixture")):
+        with patch("backend.chat.generate", return_value=({"answer": "이해를 돕는 답변입니다.", "evidence_ids": ["B9999"], "source_ids": []}, "fixture")):
             with self.assertRaises(ValueError):
                 answer_question(result, body, [])
 
@@ -145,7 +145,7 @@ class ReviewTests(unittest.TestCase):
         result = review((ROOT / "samples/lease-return.txt").read_text(), "lease")
         body = ChatRequest(analysis_revision=1, question="무엇을 준비할까?")
         source_id = result["sources"][0]["source_id"]
-        with patch("mvp.chat.generate", return_value=({"answer": "반환 요청과 지급 내역을 서면으로 정리하세요.", "evidence_ids": [], "source_ids": [source_id], "citations": []}, "fixture")):
+        with patch("backend.chat.generate", return_value=({"answer": "반환 요청과 지급 내역을 서면으로 정리하세요.", "evidence_ids": [], "source_ids": [source_id], "citations": []}, "fixture")):
             answer = answer_question(result, body, [])
         self.assertEqual(answer["source_ids"], [])
         self.assertEqual(answer["citations"], [])
@@ -185,7 +185,7 @@ class ConversationAPITests(unittest.TestCase):
         def delete_while_answering(*args):
             self.client.app.state.store.delete(self.id)
             return {"text": "late", "evidence": [], "source_ids": []}
-        with patch("mvp.app.answer_question", side_effect=delete_while_answering):
+        with patch("backend.app.answer_question", side_effect=delete_while_answering):
             response = self.client.post(f"/api/analyses/{self.id}/chat", json={"analysis_revision": 1, "question": "어떤 뜻이야?"})
         self.assertEqual(response.status_code, 409)
         self.assertEqual(self.client.app.state.store.chat(self.id, 1), [])
@@ -194,7 +194,7 @@ class ConversationAPITests(unittest.TestCase):
         self.client.post(f"/api/analyses/{self.id}/chat", json={"analysis_revision": 1, "question": "쉽게 설명해줘", "finding_id": "R001", "intent": "explain"})
         result = self.client.get(f"/api/analyses/{self.id}").json()
         block = result["review"]["findings"][0]["evidence"][0]["block_id"]
-        with patch("mvp.chat.generate", return_value=({"answer": "새 임차인을 구할 때까지 반환을 기다릴 수 있다는 의미입니다.", "evidence_ids": [block], "source_ids": []}, "fixture")) as generate:
+        with patch("backend.chat.generate", return_value=({"answer": "새 임차인을 구할 때까지 반환을 기다릴 수 있다는 의미입니다.", "evidence_ids": [block], "source_ids": []}, "fixture")) as generate:
             response = self.client.post(f"/api/analyses/{self.id}/chat", json={"analysis_revision": 1, "question": "그럼 그동안 기다려야 하는 거야?", "finding_id": "R001"})
         self.assertEqual(response.status_code, 200)
         self.assertIn("쉽게 설명해줘", generate.call_args.args[1])

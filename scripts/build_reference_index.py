@@ -13,7 +13,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from mvp.corpus import DEFAULT_DB, normalize_record
+from backend.corpus import DEFAULT_DB, normalize_record
 from scripts.inspect_downloaded_data import json_members, read_json
 
 
