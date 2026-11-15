@@ -36,7 +36,13 @@ export default function LanguagePicker({ onOpen }) {
       ref={root}
       className="language-picker"
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+        // Close only when focus really moved elsewhere (keyboard). Safari does not focus a tapped
+        // button, so a tap on another language blurs with no target; outside taps close via pointerdown.
+        if (
+          event.relatedTarget &&
+          !event.currentTarget.contains(event.relatedTarget)
+        )
+          setOpen(false);
       }}
       onKeyDown={(event) => {
         if (event.key === "Escape" && open) {
