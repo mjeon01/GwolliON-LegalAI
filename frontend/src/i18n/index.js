@@ -3,14 +3,14 @@ import messages from "./messages.json";
 let current = "ko";
 try {
   const saved = localStorage.getItem("gwollion:language");
-  if (["ko", "zh", "es"].includes(saved)) current = saved;
+  if (["ko", "en", "zh", "es"].includes(saved)) current = saved;
 } catch {
   /* private browsing */
 }
 const listeners = new Set();
 export const language = () => current;
 export function setLanguage(value) {
-  if (!["ko", "zh", "es"].includes(value)) return;
+  if (!["ko", "en", "zh", "es"].includes(value)) return;
   current = value;
   try {
     localStorage.setItem("gwollion:language", value);

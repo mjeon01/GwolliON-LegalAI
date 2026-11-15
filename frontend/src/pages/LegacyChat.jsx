@@ -90,7 +90,9 @@ export default function LegacyChat({ result: r }) {
     if (busy || loading || requestRef.current) return;
     // Typed questions keep the chosen scope; clause prompts need a clause, so they fall back to the first.
     const target =
-      intent === "custom" ? findingId : findingId || findings[0]?.finding_id || "";
+      intent === "custom"
+        ? findingId
+        : findingId || findings[0]?.finding_id || "";
     if (target !== findingId) setFindingId(target);
     const controller = new AbortController();
     requestRef.current = controller;
@@ -357,14 +359,23 @@ export default function LegacyChat({ result: r }) {
                     <details>
                       <summary>{t("답변에 인용한 참고 자료")}</summary>
                       <p className="small muted">
-                        {t("현재 계약의 사실관계·판단 결과를 뜻하지 않는 참고 자료입니다.")}
+                        {t(
+                          "현재 계약의 사실관계·판단 결과를 뜻하지 않는 참고 자료입니다.",
+                        )}
                       </p>
                       {turn.answer.reference_sources.map((source) => (
-                        <blockquote className="evidence" key={source.source_id} lang="ko">
+                        <blockquote
+                          className="evidence"
+                          key={source.source_id}
+                          lang="ko"
+                        >
                           <strong>{source.title}</strong>
                           <p>
                             {(turn.answer.citations || [])
-                              .filter((citation) => citation.source_id === source.source_id)
+                              .filter(
+                                (citation) =>
+                                  citation.source_id === source.source_id,
+                              )
                               .map((citation) => citation.quote)
                               .join("\n") || source.text}
                           </p>
@@ -459,7 +470,7 @@ export default function LegacyChat({ result: r }) {
               </Field>
               <div className="composer-bottom">
                 <span className="small muted">
-                  {t("한국어·중국어·스페인어로 질문할 수 있습니다.")}
+                  {t("한국어·영어·중국어·스페인어로 질문할 수 있습니다.")}
                 </span>
                 <button
                   className="btn btn-primary btn-sm"

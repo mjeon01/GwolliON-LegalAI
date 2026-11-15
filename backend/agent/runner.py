@@ -8,7 +8,7 @@ from backend.agent.verify import verify
 from backend.extraction import GenerationCancelled
 
 MAX_STEPS = 8
-LANGUAGES = {"ko": "Korean", "zh": "Simplified Chinese", "es": "Spanish"}
+LANGUAGES = {"ko": "Korean", "en": "English", "zh": "Simplified Chinese", "es": "Spanish"}
 ROLE_LABELS = {"worker": "근로자", "employer": "사용자(사업주)", "tenant": "임차인", "landlord": "임대인", "buyer": "매수인", "seller": "매도인"}
 
 INSTRUCTIONS = """You are 권리ON, an assistant that helps people in Korea understand and act on their contracts, especially workers, tenants and foreign residents. You are not a lawyer and never give a final legal verdict.

@@ -196,6 +196,31 @@ GUIDES = {
         "old_version": "Es necesario comprobar la versión de la ley aplicable en la fecha del hecho.",
         "actions": ["Guarde el contrato, los anexos, los pagos y las comunicaciones.", "Confirme por escrito las condiciones poco claras con la otra parte.", "Consulte a una entidad especializada con la documentación."],
     },
+    "en": {
+        "heading": "Contract review guide", "notice": "This guide has not yet been reviewed by legal or language experts. The contract alone cannot confirm a violation or fraud. Check the Korean original and the legal sources as well.",
+        "facts": "Details taken from the Korean contract (original text, figures and units are kept)",
+        "labels": ["Wage", "Payday", "Working hours", "Weekly hours", "Break time", "Contract period", "Workplace", "Days off", "Deposit", "Monthly rent", "Leased home", "Deposit return terms"],
+        "extra_labels": {"job_description": "Duties", "payment_method": "Payment method", "annual_leave": "Paid annual leave", "work_days": "Working days"},
+        "statuses": {"found": "Found; check against the original", "not_found": "Not found", "conflict": "Several values; confirm which applies"},
+        "issues": {
+            "contract_period": "Check whether the contract has a fixed term, and confirm the start date and, if any, the end date.",
+            "missing_terms": "Some contract terms are missing. Check the other pages and attachments, and confirm unclear terms in writing.",
+            "conflicting_terms": "Different values or wording appear. Check the components and any amendments to confirm which terms apply.",
+            "wage_period": "Confirm whether the wage is hourly, monthly or yearly, and how it is calculated and paid.",
+            "penalty": "Wording about compensation was found. Distinguish an amount fixed in advance for breaking the contract from actual damages, and check the applicable rules.",
+            "included_allowance": "Confirm the items and amounts of overtime, night and holiday pay, the actual hours, and the size of the workplace.",
+            "hours_context": "The contract hours differ from the hours you reported. Compare attendance records and overtime.",
+            "work_hours": "Weekly hours exceed 40. Check breaks, the overtime agreement and any exceptions; this alone does not confirm a violation.",
+            "break_time": "No break time was found. Confirm the actual working hours, the breaks and whether they can be used freely.",
+            "lease_registration": "Check the handover of the home, the resident registration and the dates. Completing these steps does not confirm the priority of rights or recovery of the deposit.",
+            "deposit_return": "Confirm the deposit return date and any reasons for deductions. Keep the contract, payments and messages.",
+            "deposit_unreturned": "You said the full deposit was not returned. Organize the contract end, your requests, the unpaid amount and the replies. This does not confirm fraud.",
+            "review_scope": "The basic terms within this review were found. Whether the wage is adequate, how the contract is carried out, and the validity of every special clause need a separate review.",
+        },
+        "questions": {"document_complete": "Did you include all pages and attachments?", "event_date": "What is the date of the contract or event you want to check?", "workplace_size": "How many workers does the workplace usually have?", "weekly_work_hours": "How many hours do you actually work per week?", "move_in": "Have you received the home and moved in?", "resident_registration": "Have you registered your residence at that home?", "deposit_returned": "Did you receive the full deposit after the contract ended?"},
+        "old_version": "The version of the law in force on the date of the event needs to be checked.",
+        "actions": ["Keep the contract, attachments, payments and messages.", "Confirm unclear terms with the other party in writing.", "Consult a specialist organization with your documents."],
+    },
 }
 
 
@@ -205,16 +230,20 @@ def translate(result, language):
     labels = dict(zip(keys, guide["labels"]))
     labels.update(guide["extra_labels"])
     context_keys = list(QUESTION_LABELS)
-    context_labels = dict(zip(context_keys, ["全部页面及附件", "合同或事件日期", "常用劳动者人数", "实际每周工作时间", "已接收房屋并入住", "已办理迁入登记", "合同结束后已全额收到押金"] if language == "zh" else ["Todas las páginas y anexos", "Fecha del contrato o del hecho", "Número habitual de trabajadores", "Horas reales por semana", "Vivienda recibida y ocupada", "Residencia registrada", "Depósito recibido íntegramente al finalizar el contrato"]))
-    value_labels = {"true":"是", "false":"否", "under5":"少于5人", "5plus":"5人或以上"} if language == "zh" else {"true":"Sí", "false":"No", "under5":"Menos de 5", "5plus":"5 o más"}
+    context_labels = dict(zip(context_keys, {
+        "zh": ["全部页面及附件", "合同或事件日期", "常用劳动者人数", "实际每周工作时间", "已接收房屋并入住", "已办理迁入登记", "合同结束后已全额收到押金"],
+        "es": ["Todas las páginas y anexos", "Fecha del contrato o del hecho", "Número habitual de trabajadores", "Horas reales por semana", "Vivienda recibida y ocupada", "Residencia registrada", "Depósito recibido íntegramente al finalizar el contrato"],
+        "en": ["All pages and attachments", "Date of the contract or event", "Usual number of workers", "Actual weekly hours", "Home received and moved in", "Residence registered", "Full deposit received after the contract ended"]}[language]))
+    value_labels = {"zh": {"true":"是", "false":"否", "under5":"少于5人", "5plus":"5人或以上"}, "es": {"true":"Sí", "false":"No", "under5":"Menos de 5", "5plus":"5 o más"},
+                    "en": {"true":"Yes", "false":"No", "under5":"Fewer than 5", "5plus":"5 or more"}}[language]
     context_facts = [{"key": key, "label": context_labels[key], "raw_value": value,
                       "text": value_labels.get(str(value).lower(), str(value))}
                      for key, value in result["context"].items() if value is not None and value != "unknown"]
     return {"analysis_revision": result["analysis_revision"], "language": language, "method": "template-v1",
             "review_required": True, "heading": guide["heading"], "notice": guide["notice"], "facts_heading": guide["facts"],
             "terms": [{"key": t["key"], "label": labels.get(t["key"], t["label"]), "status_text": guide["statuses"][t["status"]], "candidates": t["candidates"]} for t in result["terms"]],
-            "issues": [{"issue_id": i["issue_id"], "status": i["status"], "text": guide["issues"].get(i["issue_type"], ("此新增条款尚无翻译，请查看韩文说明：" if language == "zh" else "Esta cláusula nueva todavía no tiene traducción. Consulte la explicación en coreano: ") + i["explanation_ko"]) + (" " + guide["old_version"] if i["status"] == "insufficient_evidence" else ""), "source_ids": i["source_ids"], "evidence": i["evidence"]} for i in result["issues"]],
+            "issues": [{"issue_id": i["issue_id"], "status": i["status"], "text": guide["issues"].get(i["issue_type"], {"zh": "此新增条款尚无翻译，请查看韩文说明：", "es": "Esta cláusula nueva todavía no tiene traducción. Consulte la explicación en coreano: ", "en": "This new item has no translation yet. See the Korean explanation: "}[language] + i["explanation_ko"]) + (" " + guide["old_version"] if i["status"] == "insufficient_evidence" else ""), "source_ids": i["source_ids"], "evidence": i["evidence"]} for i in result["issues"]],
             "questions": [{**q, "text": guide["questions"][q["context_key"]]} for q in result["questions"]],
             "actions": guide["actions"], "sources": result["sources"],
-            "context_heading": "用户提供的信息" if language == "zh" else "Información indicada por el usuario", "context_facts": context_facts,
+            "context_heading": {"zh": "用户提供的信息", "es": "Información indicada por el usuario", "en": "Information you provided"}[language], "context_facts": context_facts,
             "validation": {"values_preserved": True, "source_ids_preserved": True, "context_preserved": True, "meaning_reviewed": False}}

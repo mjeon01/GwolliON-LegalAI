@@ -18,8 +18,10 @@ ADDRESS = r"[가-힣]+(?:특별시|광역시|특별자치시|특별자치도|도
 DATE = r"(\d{4})\s*(?:년|[-.])\s*(\d{1,2})\s*(?:월|[-.])\s*(\d{1,2})\s*일?"
 CLOCK = r"(\d{1,2})시\s*(\d{2})분"
 TOKEN = r"\{\{\d+\}\}"
-WEEKDAYS = {"월요일": ("星期一", "lunes"), "화요일": ("星期二", "martes"), "수요일": ("星期三", "miércoles"), "목요일": ("星期四", "jueves"),
-            "금요일": ("星期五", "viernes"), "토요일": ("星期六", "sábado"), "일요일": ("星期日", "domingo")}
+WEEKDAYS = {"월요일": ("星期一", "lunes", "Monday"), "화요일": ("星期二", "martes", "Tuesday"), "수요일": ("星期三", "miércoles", "Wednesday"),
+            "목요일": ("星期四", "jueves", "Thursday"), "금요일": ("星期五", "viernes", "Friday"), "토요일": ("星期六", "sábado", "Saturday"),
+            "일요일": ("星期日", "domingo", "Sunday")}
+DAY_INDEX = {"zh": 0, "es": 1, "en": 2}
 BATCH_LINES = 10
 BATCH_CHARS = 1500
 PROMPT = """Translate each Korean contract text into {language}. Each key is independent: translate it completely and never merge or split keys.
@@ -29,9 +31,10 @@ Use exactly these party names: {roles}.
 Return JSON with the same keys.
 """
 GLOSSARY = {"zh": "사업주=雇主, 근로자=劳动者, 임대인=出租人, 임차인=承租人, 세입자=承租人, 매도인=卖方, 매수인=买方",
-            "es": "사업주=empleador, 근로자=trabajador, 임대인=arrendador, 임차인=arrendatario, 세입자=arrendatario, 매도인=vendedor, 매수인=comprador"}
+            "es": "사업주=empleador, 근로자=trabajador, 임대인=arrendador, 임차인=arrendatario, 세입자=arrendatario, 매도인=vendedor, 매수인=comprador",
+            "en": "사업주=employer, 근로자=worker, 임대인=landlord, 임차인=tenant, 세입자=tenant, 매도인=seller, 매수인=buyer"}
 SOURCE_ROLES = ("사업주", "근로자", "임대인", "임차인", "매도인", "매수인")
-MIN_LENGTH = {"zh": 0.2, "es": 0.5}
+MIN_LENGTH = {"zh": 0.2, "es": 0.5, "en": 0.5}
 
 
 class TranslationUnavailable(Exception):
@@ -51,7 +54,7 @@ def lock(text, language="zh"):
     text = re.sub(DATE, lambda m: keep(f"{m[1]}-{int(m[2]):02d}-{int(m[3]):02d}"), text)
     text = re.sub(CLOCK, lambda m: keep(f"{int(m[1]):02d}:{m[2]}"), text)
     text = re.sub(MONEY, lambda m: keep(m[0]), text)
-    text = re.sub("|".join(WEEKDAYS), lambda m: keep(WEEKDAYS[m[0]][language == "es"]), text)
+    text = re.sub("|".join(WEEKDAYS), lambda m: keep(WEEKDAYS[m[0]][DAY_INDEX.get(language, 0)]), text)
     return text, values
 
 
@@ -75,7 +78,7 @@ def is_faithful(source, output, values, language):
     plain = re.sub(TOKEN, "", output).strip()
     if len(plain) < len(re.sub(TOKEN, "", source).strip()) * MIN_LENGTH[language]:
         return False
-    if language == "es" and (re.search(r"[一-鿿]", plain) or half_translated(source, plain)):
+    if language in ("es", "en") and (re.search(r"[一-鿿]", plain) or half_translated(source, plain)):
         return False
     found = {role for word, role in FOREIGN_ROLES.items() if word.lower() in plain.lower()}
     named = {role for role in SOURCE_ROLES if role in source} | ({"임차인"} if "세입자" in source else set())

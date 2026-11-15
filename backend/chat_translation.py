@@ -55,7 +55,7 @@ def local_fields(fields, language, on_progress=None, cancelled=None):
                     return audit, model
             return {'equivalent': True, 'errors': []}, model
         else:
-            target = {'ko': '韩语 (Korean)', 'zh': '简体中文 (Simplified Chinese)', 'es': '西班牙语 (Spanish)'}[language]
+            target = {'ko': '韩语 (Korean)', 'zh': '简体中文 (Simplified Chinese)', 'es': '西班牙语 (Spanish)', 'en': '英语 (English)'}[language]
             fields = json.loads(prompt.split('\n', 1)[1])
             # Flat string fields avoid the small model copying nested JSON syntax
             # from the cloud prompt's text/locked_values objects into its answer.

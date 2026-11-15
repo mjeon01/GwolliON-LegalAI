@@ -18,6 +18,6 @@ def sample_translation(result, language):
     """Return the stored translation when every contract line is a sample line, otherwise None."""
     data = catalog()
     lines = [b["text"] for b in result["blocks"] if re.search(r"[가-힣]", b["text"])]
-    if not lines or not set(lines) <= set(data.get("lines", ())):
+    if language not in data or not lines or not set(lines) <= set(data.get("lines", ())):
         return None
     return {**apply_translations(result, language, data.get(language, {})), "bundled": True}

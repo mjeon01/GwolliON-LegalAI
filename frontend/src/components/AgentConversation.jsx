@@ -303,7 +303,7 @@ export default function AgentConversation({
             </Field>
             <div className="composer-bottom">
               <span className="small muted">
-                {t("한국어·중국어·스페인어로 질문할 수 있습니다.")}
+                {t("한국어·영어·중국어·스페인어로 질문할 수 있습니다.")}
               </span>
               <button
                 className="btn btn-primary btn-sm"

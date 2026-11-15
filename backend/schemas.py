@@ -16,7 +16,7 @@ class Context(BaseModel):
     deposit_returned: StrictBool | None = None
 
 
-Language = Literal["ko", "zh", "es"]
+Language = Literal["ko", "en", "zh", "es"]
 
 
 class ReadPage(BaseModel):
@@ -147,7 +147,7 @@ class StandaloneDraftRequest(BaseModel):
 class FilingRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     kind: Literal["labor_petition", "complaint", "lawyer_request", "help_request"]
-    language: Literal["ko", "zh", "es"] = "ko"
+    language: Literal["ko", "en", "zh", "es"] = "ko"
     fields: dict[str, str] = Field(default_factory=dict, max_length=40)
 
     @model_validator(mode="after")
@@ -177,7 +177,7 @@ class ChatRequest(BaseModel):
 class TranslationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     analysis_revision: int = Field(ge=1)
-    language: Literal["zh", "es"]
+    language: Literal["en", "zh", "es"]
 
     engine: Literal["template", "openai"] = "template"
 
@@ -185,13 +185,13 @@ class TranslationRequest(BaseModel):
 class AutoTranslationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     analysis_revision: int = Field(ge=1)
-    language: Literal["zh", "es"]
+    language: Literal["en", "zh", "es"]
 
 
 class DocumentTranslationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     analysis_revision: int = Field(ge=1)
-    language: Literal["zh", "es"]
+    language: Literal["en", "zh", "es"]
     text: str = Field(min_length=1, max_length=50000)
 
 

@@ -16,7 +16,7 @@ function scan(folder) {
         if(p.node.callee.name !== 't' || p.node.arguments[0]?.type !== 'StringLiteral') return;
         const key=p.node.arguments[0].value;
         if(!/[가-힣]/.test(key)) return;
-        if(!messages[key]?.zh || !messages[key]?.es) failures.push(`${file}: missing ${key}`);
+        if(!messages[key]?.zh || !messages[key]?.es || !messages[key]?.en) failures.push(`${file}: missing ${key}`);
       },
       JSXText(p) {if(/[가-힣]/.test(p.node.value)) failures.push(`${file}: unlocalized JSX ${p.node.value.trim()}`);},
     });
@@ -25,7 +25,7 @@ function scan(folder) {
 scan(root);
 for(const [key,translations] of Object.entries(messages)) {
   const markers=s => (s.match(/\{\d+\}/g)||[]).sort().join();
-  for(const lang of ['zh','es']) if(!translations[lang] || markers(key)!==markers(translations[lang])) failures.push(`${lang}: placeholders differ for ${key}`);
+  for(const lang of ['zh','es','en']) if(!translations[lang] || markers(key)!==markers(translations[lang])) failures.push(`${lang}: placeholders differ for ${key}`);
 }
 if(failures.length) {console.error(failures.join('\n'));process.exit(1);}
-console.log(`Validated ${Object.keys(messages).length} Korean/Chinese/Spanish messages and interpolation markers.`);
+console.log(`Validated ${Object.keys(messages).length} Korean/English/Chinese/Spanish messages and interpolation markers.`);

@@ -9,19 +9,23 @@ from backend.openai_client import generate, OpenAIError
 from backend.extraction import MONEY
 from backend.config import ai_provider
 
-LANGUAGES = {'ko': 'Korean', 'zh': 'Simplified Chinese', 'es': 'Spanish'}
+LANGUAGES = {'ko': 'Korean', 'en': 'English', 'zh': 'Simplified Chinese', 'es': 'Spanish'}
+# Position of each language in the ROLES glosses.
+GLOSS = {'zh': 0, 'es': 1, 'en': 2}
 ROLES = {
-    '임대인': ('出租人', 'arrendador'), '임차인': ('承租人', 'arrendatario'),
-    '세입자': ('承租人', 'inquilino'), '근로자': ('劳动者', 'trabajador'),
-    '사업주': ('雇主', 'empleador'), '사용자': ('用户或雇主，依上下文', 'usuario o empleador según contexto'),
-    '매수인': ('买方', 'comprador'), '매도인': ('卖方', 'vendedor'),
+    '임대인': ('出租人', 'arrendador', 'landlord'), '임차인': ('承租人', 'arrendatario', 'tenant'),
+    '세입자': ('承租人', 'inquilino', 'tenant'), '근로자': ('劳动者', 'trabajador', 'worker'),
+    '사업주': ('雇主', 'empleador', 'employer'), '사용자': ('用户或雇主，依上下文', 'usuario o empleador según contexto', 'employer or user, depending on context'),
+    '매수인': ('买方', 'comprador', 'buyer'), '매도인': ('卖方', 'vendedor', 'seller'),
 }
 FOREIGN_ROLES = {'出租人': '임대인', '房东': '임대인', '承租人': '임차인', '租客': '임차인',
                  '劳动者': '근로자', '雇主': '사업주', '买方': '매수인', '卖方': '매도인',
                  'arrendador': '임대인', 'arrendadora': '임대인', 'arrendatario': '임차인', 'arrendataria': '임차인',
                  'inquilino': '임차인', 'inquilina': '임차인', 'trabajador': '근로자', 'trabajadora': '근로자',
                  'empleador': '사업주', 'empleadora': '사업주', 'comprador': '매수인', 'compradora': '매수인',
-                 'vendedor': '매도인', 'vendedora': '매도인'}
+                 'vendedor': '매도인', 'vendedora': '매도인',
+                 'landlord': '임대인', 'tenant': '임차인', 'worker': '근로자', 'employee': '근로자',
+                 'employer': '사업주', 'buyer': '매수인', 'seller': '매도인'}
 
 
 def content_hash(value):
@@ -37,7 +41,7 @@ def protect(text, language):
         token = f'⟪G{len(tokens):04d}⟫'
         value = match[0]
         if value in ROLES and language != 'ko':
-            value += ' (' + ROLES[value][0 if language == 'zh' else 1] + ')'
+            value += ' (' + ROLES[value][GLOSS[language]] + ')'
         elif value in FOREIGN_ROLES and language == 'ko':
             value = FOREIGN_ROLES[value]
         tokens[token] = value
@@ -106,8 +110,8 @@ def translated_fields(fields, language, *, run_model=None, require_target_langua
             plain = re.sub(r'⟪G\d{4}⟫', '', text)
             source_plain = re.sub(r'⟪G\d{4}⟫', '', masked)
             if require_target_language and re.search(r'[가-힣一-鿿A-Za-z]', source_plain):
-                expected = {'ko': r'[가-힣]', 'zh': r'[一-鿿]', 'es': r'[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]'}[language]
-                if not re.search(expected, plain) or (language == 'es' and re.search(r'[一-鿿]', plain)) or (language != 'ko' and len(re.findall(r'[가-힣]', plain)) > len(re.findall(expected, plain))):
+                expected = {'ko': r'[가-힣]', 'zh': r'[一-鿿]', 'es': r'[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]', 'en': r'[A-Za-z]'}[language]
+                if not re.search(expected, plain) or (language in ('es', 'en') and re.search(r'[一-鿿]', plain)) or (language != 'ko' and len(re.findall(r'[가-힣]', plain)) > len(re.findall(expected, plain))):
                     raise OpenAIError('translation_language', '선택한 언어로 답변을 번역하지 못했습니다. 다시 시도해주세요.', 422)
             if Counter(re.findall(r'⟪G\d{4}⟫', text)) != Counter(tokens.keys()) or re.search(r'\d', re.sub(r'⟪G\d{4}⟫', '', text)):
                 raise OpenAIError('translation_integrity', '번역에서 금액·날짜·인용·당사자 보존 검사를 통과하지 못했습니다. 원문을 유지합니다. 다시 번역해주세요.', 422)

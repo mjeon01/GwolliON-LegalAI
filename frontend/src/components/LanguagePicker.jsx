@@ -3,6 +3,7 @@ import { setLanguage, t, useLanguage } from "../i18n/index.js";
 
 const languages = [
   { code: "ko", label: "한국어", htmlLang: "ko", short: "KO" },
+  { code: "en", label: "English", htmlLang: "en", short: "EN" },
   { code: "zh", label: "中文", htmlLang: "zh-Hans", short: "ZH" },
   { code: "es", label: "Español", htmlLang: "es", short: "ES" },
 ];
