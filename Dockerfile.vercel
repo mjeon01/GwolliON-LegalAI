@@ -14,5 +14,5 @@ COPY backend/ backend/
 COPY resources/ resources/
 COPY samples/ samples/
 COPY --from=frontend /app/frontend/dist frontend/dist
-ENV GWOLLION_ALLOWED_HOSTS=*.vercel.app GWOLLION_DB=/tmp/gwollion/analyses.sqlite3 GWOLLION_INLINE_ANALYSIS=1
+ENV GWOLLION_AI_PROVIDER=openai GWOLLION_ALLOWED_HOSTS=*.vercel.app GWOLLION_DB=/tmp/gwollion/analyses.sqlite3 GWOLLION_INLINE_ANALYSIS=1
 CMD ["sh", "-c", "export GWOLLION_TESSDATA=$(dirname $(find /usr/share/tesseract-ocr -name kor.traineddata)) && exec uvicorn backend.app:app --host 0.0.0.0 --port ${PORT:-80}"]

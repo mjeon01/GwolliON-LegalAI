@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:e2e": "npm run build && playwright test",
+    "test:e2e": "VITE_CLOUD_AI=0 npm run build && playwright test",
     "test:i18n": "node scripts/check-i18n.cjs"
   },
   "keywords": [],

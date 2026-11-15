@@ -126,7 +126,7 @@ OLLAMA_MODEL=qwen2.5:7b
 OLLAMA_URL=http://127.0.0.1:11434
 ```
 
-설정은 요청 시 읽습니다. 유료 OpenAI 기능은 서버의 `GWOLLION_AI_PROVIDER=openai`와 API 키를 명시적으로 설정한 경우에만 사용할 수 있으며, 현재 UI는 로컬 모델을 요청합니다. `/api/health`의 `openai_configured`는 키 존재 여부이며 인증 성공을 뜻하지 않습니다. 인증 오류·사용량 제한·시간 초과는 입력을 보존하고 재시도를 안내합니다.
+설정은 요청 시 읽습니다. 유료 OpenAI 기능은 서버의 `GWOLLION_AI_PROVIDER=openai`와 API 키를 명시적으로 설정한 경우에만 사용할 수 있으며, 기본 빌드와 Vercel 배포(`Dockerfile.vercel`이 `GWOLLION_AI_PROVIDER=openai`를 설정)는 OpenAI를 요청하고, `VITE_CLOUD_AI=0`으로 빌드하면 로컬 모델을 요청합니다(브라우저 테스트가 이 방식). `/api/health`의 `openai_configured`는 키 존재 여부이며 인증 성공을 뜻하지 않습니다. 인증 오류·사용량 제한·시간 초과는 입력을 보존하고 재시도를 안내합니다.
 
 | 설정 | 용도 |
 | --- | --- |
