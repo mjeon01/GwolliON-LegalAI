@@ -12,6 +12,9 @@ import {
   PageHead,
   PrivacyNote,
 } from "../components/UI.jsx";
+// Text taken from the file itself is exact; only OCR and photo readings need comparing with the original.
+const EXACT = new Set(["text", "pdf_text"]);
+const exact = (p) => EXACT.has(p.method);
 const blank = {
   title: "",
   text: "",
@@ -155,8 +158,14 @@ export default function Upload() {
       setForm((old) => ({
         ...old,
         text: data.text,
-        title: old.title || items[0].file.name.replace(/\.[^.]+$/, ""),
-        reading: data.reading,
+        title: items[0].file.name.replace(/\.[^.]+$/, ""),
+        reading: data.reading && {
+          ...data.reading,
+          pages: (data.reading.pages || []).map((p) => ({
+            ...p,
+            confirmed: p.confirmed || exact(p),
+          })),
+        },
         document_id: data.document_id,
       }));
       setPreviews(data.page_previews || []);
@@ -191,6 +200,21 @@ export default function Upload() {
     });
   }
   const pages = form.reading?.pages || [];
+  const toCheck = pages.filter((p) => !exact(p) || p.method === "manual_text");
+  const allExact = !!pages.length && !toCheck.length;
+  function confirmAll(checked) {
+    setForm((old) => ({
+      ...old,
+      reading: {
+        ...old.reading,
+        pages: old.reading.pages.map((p) => ({
+          ...p,
+          confirmed: checked,
+          status: p.status === "failed" ? p.status : "ok",
+        })),
+      },
+    }));
+  }
   const unconfirmed = pages.some(
     (p) =>
       !p.confirmed ||
@@ -204,7 +228,7 @@ export default function Upload() {
     if (photosChanged)
       return setError("사진이 변경되었습니다. 현재 순서로 다시 읽어주세요.");
     if (unconfirmed)
-      return setError("모든 페이지를 원본과 대조하고 확인 표시를 해주세요.");
+      return setError("읽은 내용을 원본과 대조하고 확인 표시를 해주세요.");
     if (form.text.trim().length < 20)
       return setError("검토할 계약서 내용을 20자 이상 입력해주세요.");
     if (form.text.length > 50000)
@@ -219,8 +243,8 @@ export default function Upload() {
         body: JSON.stringify({
           ...form,
           title: form.title.trim() || "내 계약서",
-          engine: CLOUD_AI_ENABLED ? "openai" : "rules",
-          language: CLOUD_AI_ENABLED ? language() : "ko",
+          engine: CLOUD_AI_ENABLED ? "openai" : "ollama",
+          language: language(),
           evidence_mode: "local",
         }),
       });
@@ -245,6 +269,12 @@ export default function Upload() {
           </ButtonLink>
         }
       />
+      <p className="notice upload-alternative">
+        {t("계약서를 받지 못했거나 지금 촬영하기 어렵나요?")}{" "}
+        <a className="text-link" href="/interview/">
+          {t("계약서 없이 상담하기")}
+        </a>
+      </p>
       <div className="editor-layout">
         <form
           onSubmit={submit}
@@ -414,73 +444,104 @@ export default function Upload() {
             )}
             {t(
               !!pages.length ? (
-                pages.map((p, i) => (
-                  <section className="reading-page" key={p.page}>
-                    <h3>
-                      {t("페이지")}
-                      {p.page} ·{" "}
-                      {{
-                        text: "텍스트 읽기",
-                        pdf_text: "PDF 텍스트",
-                        ocr: "로컬 OCR",
-                        openai_vision: "사진 판독",
-                        manual_text: "직접 수정",
-                      }[p.method] || p.method}
-                    </h3>
-                    <div className="page-comparison">
-                      {previews.find((v) => v.page === p.page) && (
-                        <img
-                          src={previews.find((v) => v.page === p.page).url}
-                          alt={t("판독에 사용한 사진")}
-                        />
+                <>
+                  {allExact && (
+                    <p className="notice reading-exact">
+                      {t(
+                        "파일의 글자를 그대로 읽었습니다. 바로 검토를 시작해도 됩니다.",
                       )}
-                      <Field label={t("한국어 원문 확인·수정")}>
-                        <textarea
-                          rows={10}
-                          value={p.text}
-                          maxLength={50000}
-                          onChange={(e) =>
-                            editPage(i, {
-                              text: e.target.value,
-                              confirmed: false,
-                              status: "needs_review",
-                            })
-                          }
-                        />
-                      </Field>
-                    </div>
-                    {p.warnings.map((w, j) => (
-                      <p className="notice" key={j}>
-                        {t(w)}
-                      </p>
-                    ))}
-                    {p.status === "failed" && (
-                      <p role="alert">
-                        {t(
-                          "이 페이지를 읽지 못했습니다. 다시 읽거나 원문을 직접 입력해주세요.",
+                    </p>
+                  )}
+                  {pages.map((p, i) => {
+                    const editor = (
+                      <>
+                        <div className="page-comparison">
+                          {previews.find((v) => v.page === p.page) && (
+                            <img
+                              src={previews.find((v) => v.page === p.page).url}
+                              alt={t("판독에 사용한 사진")}
+                            />
+                          )}
+                          <Field label={t("한국어 원문 확인·수정")}>
+                            <textarea
+                              rows={10}
+                              value={p.text}
+                              maxLength={50000}
+                              onChange={(e) =>
+                                editPage(i, {
+                                  text: e.target.value,
+                                  method: "manual_text",
+                                  confirmed: false,
+                                  status: "needs_review",
+                                })
+                              }
+                            />
+                          </Field>
+                        </div>
+                        {p.warnings.map((w, j) => (
+                          <p className="notice" key={j}>
+                            {t(w)}
+                          </p>
+                        ))}
+                        {p.status === "failed" && (
+                          <p role="alert">
+                            {t(
+                              "이 페이지를 읽지 못했습니다. 다시 읽거나 원문을 직접 입력해주세요.",
+                            )}
+                          </p>
                         )}
-                      </p>
-                    )}
+                      </>
+                    );
+                    const heading = (
+                      <>
+                        {t("페이지")}
+                        {p.page} ·{" "}
+                        {{
+                          text: "텍스트 읽기",
+                          pdf_text: "PDF 텍스트",
+                          ocr: "로컬 OCR",
+                          openai_vision: "사진 판독",
+                          manual_text: "직접 수정",
+                        }[p.method] || p.method}
+                      </>
+                    );
+                    return exact(p) ? (
+                      <details
+                        className="reading-page reading-fold"
+                        key={p.page}
+                      >
+                        <summary>
+                          {heading}
+                          <span className="muted small">
+                            {t("읽은 원문 보기·수정 (선택)")}
+                          </span>
+                        </summary>
+                        {editor}
+                      </details>
+                    ) : (
+                      <section className="reading-page" key={p.page}>
+                        <h3>{heading}</h3>
+                        {editor}
+                      </section>
+                    );
+                  })}
+                  {!allExact && (
                     <label className="check-label">
                       <input
                         type="checkbox"
-                        checked={p.confirmed}
-                        disabled={
-                          !p.text.trim() ||
-                          p.status === "failed" ||
-                          p.text.includes("[판독 불가]")
-                        }
-                        onChange={(e) =>
-                          editPage(i, {
-                            confirmed: e.target.checked,
-                            status: "ok",
-                          })
-                        }
+                        checked={!unconfirmed}
+                        disabled={pages.some(
+                          (p) =>
+                            !p.text.trim() ||
+                            p.status === "failed" ||
+                            p.text.includes("[판독 불가]"),
+                        )}
+                        onChange={(e) => confirmAll(e.target.checked)}
                       />
                       {t("원본과 대조해 금액·날짜·누락을 확인했습니다.")}
                     </label>
-                  </section>
-                ))
+                  )}
+                </>
               ) : (
                 <Field
                   label={t("계약서 내용")}
@@ -507,26 +568,34 @@ export default function Upload() {
               <span>{t(form.text.length.toLocaleString())} / 50,000</span>
               <span>{t("원문을 수정하면 수정한 내용으로 검토합니다.")}</span>
             </div>
-            <Field label={t("전체 페이지와 별첨을 포함했나요?")}>
-              <select
-                value={
-                  form.context.document_complete == null
-                    ? ""
-                    : String(form.context.document_complete)
-                }
-                onChange={(e) =>
-                  set("context", {
-                    ...form.context,
-                    document_complete:
-                      e.target.value === "" ? null : e.target.value === "true",
-                  })
-                }
-              >
-                <option value="">{t("아직 확인하지 못했어요")}</option>
-                <option value="true">{t("네, 모두 포함했어요")}</option>
-                <option value="false">{t("일부만 포함했어요")}</option>
-              </select>
-            </Field>
+            <fieldset className="choice-row">
+              <legend>{t("전체 페이지와 별첨을 포함했나요?")}</legend>
+              {[
+                [true, "네, 모두 포함했어요"],
+                [false, "일부만 포함했어요"],
+              ].map(([value, label]) => (
+                <button
+                  type="button"
+                  key={label}
+                  className={
+                    "btn btn-ghost choice" +
+                    (form.context.document_complete === value
+                      ? " selected"
+                      : "")
+                  }
+                  aria-pressed={form.context.document_complete === value}
+                  onClick={() =>
+                    set("context", {
+                      ...form.context,
+                      document_complete:
+                        form.context.document_complete === value ? null : value,
+                    })
+                  }
+                >
+                  {t(label)}
+                </button>
+              ))}
+            </fieldset>
           </fieldset>
           <ErrorNotice message={error} />
           {busy && (

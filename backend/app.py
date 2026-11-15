@@ -1,4 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
+import hashlib
+import hmac
+import secrets
 from contextlib import asynccontextmanager
 import json
 import asyncio
@@ -16,9 +19,9 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from backend.analysis import extract, evaluate
 from backend.documents import draft, translate
 from backend.extraction import ollama_settings, GenerationCancelled
-from backend.streaming import chat_events
+from backend.streaming import chat_events, agent_events
 from backend.knowledge import Knowledge, ROOT
-from backend.schemas import AnalyzeRequest, AnswersRequest, DraftRequest, DocumentPdfRequest, AutoTranslationRequest, StandaloneDraftRequest, ChatRequest, TranslationRequest, DocumentTranslationRequest, IncidentTranslationRequest
+from backend.schemas import AnalyzeRequest, AnswersRequest, DraftRequest, DocumentPdfRequest, AutoTranslationRequest, StandaloneDraftRequest, FilingRequest, ChatRequest, TranslationRequest, DocumentTranslationRequest, IncidentTranslationRequest, AgentSessionRequest, AgentMessageRequest
 from backend.chat import answer_question, multilingual_answer
 from backend.store import Store, StaleRevision
 from backend.reading import read_document, read_documents, ReadingError, ocr_available
@@ -28,10 +31,18 @@ from backend.pages import highlights, ocr_words, snapshot
 from starlette.concurrency import run_in_threadpool
 from backend.sample_translations import sample_translation
 from backend import openai_client
+from backend.config import ai_provider
 from backend.openai_client import OpenAIError, settings as openai_settings, require_key
 from backend.translation import content_hash, translate_review, translate_document, translate_incident
 
 FRONTEND_DIR = ROOT / "frontend/dist"
+# Contracts carry personal data: every analysis and agent session is readable only with its owner token.
+PROTECTED = re.compile(r"^/api/(analyses|agent/sessions)/([0-9a-f-]{36})(?:/|$)")
+NOT_FOUND = "분석을 찾을 수 없습니다. 삭제되었거나 이 브라우저에서 만든 분석이 아닐 수 있습니다."
+
+
+def token_hash(token):
+    return hashlib.sha256(token.encode()).hexdigest()
 SAMPLES_DIR = ROOT / "samples"
 
 
@@ -62,6 +73,30 @@ def create_app(db_path=None):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Content-Security-Policy"] = "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
         return response
+
+    def owns(stored, token, store=None):
+        """stored: owner hash, "" for rows that predate tokens, None when missing."""
+        if stored is None:
+            return False
+        if stored == "":
+            return not (store or app.state.store).shared
+        return bool(token) and hmac.compare_digest(stored, token_hash(token))
+
+    @app.middleware("http")
+    async def owner_only(request: Request, call_next):
+        match = PROTECTED.match(request.url.path)
+        if match:
+            store = app.state.store
+            kind, id = match.groups()
+            if kind == "analyses":
+                stored = await run_in_threadpool(store.owner_hash, id)
+            else:
+                session = await run_in_threadpool(store.session, id)
+                stored = None if session is None else session["owner_hash"]
+            token = request.headers.get("x-gwollion-token") or request.query_params.get("access")
+            if not owns(stored, token, store):
+                return JSONResponse({"detail": NOT_FOUND, "code": "not_found"}, status_code=404)
+        return await call_next(request)
 
     @app.exception_handler(OpenAIError)
     async def openai_error(request, exc):
@@ -106,7 +141,7 @@ def create_app(db_path=None):
         except OpenAIError as exc:
             app.state.store.finish(id, error=str(exc))
         except ValueError as exc:
-            app.state.store.finish(id, error=str(exc) if "자까지" in str(exc) else "모델 출력이나 추출값을 검증하지 못했습니다. 규칙 추출로 확인하거나 다시 시도해주세요.")
+            app.state.store.finish(id, error=str(exc) if ("자까지" in str(exc) or "줄바꿈" in str(exc)) else "모델 출력이나 추출값을 검증하지 못했습니다. 규칙 추출로 확인하거나 다시 시도해주세요.")
         except Exception:
             app.state.store.finish(id, error="분석을 완료하지 못했습니다. 로컬 Ollama 실행 여부와 모델을 확인하고 다시 시도해주세요.")
 
@@ -119,7 +154,7 @@ def create_app(db_path=None):
 
     # Each task has a document URL; refresh and browser back keep the current task.
     for page in ("upload", "samples", "review", "chat", "draft", "documents", "history",
-                 "original", "sources", "confirm"):
+                 "original", "sources", "confirm", "interview"):
         app.add_api_route(f"/{page}/", home, methods=["GET"], include_in_schema=False)
 
     @app.get("/api/health")
@@ -127,7 +162,8 @@ def create_app(db_path=None):
         _, model = ollama_settings()
         key, openai_model = openai_settings()
         articles = Knowledge().articles
-        return {"status": "ok", "articles": len(articles), "laws": sorted({a["law_title"] for a in articles}), "ollama_model": model, "supported_uploads": ["txt", "pdf", "jpg", "jpeg", "png", "webp"], "ocr_available": ocr_available(), "mode": "local-workspace", "openai_configured": bool(key), "openai_model": openai_model}
+        return {"status": "ok", "articles": len(articles), "laws": sorted({a["law_title"] for a in articles}), "ollama_model": model, "supported_uploads": ["txt", "pdf", "jpg", "jpeg", "png", "webp"], "ocr_available": ocr_available(), "mode": "local-workspace", "ai_provider": ai_provider(), "openai_configured": bool(key), "openai_model": openai_model,
+                "agent_available": ai_provider() == "openai" and bool(key)}
 
     @app.get("/api/samples")
     def samples():
@@ -199,18 +235,21 @@ def create_app(db_path=None):
     def analyze(request: AnalyzeRequest):
         if request.engine == "openai":
             require_key()
-        id = str(uuid4())
-        app.state.store.create(id, request.model_dump(mode="json"))
+        id, token = str(uuid4()), secrets.token_urlsafe(24)
+        app.state.store.create(id, request.model_dump(mode="json"), token_hash(token))
         # Serverless hosts may freeze threads once the response is sent.
         if os.environ.get("GWOLLION_INLINE_ANALYSIS"):
             worker(id, request)
         else:
             app.state.executor.submit(worker, id, request)
-        return {"analysis_id": id, "analysis_revision": 1, "status": "queued"}
+        return {"analysis_id": id, "analysis_revision": 1, "status": "queued", "access_token": token}
 
     @app.get("/api/analyses")
-    def history():
-        return app.state.store.list()
+    def history(request: Request):
+        pairs = (item.split(":", 1) for item in request.headers.get("x-gwollion-tokens", "").split(",") if ":" in item)
+        claimed = dict(list(pairs)[:200])
+        store = app.state.store
+        return store.list({id for id, token in claimed.items() if owns(store.owner_hash(id) or None, token)})
 
     @app.get("/api/analyses/{id}")
     def get_analysis(id: str):
@@ -256,7 +295,23 @@ def create_app(db_path=None):
 
     @app.post("/api/drafts")
     def standalone_draft(body: StandaloneDraftRequest):
-        return draft(None, body.kind, body.incident)
+        try:
+            return draft(None, body.kind, body.incident, written_on=body.written_on)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
+
+    @app.post("/api/filings")
+    def filing(body: FilingRequest):
+        from backend.filings import FilingError, build
+        try:
+            return build(body.kind, body.fields, body.language)
+        except FilingError as exc:
+            raise HTTPException(422, str(exc)) from None
+
+    @app.post("/api/incident-translations")
+    def standalone_incident_translation(body: IncidentTranslationRequest):
+        # Facts written in Chinese or Spanish become Korean before they go into a Korean document.
+        return translate_incident(body.incident)
 
     @app.get("/api/analyses/{id}/chat")
     def chat_history(id: str, analysis_revision: int):
@@ -305,7 +360,7 @@ def create_app(db_path=None):
         )
 
     def run_translation(key, source, digest):
-        id, revision, language = key
+        id, revision, language, provider = key
         job = app.state.translation_jobs[key]
 
         def progress(done, total, text, translated):
@@ -315,7 +370,7 @@ def create_app(db_path=None):
 
         try:
             payload = translate_analysis(source, language, progress)
-            app.state.store.save_translation(id, revision, language, "auto_review", digest, payload)
+            app.state.store.save_translation(id, revision, language, "auto_review:" + provider, digest, payload)
             job.update(status="complete", payload=payload)
         except TranslationUnavailable as exc:
             job.update(status="failed", error=str(exc) or "로컬 번역 모델에 연결하지 못했습니다. Ollama 실행 여부를 확인하고 다시 시도해주세요.")
@@ -327,13 +382,13 @@ def create_app(db_path=None):
         """Start or poll the local translation; repeat the call until status is complete."""
         source = ready(id, body.analysis_revision)["result"]
         digest = content_hash({"blocks": source["blocks"], "review": source["review"], "issues": source["issues"]})
-        cached = app.state.store.translation(id, body.analysis_revision, body.language, "auto_review", digest)
+        cached = app.state.store.translation(id, body.analysis_revision, body.language, "auto_review:" + ai_provider(), digest)
         if cached:
             return {"status": "complete", **cached}
         bundled = sample_translation(source, body.language)
         if bundled:
             return {"status": "complete", **bundled}
-        key, jobs = (id, body.analysis_revision, body.language), app.state.translation_jobs
+        key, jobs = (id, body.analysis_revision, body.language, ai_provider()), app.state.translation_jobs
         job = jobs.get(key)
         if job is None:
             job = jobs[key] = {"status": "running", "done": 0, "total": 0, "blocks": {}}
@@ -380,12 +435,12 @@ def create_app(db_path=None):
 
     @app.post("/api/analyses/{id}/document-translations")
     def document_translations(id: str, body: DocumentTranslationRequest):
-        return cached_translation(id, body.analysis_revision, body.language, "document", body.text,
+        return cached_translation(id, body.analysis_revision, body.language, "document:" + ai_provider(), body.text,
                                   lambda: {**translate_document(body.text, body.language), "analysis_id": id, "analysis_revision": body.analysis_revision})
 
     @app.post("/api/analyses/{id}/incident-translations")
     def incident_translations(id: str, body: IncidentTranslationRequest):
-        return cached_translation(id, body.analysis_revision, body.language, "incident", body.incident.model_dump(),
+        return cached_translation(id, body.analysis_revision, body.language, "incident:" + ai_provider(), body.incident.model_dump(),
                                   lambda: translate_incident(body.incident))
 
     @app.post("/api/analyses/{id}/translations")
@@ -395,6 +450,72 @@ def create_app(db_path=None):
             return cached_translation(id, body.analysis_revision, body.language, "review", result,
                                       lambda: translate_review(result, body.language))
         return translate(result, body.language)
+
+    # Agent sessions: with an uploaded contract, or an interview when there is no written contract.
+    def session_view(session):
+        return {"session_id": session["id"], "analysis_id": session["analysis_id"], "mode": session["mode"].split(":")[0],
+                "facts": session["facts"], "turns": session["turns"]}
+
+    @app.post("/api/agent/sessions", status_code=201)
+    def create_session(body: AgentSessionRequest, request: Request):
+        store = app.state.store
+        token = request.headers.get("x-gwollion-token")
+        if body.analysis_id:
+            stored = store.owner_hash(body.analysis_id)
+            if not owns(stored, token):
+                raise HTTPException(404, NOT_FOUND)
+            existing = store.sessions_for(body.analysis_id)
+            if existing:
+                return {**session_view(store.session(existing[0]["id"])), "access_token": token}
+            id = str(uuid4())
+            store.create_session(id, body.analysis_id, stored, "contract")
+        else:
+            id, token = str(uuid4()), secrets.token_urlsafe(24)
+            store.create_session(id, None, token_hash(token), f"interview:{body.contract_type}:{body.user_role}")
+        return {**session_view(store.session(id)), "access_token": token}
+
+    @app.get("/api/agent/sessions/{id}")
+    def get_session(id: str):
+        session = app.state.store.session(id)
+        if not session:
+            raise HTTPException(404, NOT_FOUND)
+        return session_view(session)
+
+    @app.delete("/api/agent/sessions/{id}/facts/{key}")
+    def forget_fact(id: str, key: str):
+        session = get_session(id)
+        facts = {k: v for k, v in session["facts"].items() if k != key}
+        app.state.store.save_facts(id, facts)
+        return {"facts": facts}
+
+    @app.post("/api/agent/sessions/{id}/messages")
+    async def agent_message(id: str, body: AgentMessageRequest):
+        from backend.agent.runner import run_turn
+        require_key()
+        store = app.state.store
+        session = store.session(id)
+        if not session:
+            raise HTTPException(404, NOT_FOUND)
+        result = None
+        if session["analysis_id"]:
+            value = row(session["analysis_id"])
+            if value["status"] not in {"completed", "awaiting_input"} or not value["result"]:
+                raise HTTPException(409, "분석 완료 후 질문해주세요.")
+            result = value["result"]
+
+        async def complete(emit, cancelled):
+            try:
+                turn, facts = await run_in_threadpool(run_turn, session, result, body.message, body.language, body.finding_id, emit, cancelled)
+            except GenerationCancelled:
+                raise asyncio.CancelledError()
+            try:
+                store.append_turn(id, len(session["turns"]), turn, facts)
+            except StaleRevision:
+                raise HTTPException(409, "다른 창에서 대화가 이어졌습니다. 새로고침한 뒤 다시 질문해주세요.")
+            return {"turn": turn, "facts": facts}
+
+        return StreamingResponse(agent_events(complete), media_type="text/event-stream",
+                                 headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"})
 
     @app.get("/api/sources")
     def search_sources(q: str = "근로시간"):

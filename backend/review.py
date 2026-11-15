@@ -3,6 +3,7 @@ import json
 import re
 from datetime import date
 
+from backend import foreign_form
 from backend.extraction import generate
 from backend.knowledge import Knowledge
 
@@ -83,7 +84,7 @@ def negated(text, kind=None):
     if kind == "penalty" or kind is None:
         if re.search(r"(?:위약금|배상액).*(?:정하지\s*않|지급하지\s*않|없다|없습니다|금지한다)", text):
             return True
-    if kind in {"included_allowance", None} and re.search(r"수당.*포함(?:하|되)?지\s*않", text):
+    if kind in {"included_allowance", None} and re.search(r"수당.*포함(?:하|되)?지\s*않|가산하여\s*수당(?:을)?\s*지급", text):
         return True
     if kind in {"sale_advance", None} and re.search(r"(?:먼저|선).*지급(?:하)?지\s*않", text):
         return True
@@ -296,6 +297,19 @@ applicability_questions에는 사업장 규모·사건 날짜·하자 원인 등
 
 
 def semantic_review(blocks, contract_type, role, grounding=None):
+    from backend.extraction import block_batches
+    batches = block_batches(blocks)
+    if len(batches) > 1:
+        reviewed = [semantic_review(batch, contract_type, role, grounding) for batch in batches]
+        return {'method': 'ollama', 'model': next((r['model'] for r in reviewed if r.get('model')), None),
+                'complete': all(r['complete'] for r in reviewed),
+                'findings': [finding for r in reviewed for finding in r['findings']],
+                'rejected_candidates': sum(r['rejected_candidates'] for r in reviewed),
+                'ranges': [{'block_ids': [b['block_id'] for b in batch], 'pages': sorted({b['page'] for b in batch}),
+                            'status': 'complete' if r['complete'] else 'partial', 'error_code': None}
+                           for batch, r in zip(batches, reviewed)],
+                'stages': ['contract_only_detection', 'grounded_candidate_explanation'],
+                'scope': '조항 단위로 나누어 로컬 모델 검토'}
     # Detect burdens from this contract first. Exposing unrelated historical
     # documents while detecting clauses caused a real false unilateral-change claim.
     detected = _semantic_review(blocks, contract_type, role)
@@ -326,7 +340,7 @@ def review_contract(request, blocks, checks, issues, extraction):
     knowledge, sources, findings = Knowledge(supplemental=bundle.get("sources", [])), {}, []
     housing_scope = not (request.contract_type == "lease" and re.search(r"상가\s*(?:건물\s*)?임대차|점포\s*임대차|임차\s*상가", "\n".join(b["text"] for b in blocks[:5])))
 
-    def append(kind, title, why, scenario, suggestion, evidence, refs=(), method="rules", citations=(), questions=(), basis_type="contract_burden"):
+    def append(kind, title, why, scenario, suggestion, evidence, refs=(), method="rules", citations=(), questions=(), basis_type="contract_burden", severity=None, topic=None):
         ids = []
         for law, number in refs:
             if law == "주택임대차보호법" and not housing_scope:
@@ -343,7 +357,7 @@ def review_contract(request, blocks, checks, issues, extraction):
         if role == "employer" and method == "rules":
             why = "이 문구를 그대로 사용하면 약정의 적용 범위나 효력을 두고 근로자와 분쟁이 생길 수 있습니다. " + ({"penalty": "근로계약 불이행에 대한 배상액을 미리 정하는지 법률 기준과 대조해야 합니다.", "included_allowance": "임금 구성과 포함 시간을 명확히 해야 실제 수당 정산을 설명할 수 있습니다.", "wage_deduction": "임금 공제의 법적 근거와 요건을 먼저 확인해야 합니다.", "leave_waiver": "사업장 규모와 근로조건에 따른 휴가 기준을 확인해야 합니다."}.get(kind, ""))
             scenario = "이 조항을 근거로 근로자에게 이행을 요구했을 때 약정 효력이나 미지급 임금 등에 관한 다툼이 생길 수 있습니다."
-        findings.append({"finding_id": f"R{len(findings)+1:03d}", "issue_type": kind, "title": title,
+        findings.append({"finding_id": f"R{len(findings)+1:03d}", "issue_type": kind, "title": title, "severity": severity, "topic": topic,
                          "risk_level": "warning", "user_role": role, "why_unfavorable": why,
                          "plain_explanation": why, "scenario": scenario, "revision_suggestion": suggestion,
                          "evidence": evidence, "source_ids": ids, "method": method,
@@ -360,12 +374,16 @@ def review_contract(request, blocks, checks, issues, extraction):
                 evidence.append({"block_id": b["block_id"], "page": b["page"], "start": 0, "end": len(b["text"]), "quote": b["text"]})
         if evidence:
             append(kind, title, why, scenario, suggestion, evidence, refs)
+    form = foreign_form.parse(blocks) if request.contract_type == "employment" and role == "worker" else None
+    for item in foreign_form.check(form) if form else []:
+        append(item["kind"], item["title"], item["why"], item["scenario"], item["suggestion"], item["evidence"], item["refs"], method="foreign_form",
+               severity=foreign_form.SEVERITY.get(item["kind"]), topic=foreign_form.TOPIC.get(item["kind"]))
     semantic = extraction.get("semantic_review")
     index = {b["block_id"]: b for b in blocks}
     for candidate in (semantic or {}).get("findings", []):
         if any(rule_matches(candidate["quote"], r[3], r[0]) for r in RULES if r[1] == request.contract_type and role in r[2]):
             continue
-        if any(candidate["quote"] == e["quote"] for f in findings for e in f["evidence"]):
+        if any(candidate["quote"] == e["quote"] or candidate["block_id"] == e["block_id"] for f in findings for e in f["evidence"]):
             continue
         b, quote = index[candidate["block_id"]], candidate["quote"]
         start = b["text"].index(quote)
@@ -395,9 +413,14 @@ def review_contract(request, blocks, checks, issues, extraction):
     headline = {"warning": f"{ROLE_LABELS[role]} 입장에서 주의할 조항 {len(findings)}개를 찾았습니다.",
                 "needs_information": "이상 없다고 말하기 전에 확인할 내용이 있습니다.",
                 "clear": "이번 검토 범위에서 불리한 조항이 발견되지 않았습니다."}[verdict]
+    counts = foreign_form.summary(findings) if form else None
+    if form:
+        headline = {"warning": f"외국인 표준근로계약서에서 고쳐야 할 곳 {len(findings)}개를 찾았습니다.",
+                    "needs_information": "외국인 표준근로계약서의 항목은 기준에 맞게 적혀 있습니다. 모든 페이지를 올렸는지만 확인해주세요.",
+                    "clear": "외국인 표준근로계약서의 항목이 기준에 맞게 적혀 있습니다."}[verdict]
     checked = [r[0] for r in RULES if r[1] == request.contract_type and role in r[2]]
     return {"verdict": verdict, "headline": headline, "role_label": ROLE_LABELS[role], "findings": findings,
-            "pending_reasons": reasons, "scope_note": ("입력된 조항을 나눠 규칙과 AI로 검토했습니다. 미완료 범위는 별도로 표시합니다. 실제 이행, 등기·권리 순위, 금액의 적정성과 조항의 법적 효력은 추가 확인이 필요합니다." if request.engine == "openai" else "기본 조건과 책임·권리 제한·일방 결정 등의 표현을 포함한 후보를 검토했습니다. 이런 표현 없이 적힌 불리한 조건은 놓칠 수 있습니다. 실제 이행, 등기·권리 순위, 금액의 적정성과 모든 조항의 법적 효력은 추가 검토가 필요합니다."),
+            "pending_reasons": reasons, "summary": counts, "scope_note": (((f"기준에 어긋나는 기재 {counts['high']}곳, 채우거나 확인할 기재 {counts['check']}곳입니다. 카드를 눌러 근거 줄과 고칠 문구를 확인하세요. " if findings else "임금·근로시간·휴게·휴일·숙식비·서명을 기준과 대조했습니다. ") + "공휴일 유급 여부는 사업장 규모(5인 이상)에 따라 달라집니다.") if form else "입력된 조항을 나눠 규칙과 AI로 검토했습니다. 미완료 범위는 별도로 표시합니다. 실제 이행, 등기·권리 순위, 금액의 적정성과 조항의 법적 효력은 추가 확인이 필요합니다." if request.engine == "openai" else "기본 조건과 책임·권리 제한·일방 결정 등의 표현을 포함한 후보를 검토했습니다. 이런 표현 없이 적힌 불리한 조건은 놓칠 수 있습니다. 실제 이행, 등기·권리 순위, 금액의 적정성과 모든 조항의 법적 효력은 추가 검토가 필요합니다."),
             "method": "rules_and_semantic" if semantic else "rules", "checked_categories": checked,
             "checked_items": [r[4] for r in RULES if r[1] == request.contract_type and role in r[2]],
             "semantic_complete": semantic["complete"] if semantic else None}, list(sources.values())

@@ -61,3 +61,43 @@ async def chat_events(complete):
         cancelled.set()
         task.cancel()
         await asyncio.gather(task, return_exceptions=True)
+
+
+async def agent_events(complete):
+    """Relay agent steps as they happen, then the saved turn. The answer is never sent before verification."""
+    queue = asyncio.Queue()
+    loop = asyncio.get_running_loop()
+    cancelled = Event()
+
+    def emit(name, data):
+        if not cancelled.is_set():
+            loop.call_soon_threadsafe(queue.put_nowait, (name, data))
+
+    async def run():
+        try:
+            await queue.put(("done", await complete(emit, cancelled)))
+        except OpenAIError as exc:
+            await queue.put(("error", {"detail": str(exc), "code": exc.code, "status": exc.status}))
+        except HTTPException as exc:
+            await queue.put(("error", {"detail": exc.detail, "status": exc.status_code}))
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            await queue.put(("error", {"detail": "답변을 완료하지 못했습니다. 다시 시도해주세요.", "status": 503}))
+
+    task = asyncio.create_task(run())
+    try:
+        yield event("status", {"phase": "preparing"})
+        while True:
+            try:
+                name, data = await asyncio.wait_for(queue.get(), timeout=10)
+            except asyncio.TimeoutError:
+                yield ": keepalive\n\n"
+                continue
+            yield event(name, data)
+            if name in ("done", "error"):
+                break
+    finally:
+        cancelled.set()
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)

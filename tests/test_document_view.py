@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import fitz
 from fastapi.testclient import TestClient
+from tests.owner_client import OwnerClient
 
 from backend.app import create_app
 from backend.knowledge import ROOT
@@ -57,7 +58,7 @@ class DocumentApiTests(unittest.TestCase):
         samples = patch("backend.app.SAMPLES_DIR", ROOT / "tests/fixtures/samples")
         samples.start()
         self.addCleanup(samples.stop)
-        client = TestClient(create_app(Path(folder.name) / "view.sqlite3"))
+        client = OwnerClient(create_app(Path(folder.name) / "view.sqlite3"))
         client.__enter__()
         self.addCleanup(client.__exit__, None, None, None)
         self.client = client

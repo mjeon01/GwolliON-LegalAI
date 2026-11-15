@@ -261,9 +261,32 @@ def generate_stream(schema, prompt, timeout=90, num_predict=1800, num_ctx=16384,
     return json.loads("".join(chunks)), model
 
 
+def block_batches(blocks, max_chars=6000, max_blocks=35):
+    batches, current, size = [], [], 0
+    for block in blocks:
+        length = len(block['text'])
+        if length > max_chars:
+            raise ValueError('한 조항이 6,000자를 넘습니다. 원문에 줄바꿈을 추가해 조항을 나눠주세요.')
+        if current and (size + length > max_chars or len(current) >= max_blocks):
+            batches.append(current)
+            current, size = [], 0
+        current.append(block)
+        size += length
+    if current:
+        batches.append(current)
+    return batches
+
+
 def ollama_extract(blocks, contract_type):
-    if sum(len(b["text"]) for b in blocks) > 6000:
-        raise ValueError("로컬 AI 추출은 현재 6,000자까지 지원합니다. 규칙 추출을 선택하거나 문서를 나눠주세요.")
+    batches = block_batches(blocks)
+    if len(batches) > 1:
+        found, rejected, model = {key: [] for key in contract_fields(contract_type)}, 0, None
+        for batch in batches:
+            values, model, rejected_count = ollama_extract(batch, contract_type)
+            rejected += rejected_count
+            for key, candidates in values.items():
+                found[key].extend(candidates)
+        return found, model, rejected
     fields = contract_fields(contract_type)
     schema = {"type": "object", "properties": {"terms": {"type": "array", "maxItems": 40, "items": {"type": "object", "properties": {
         "key": {"type": "string", "enum": list(fields)}, "value_text": {"type": "string"}, "block_id": {"type": "string"}}, "required": ["key", "value_text", "block_id"]}}}, "required": ["terms"]}

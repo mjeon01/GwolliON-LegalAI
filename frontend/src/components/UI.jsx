@@ -48,11 +48,11 @@ export function Header({ home = false }) {
     document.addEventListener("keydown", close);
     return () => document.removeEventListener("keydown", close);
   }, [open]);
+  // One way to ask: about the open contract when there is one, otherwise without a contract.
   const nav = [
     ["review", "계약서 검토"],
-    ["chat", "질문하기"],
+    [analysisId ? "chat" : "interview", "상담하기"],
     ["draft", "문서 작성"],
-    ["history", "검토 기록"],
   ];
   const selected = [
     "upload",
@@ -62,7 +62,11 @@ export function Header({ home = false }) {
     "confirm",
   ].includes(page)
     ? "review"
-    : page;
+    : page === "chat" || page === "interview"
+      ? analysisId
+        ? "chat"
+        : "interview"
+      : page;
   return (
     <header className={`nav ${home ? "" : "workspace-nav"}`}>
       <a className="skip-link" href="#main">
@@ -81,7 +85,7 @@ export function Header({ home = false }) {
             key={key}
             href={href(
               key === "review" && !analysisId ? "upload" : key,
-              key === "history" ? null : analysisId,
+              key === "interview" ? null : analysisId,
             )}
             className={selected === key ? "active" : ""}
             aria-current={selected === key ? "page" : undefined}

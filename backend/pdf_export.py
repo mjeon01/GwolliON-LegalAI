@@ -4,12 +4,12 @@ import re
 from xml.sax.saxutils import escape
 
 from reportlab.lib.colors import HexColor
-from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer
 
 from backend.knowledge import ROOT
 
@@ -30,11 +30,21 @@ def styles():
         "clause": ParagraphStyle("clause", parent=body, fontName="DocBold", spaceBefore=6),
         "bullet": ParagraphStyle("bullet", parent=body, leftIndent=11, firstLineIndent=-11),
         "indent": ParagraphStyle("indent", parent=body, leftIndent=11),
+        "date": ParagraphStyle("date", parent=body, alignment=TA_CENTER, spaceBefore=14, spaceAfter=10),
+        "sign": ParagraphStyle("sign", parent=body, alignment=TA_RIGHT, spaceAfter=10),
+        "addressee": ParagraphStyle("addressee", parent=body, fontName="DocBold", fontSize=13, leading=20, spaceBefore=12),
         "body": body,
     }
 
 
 def line_kind(line):
+    stripped = line.strip()
+    if re.fullmatch(r"\d{4}년 \d{1,2}월 \d{1,2}일", stripped):
+        return "date"
+    if re.search(r"(?:\(서명 또는 인\)|\(서명\)|드림)$", stripped):
+        return "sign"
+    if stripped.endswith("귀하"):
+        return "addressee"
     if re.match(r"\d+\.\s", line):
         return "heading"
     if re.match(r"조항 \d+\.\s", line):
@@ -47,7 +57,7 @@ def line_kind(line):
 def render_pdf(text, title):
     register_fonts()
     style = styles()
-    story, titled = [], False
+    story, titled, closing = [], False, None
     for raw in text.splitlines():
         line = raw.rstrip()
         if not line.strip():
@@ -57,8 +67,14 @@ def render_pdf(text, title):
             titled = True
         else:
             kind = line_kind(line)
+            if kind == "date" and closing is None:
+                closing = len(story)
             shown = "•&nbsp;&nbsp;" + escape(line[2:]) if kind == "bullet" else escape(line.strip())
             story.append(Paragraph(shown, style[kind]))
+
+    # The date, signature and addressee of a filing stay on one page.
+    if closing is not None:
+        story[closing:] = [KeepTogether(story[closing:])]
 
     def page_number(canvas, doc):
         canvas.setFont("DocRegular", 8.5)

@@ -79,9 +79,7 @@ test("photos → review → question → edited TXT with multilingual UI", async
         "\n계약 서류를 서로 확인한다.",
     );
   await page.getByRole("checkbox").check();
-  await page
-    .getByLabel("전체 페이지와 별첨을 포함했나요?")
-    .selectOption("true");
+  await page.getByRole("button", { name: "네, 모두 포함했어요" }).click();
   await noOverflow(page);
   await page.screenshot({
     path: info.outputPath("photo-confirm.png"),
@@ -92,7 +90,7 @@ test("photos → review → question → edited TXT with multilingual UI", async
   await expect(page.locator(".finding-card")).toHaveCount(2);
   await expect(page.locator(".doc-mark.tone-risk")).toHaveCount(2);
   const id = new URL(page.url()).searchParams.get("id");
-  expect(analysisRequests[0].engine).toBe("openai");
+  expect(analysisRequests[0].engine).toBe("ollama");
   await selectLanguage(page, "zh");
   await expect(page.getByText(/OPENAI_API_KEY/)).toHaveCount(0);
   await expect(page.locator("select option", { hasText: "Ollama" })).toHaveCount(0);
@@ -271,28 +269,33 @@ test("language persists, samples translate and errors preserve input", async ({
   await noOverflow(page);
 });
 
+// Analyses are private to their creator: keep the owner token for API calls and give it to the page.
+async function startAnalysis(page, request, data) {
+  const started = await (await request.post("/api/analyses", { data })).json();
+  const headers = { "X-Gwollion-Token": started.access_token };
+  await page.addInitScript(
+    ([id, token]) =>
+      localStorage.setItem("gwollion:access", JSON.stringify({ [id]: token })),
+    [started.analysis_id, started.access_token],
+  );
+  const base = "/api/analyses/" + started.analysis_id;
+  await expect
+    .poll(async () => (await (await request.get(base, { headers })).json()).status)
+    .toMatch(/completed|awaiting_input/);
+  return { id: started.analysis_id, base, headers };
+}
+
 test("separate pages retain language and fit the viewport", async ({
   page,
   request,
 }, info) => {
   const sample = await (await request.get("/api/samples/sale-basic")).json();
-  const started = await (
-    await request.post("/api/analyses", {
-      data: {
-        text: sample.text,
-        contract_type: "sale",
-        engine: "rules",
-        context: sample.context,
-      },
-    })
-  ).json();
-  const id = started.analysis_id;
-  await expect
-    .poll(
-      async () =>
-        (await (await request.get("/api/analyses/" + id)).json()).status,
-    )
-    .toMatch(/completed|awaiting_input/);
+  const { id } = await startAnalysis(page, request, {
+    text: sample.text,
+    contract_type: "sale",
+    engine: "rules",
+    context: sample.context,
+  });
   for (const lang of ["ko", "zh", "es"]) {
     await page.goto("/");
     await selectLanguage(page, lang);
@@ -337,21 +340,13 @@ test("streaming types progressively, preserves failed questions and recovers sav
   request,
 }, info) => {
   const sample = await (await request.get("/api/samples/sale-risk")).json();
-  const started = await (
-    await request.post("/api/analyses", {
-      data: {
-        text: sample.text,
-        contract_type: "sale",
-        engine: "rules",
-        context: sample.context,
-      },
-    })
-  ).json();
-  const base = "/api/analyses/" + started.analysis_id;
-  await expect
-    .poll(async () => (await (await request.get(base)).json()).status)
-    .toMatch(/completed|awaiting_input/);
-  await page.goto("/chat/?id=" + started.analysis_id);
+  const { id: analysisId, base, headers } = await startAnalysis(page, request, {
+    text: sample.text,
+    contract_type: "sale",
+    engine: "rules",
+    context: sample.context,
+  });
+  await page.goto("/chat/?id=" + analysisId);
   const input = page.getByLabel("직접 질문하기", { exact: true });
   const send = page.getByRole("button", { name: "질문 보내기" });
   await input.fill("잔금을 보내기 전에 확인할 서류는 무엇인가요?");
@@ -412,7 +407,7 @@ test("streaming types progressively, preserves failed questions and recovers sav
   await page.reload();
   await expect(page.locator(".chat-turn")).toHaveCount(2);
   expect(
-    (await (await request.get(base + "/chat?analysis_revision=1")).json())
+    (await (await request.get(base + "/chat?analysis_revision=1", { headers })).json())
       .turns,
   ).toHaveLength(2);
 });

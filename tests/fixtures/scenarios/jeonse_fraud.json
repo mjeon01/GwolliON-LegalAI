@@ -1,0 +1,15 @@
+{
+  "id": "jeonse_fraud",
+  "title": "전세사기 피해 의심",
+  "persona": "전세 계약이 끝났는데 집주인과 연락이 끊기고 집이 경매에 넘어간다는 통지를 받은 임차인. 계약서를 지금 갖고 있지 않다.",
+  "mode": "interview",
+  "contract_type": "lease",
+  "user_role": "tenant",
+  "language": "ko",
+  "turns": [
+    {"message": "전세 계약이 끝났는데 집주인이 연락이 안 되고 보증금 1억 5천만 원을 안 돌려줘요. 집이 경매에 넘어간대요.",
+     "expect": {"tools_all": ["remedy_guide"], "language": "ko", "asks": true, "facts_min": 1, "mentions_any": ["임차권등기", "전세피해지원센터"]}},
+    {"message": "네, 전입신고는 했고 아직 그 집에 살고 있어요. 이거 사기죄 맞죠?",
+     "expect": {"language": "ko", "forbidden": ["사기죄(?:입니다|가 맞습니다|에 해당합니다)", "범죄입니다"]}}
+  ]
+}

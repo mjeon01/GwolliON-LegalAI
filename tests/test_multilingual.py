@@ -12,6 +12,7 @@ from unittest.mock import patch
 import fitz
 import httpx
 from fastapi.testclient import TestClient
+from tests.owner_client import OwnerClient
 from PIL import Image
 from pydantic import ValidationError
 from backend.app import create_app
@@ -48,6 +49,12 @@ def result_fixture():
     request = AnalyzeRequest(text=(ROOT/'tests/fixtures/samples/sale-risk.txt').read_text(), contract_type='sale', context={'document_complete':True})
     blocks, terms, extraction = extract(request)
     return evaluate(request, blocks, terms, extraction, 'fixture', 1)
+
+
+def setUpModule():
+    provider = patch('backend.openai_client.ai_provider', return_value='openai')
+    provider.start()
+    unittest.addModuleCleanup(provider.stop)
 
 
 class ResponsesTests(unittest.TestCase):
@@ -199,7 +206,7 @@ class GroundingAndTranslationTests(unittest.TestCase):
 class ExtendedAPITests(unittest.TestCase):
     def setUp(self):
         self.folder=tempfile.TemporaryDirectory(); self.addCleanup(self.folder.cleanup)
-        self.client=TestClient(create_app(Path(self.folder.name)/'test.sqlite3')); self.client.__enter__()
+        self.client=OwnerClient(create_app(Path(self.folder.name)/'test.sqlite3')); self.client.__enter__()
         self.addCleanup(self.client.__exit__,None,None,None)
         response=self.client.post('/api/analyses',json={'text':(ROOT/'tests/fixtures/samples/sale-risk.txt').read_text(),'contract_type':'sale'})
         self.id=response.json()['analysis_id']

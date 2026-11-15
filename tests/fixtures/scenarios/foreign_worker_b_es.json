@@ -1,0 +1,18 @@
+{
+  "id": "foreign_worker_b_es",
+  "title": "외국인 근로자 B (스페인어)",
+  "persona": "한국어 계약서를 읽기 어려운 스페인어권 근로자. 카페에서 일을 시작하며 무급 수습과 임금을 걱정한다.",
+  "mode": "contract",
+  "contract": "samples/employment-cafe.txt",
+  "contract_type": "employment",
+  "user_role": "worker",
+  "language": "es",
+  "turns": [
+    {"message": "¿Qué cláusula de este contrato es la más desfavorable para mí?",
+     "expect": {"tools_any": ["classify_clauses", "read_contract"], "language": "es", "evidence": true}},
+    {"message": "Gano 9000 wones por hora y trabajo 40 horas a la semana. ¿Es menos que el salario mínimo?",
+     "expect": {"tools_all": ["minimum_wage_check"], "facts_min": 1, "language": "es"}},
+    {"message": "Si el jefe no me paga, ¿a dónde puedo pedir ayuda?",
+     "expect": {"tools_all": ["remedy_guide"], "language": "es", "mentions_any": ["1350", "1577-0071"]}}
+  ]
+}

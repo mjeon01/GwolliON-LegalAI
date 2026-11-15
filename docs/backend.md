@@ -7,7 +7,7 @@
 | 파일 | 역할 |
 | --- | --- |
 | `backend/app.py` | API, 로컬 요청 검증, 백그라운드 작업, React 빌드 제공 |
-| `backend/config.py` | 서버 전용 `.env` 읽기. 명령행 스크립트도 같은 함수를 사용 |
+| `backend/config.py` | 서버 전용 `.env` 읽기와 명시적인 AI 제공자 선택. 기본은 `ollama` |
 | `backend/law_client.py` | 공식 법령 HTTP 요청·주소 검증·비밀값 제거·구조화된 조문 텍스트 추출 |
 | `backend/schemas.py` | 입력·답변·대화·문서 요청 스키마 |
 | `backend/reading.py` | TXT·PDF 직접 추출, 메타데이터 제거, 페이지별 OpenAI 판독·Tesseract OCR |
@@ -20,7 +20,7 @@
 | `backend/legal_api.py`, `corpus.py` | 공식 근거 조회와 로컬 참고자료 검색 |
 | `backend/chat.py`, `documents.py` | 후속 대화, 문서·안내 템플릿 |
 | `backend/chat_translation.py`, `streaming.py` | 로컬 대화 번역·의미 검사, 검증된 답변의 SSE 전달 |
-| `backend/openai_client.py` | `store:false` Responses API, 엄격한 JSON 검증, 안전한 오류·사용량 로그 |
+| `backend/openai_client.py` | 로컬 모드에서 호출 차단, 선택적으로 `store:false` Responses API와 오류·사용량 로그 |
 | `backend/translation.py` | 원문 값 고정, 역할·의미 검사, 검토·문서·사건 경위 번역 |
 | `backend/store.py` | SQLite 기록·revision·대화·내용별 번역 캐시 저장 |
 
@@ -68,7 +68,7 @@ flowchart LR
 
 답변·대화·초안 요청에는 최신 `analysis_revision`이 필요합니다. 오래된 revision은 409로 거절합니다. 삭제되거나 갱신된 결과를 늦게 도착한 작업이 되살리지 않도록 저장 단계에서도 확인합니다.
 
-`AnalyzeRequest.engine`은 `rules`(기본), `ollama`, `openai`입니다. 현재 UI는 클라우드 기능을 숨기고 `engine=rules`, 자유 질문 `engine=ollama`, 요청 언어는 화면의 `ko/zh/es`를 명시합니다. `ChatRequest`는 `engine=ollama/openai`와 `language=ko/zh/es`를 받으며, 기존 기본값은 유지합니다. 외국어 질문은 한국어 해석과 기존 검증을 거친 답변을 번역하고 질문 원문·한국어 해석을 함께 보관합니다.
+`AnalyzeRequest.engine`은 `rules`(기본), `ollama`, `openai`입니다. 현재 UI는 클라우드 기능을 숨기고 `engine=ollama`, 자유 질문 `engine=ollama`, 요청 언어는 화면의 `ko/zh/es`를 명시합니다. `ChatRequest`는 `engine=ollama/openai`와 `language=ko/zh/es`를 받으며, 기존 기본값은 유지합니다. 외국어 질문은 한국어 해석과 기존 검증을 거친 답변을 번역하고 질문 원문·한국어 해석을 함께 보관합니다.
 
 새 업로드 결과의 `reading.pages`에는 `page`, `text`, `method`, `status`, `warnings`, `confirmed`, `error_code`가 있습니다. `page_previews`는 메타데이터가 없는 비교용 이미지이며 DB에 저장하지 않습니다. 검토 화면에 표시할 페이지는 `document_pages` 테이블에 별도로 저장합니다(TXT는 없음). PDF 텍스트 페이지는 단어 좌표를 바로 쓰고, 사진·스캔은 검토 시작 시 Tesseract로 좌표를 구합니다. 좌표를 못 찾으면 읽은 텍스트 위에 표시합니다. 한 페이지 실패도 배열에서 제거하지 않습니다. 분석 요청의 페이지 순서·확인 표시·텍스트 연결을 검증합니다. 기존 단일 `file` + 로컬 요청의 응답·오류 동작은 호환됩니다.
 
@@ -134,3 +134,11 @@ flowchart LR
 `POST /api/analyses/{id}/chat/stream`은 기존 `ChatRequest`와 동일한 본문을 받고 `text/event-stream`으로 응답합니다. `status`(preparing/generating/verifying/retrying/translating), 검증·DB 저장 후 `delta`(text), 최종 `done`(기존 응답 구조) 순서입니다. 요청 시작 전에 확인된 revision 오류는 HTTP 오류이고, 생성 중 오류는 `error` 이벤트(detail/status)입니다. 기존 JSON `/chat`은 유지합니다. Ollama는 `stream:true` NDJSON을 사용하며 완료 신호 없는 연결 종료나 토큰 한도는 실패로 처리합니다. 원시 JSON·미검증 답변·수정 전 답변을 브라우저에 내보내지 않습니다. 클라이언트 연결 종료 시 생성 취소 표시를 전달하며 취소된 작업은 대화를 저장하지 않습니다.
 
 `POST /api/analyses/{id}/chat/{turn}/translation`은 기존 답변을 선택 언어로 번역하며, 분석 ID·revision·대화 순서·언어·한국어 원문 해시로 캐시합니다. 대화 자체를 덮어쓰지 않습니다. 로컬 다국어 질문은 `backend/chat_translation.py`를 사용해 OpenAI 없이 질문 해석 → 원문·근거 검증 → 선택 언어 번역을 수행합니다. 금액·날짜·인용·명시된 당사자는 토큰으로 고정하고, 번역 언어와 모델의 의미 대조를 확인합니다. 원문을 그대로 반환한 응답은 번역 성공으로 처리하지 않습니다.
+
+## 로컬 모델과 데이터 검색
+
+기본 제공자는 `GWOLLION_AI_PROVIDER=ollama`입니다. API 키 존재 여부로 제공자를 바꾸지 않습니다. 로컬 모드에서 `openai_client.require_key()`는 네트워크 요청과 사용량 차감 전에 `openai_disabled`를 반환합니다. 자동 검토·문서·사건 경위 번역 캐시는 제공자별로 분리합니다.
+
+`Corpus.search()`는 FTS5 trigram `LIKE` 색인에서 시작해 Training·종류·Validation 중복 필터를 적용합니다. `ESCAPE`는 trigram LIKE 색인 사용을 막으므로, 문자 그대로의 부분 문자열 검사는 `instr`로 수행합니다. 자료 종류를 분산하고 검색어를 많이 포함하는 연속 원문 구간을 선택합니다. `prompt_sources()`는 kind가 없는 기존 법령도 법령으로 분류하여 참고 사례의 자리를 빼앗지 않도록 합니다.
+
+자유 질문은 `chat_references()`에서 질문 쟁점을 우선해 로컬 자료 최대 4건을 다시 검색합니다. 답변의 `retrieval.source_ids`는 모델 입력에 제공한 자료이고, `reference_sources`는 실제로 검증된 인용에 사용한 자료입니다. 서로 다른 사건의 참고 자료는 사용자 사실이나 최신 법령으로 취급하지 않습니다. 검토·추출은 6,000자·35블록 단위로 처리하며 모든 블록 ID를 유지합니다.

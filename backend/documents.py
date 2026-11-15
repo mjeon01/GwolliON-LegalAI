@@ -43,7 +43,7 @@ def draft(result, kind, incident=None, finding_ids=None, written_on="", reply_by
     all_findings = (result or {}).get("review", {}).get("findings", [])
     findings = [f for f in all_findings if finding_ids is None or f["finding_id"] in finding_ids]
     written_on, reply_by = korean_date(written_on), korean_date(reply_by)
-    if kind in {"lawyer_request", "help_request", "complaint"}:
+    if kind in {"lawyer_request", "help_request", "complaint", "labor_petition"}:
         return action_draft(result, kind, incident, facts, findings, written_on)
     excluded = {f["issue_type"] for f in all_findings if f not in findings}
     issues = [i for i in result["issues"] if i["issue_type"] not in excluded]
@@ -115,6 +115,21 @@ def action_draft(result, kind, incident, document_facts, findings=None, written_
             if source:
                 sources.append(source)
         lines += ["", "절차 확인용 법령 (범죄 성립을 판단하는 근거가 아님)", *[s["title"] + ": " + s["official_url"] for s in sources]]
+    elif kind == "labor_petition":
+        if len(incident.get("summary", "").strip()) < 20:
+            raise ValueError("진정서에는 실제로 있었던 일을 20자 이상 입력해주세요.")
+        missing += ["근무 기간", "담당 업무", "사업장 주소", "관할 지방고용노동청"]
+        title = "진정서 (임금체불 등)"
+        lines = [title, "", "수신: 고용노동부 [관할 지방고용노동청·지청 직접 확인 후 입력]", "",
+                 "1. 진정인 (근로자)", f"성명: {supplied('writer')}", "주소·연락처: [직접 입력]", "근무 기간: [입사일 ~ 퇴사일 또는 재직 중]", "담당 업무: [직접 입력]", "",
+                 "2. 피진정인 (사업주)", f"성명·업체명: {supplied('counterparty', '[알고 있는 정보 입력]')}", "사업장 주소·연락처: [직접 입력]", "",
+                 "3. 진정 취지", "아래 사실을 확인하시어 받지 못한 임금 등 금품을 지급받을 수 있도록 조치하여 주시기 바랍니다.", "",
+                 "4. 진정 내용 (진정인의 설명)", f"시점: {supplied('date')}", f"장소: {supplied('place')}", supplied("summary"), "",
+                 "5. 받지 못한 금품 (진정인의 계산)", supplied("loss", "[항목별 금액과 계산 근거 입력: 예) 3월 임금 2,000,000원, 주휴수당 ○원]"), "",
+                 "6. 증거 자료", supplied("evidence", "[근로계약서·급여명세서·통장 입금내역·출퇴근 기록·메시지 등 실제 보유 자료 입력]"), "",
+                 "7. 요청 사항", supplied("desired_outcome", "미지급 금품의 지급과 사실관계 확인을 요청합니다."), "",
+                 f"작성일: {written_on or '[직접 입력]'}", f"진정인: {supplied('writer')} (서명 또는 날인)", "",
+                 "작성 전 확인: 위 내용은 진정인이 설명한 사실입니다. 금액은 급여명세서·입금내역과 대조하고, 모르는 사항은 모름으로 표시하세요. 진정은 고용노동부 노동포털에서 온라인으로도 제출할 수 있고, 작성이 어려우면 고용노동부 1350에 상담하세요."]
     else:
         lawyer = kind == "lawyer_request"
         title = "변호사 상담 요청문" if lawyer else "도움 요청문"

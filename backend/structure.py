@@ -24,11 +24,12 @@ def structure_contract(terms, blocks, contract_type):
     document = "\n".join(b["text"] for b in blocks)
     period, wage = value("period") or {}, value("wage") or {}
     clocks, rest = value("work_hours") or {}, value("break_time") or {}
-    fixed = True if re.search(r"기간의\s*정함이\s*있는|기간제", document) else False if period.get("indefinite") else True if period.get("end_date") else None
+    fixed = True if re.search(r"기간의\s*정함이\s*있는|기간제", document) or period.get("months") else False if period.get("indefinite") else True if period.get("end_date") else None
     payday = value("payment_date") or {}
     return {
         "contract_type": "일반근로계약서", "fixed_term": fixed,
-        "contract_period": {"start": period.get("start_date"), "end": period.get("end_date")},
+        "contract_period": {"start": period.get("start_date") or ("입국일" if period.get("months") else None),
+                            "end": period.get("end_date") or (f"입국일부터 {period['months']}개월" if period.get("months") else None)},
         "workplace": text("workplace"), "job_description": text("job_description"),
         "working_hours": {"start": clocks.get("start"), "end": clocks.get("end"),
                           "break": f"{rest['start']}~{rest['end']}" if rest.get("start") else None,

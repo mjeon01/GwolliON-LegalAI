@@ -9,6 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
+from tests.owner_client import OwnerClient
 from backend.app import create_app
 from backend.extraction import generate_stream, GenerationCancelled
 from backend.store import StaleRevision
@@ -55,7 +56,7 @@ class OllamaStreamTests(unittest.TestCase):
 class ChatStreamTests(unittest.TestCase):
     def setUp(self):
         folder = tempfile.TemporaryDirectory(); self.addCleanup(folder.cleanup)
-        self.client = TestClient(create_app(Path(folder.name) / 'test.sqlite3'))
+        self.client = OwnerClient(create_app(Path(folder.name) / 'test.sqlite3'))
         self.client.__enter__(); self.addCleanup(self.client.__exit__, None, None, None)
         started = self.client.post('/api/analyses', json={
             'text': (ROOT / 'tests/fixtures/samples/sale-risk.txt').read_text(), 'contract_type': 'sale',

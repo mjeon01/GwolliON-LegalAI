@@ -1,9 +1,11 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { t, useLanguage } from "../i18n/index.js";
-import { href } from "../lib/index.js";
+import { href, withAccess } from "../lib/index.js";
 import useLoad from "../hooks/useLoad.js";
 import { ButtonLink, Evidence, Icon } from "./UI.jsx";
 const tones = {
+  violation: "기준에 어긋나는 기재",
+  caution: "채우거나 확인할 기재",
   risk: "불리할 수 있는 조항",
   mismatch: "서로 다른 내용",
   check: "확인이 필요한 부분",
@@ -17,7 +19,12 @@ export function reviewItems(r) {
   const located = [
     ...r.review.findings.map((f) => ({
       key: f.finding_id,
-      tone: "risk",
+      tone:
+        f.severity === "high"
+          ? "violation"
+          : f.severity === "check"
+            ? "caution"
+            : "risk",
       title: f.title,
       evidence: f.evidence,
       finding: f,
@@ -31,7 +38,12 @@ export function reviewItems(r) {
         evidence: i.evidence,
         issue: i,
       })),
-  ].sort((a, b) => firstBlock(a).localeCompare(firstBlock(b)));
+  ].sort(
+    // Clear violations first, then the rest in reading order.
+    (a, b) =>
+      (a.tone === "violation" ? 0 : 1) - (b.tone === "violation" ? 0 : 1) ||
+      firstBlock(a).localeCompare(firstBlock(b)),
+  );
   const whole = r.issues
     .filter((i) => !i.evidence.length)
     .map((i) => ({
@@ -89,7 +101,9 @@ function PageImages({ id, pages, located, items, activeKey, select, zoom }) {
       }}
     >
       <img
-        src={`/api/analyses/${encodeURIComponent(id)}/pages/${page.page}`}
+        src={withAccess(
+          `/api/analyses/${encodeURIComponent(id)}/pages/${page.page}`,
+        )}
         alt={t("{0}페이지 원본", page.page)}
       />
       {items.flatMap((item) =>

@@ -8,6 +8,7 @@ import unittest
 
 import fitz
 from fastapi.testclient import TestClient
+from tests.owner_client import OwnerClient
 
 from backend.app import create_app
 from backend.knowledge import ROOT
@@ -24,7 +25,7 @@ class SampleCatalogTests(unittest.TestCase):
     def setUp(self):
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
-        self.client = TestClient(create_app(Path(folder.name) / "samples.sqlite3"))
+        self.client = OwnerClient(create_app(Path(folder.name) / "samples.sqlite3"))
         self.client.__enter__()
         self.addCleanup(self.client.__exit__, None, None, None)
 
@@ -99,7 +100,7 @@ class DocumentDraftTests(unittest.TestCase):
     def setUp(self):
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
-        self.client = TestClient(create_app(Path(folder.name) / "drafts.sqlite3"))
+        self.client = OwnerClient(create_app(Path(folder.name) / "drafts.sqlite3"))
         self.client.__enter__()
         self.addCleanup(self.client.__exit__, None, None, None)
         sample = next(s for s in SAMPLES if s["id"] == "employment-cafe")

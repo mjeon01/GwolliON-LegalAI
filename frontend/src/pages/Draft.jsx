@@ -1,5 +1,5 @@
 import { useLanguage, t } from "../i18n/index.js";
-import { CLOUD_AI_ENABLED } from "../config/features.js";
+import { DOCUMENT_TRANSLATION_ENABLED } from "../config/features.js";
 import { useEffect, useRef, useState } from "react";
 import useTranslatedReview from "../hooks/useTranslatedReview.js";
 import { downloadPdf, href, post } from "../lib/index.js";
@@ -42,7 +42,7 @@ const today = () => {
     .slice(0, 10);
 };
 /** Blanks are written as [직접 입력]-style markers in the draft. */
-function findBlanks(text) {
+export function findBlanks(text) {
   return [...text.matchAll(/\[[^\]\n]+\]/g)].map((match) => {
     const start = text.lastIndexOf("\n", match.index) + 1;
     const name = match[0].slice(1, -1).replace(/\s*직접 입력$/, "");
@@ -58,12 +58,16 @@ function findBlanks(text) {
   });
 }
 function lineKind(line) {
+  // Closing lines of a filing: the date is centred, the signature right-aligned, the addressee emphasised.
+  if (/^\d{4}년 \d{1,2}월 \d{1,2}일$/.test(line.trim())) return "date";
+  if (/(?:\(서명 또는 인\)|\(서명\)|드림)$/.test(line.trim())) return "sign";
+  if (/귀하$/.test(line.trim())) return "addressee";
   if (/^\d+\.\s/.test(line)) return "heading";
   if (/^조항 \d+\.\s/.test(line)) return "clause";
   if (line.startsWith("- ")) return "bullet";
   return line.startsWith(" ") ? "indent" : "body";
 }
-function DocumentView({ text, onBlank }) {
+export function DocumentView({ text, onBlank }) {
   let offset = 0;
   let titled = false;
   return (
@@ -166,7 +170,7 @@ export default function Draft({ result: r }) {
       !/[가-힣]/.test(value),
   );
   const needsInterpretation =
-    CLOUD_AI_ENABLED && (lang !== "ko" || foreignIncident);
+    DOCUMENT_TRANSLATION_ENABLED && (lang !== "ko" || foreignIncident);
   const incidentCurrent =
     state.incidentSource === JSON.stringify(state.incident);
   const localizedDraft = state.translations?.[lang];
@@ -224,7 +228,7 @@ export default function Draft({ result: r }) {
   // Keeps the translation in step with the Korean text; the delay lets typing finish first.
   useEffect(() => {
     if (
-      !CLOUD_AI_ENABLED ||
+      !DOCUMENT_TRANSLATION_ENABLED ||
       lang === "ko" ||
       !state.generated ||
       !state.text.trim() ||
@@ -239,7 +243,13 @@ export default function Draft({ result: r }) {
       state.view === "edit" ? 3000 : 0,
     );
     return () => clearTimeout(timer);
-  }, [translationKey, translationCurrent, busy, translating, translationFailed]);
+  }, [
+    translationKey,
+    translationCurrent,
+    busy,
+    translating,
+    translationFailed,
+  ]);
   const exportText = (both) =>
     both
       ? t(
@@ -252,7 +262,7 @@ export default function Draft({ result: r }) {
   async function generate(event) {
     event.preventDefault();
     if (
-      !CLOUD_AI_ENABLED &&
+      !DOCUMENT_TRANSLATION_ENABLED &&
       state.kind === "lawyer_request" &&
       foreignIncident
     ) {
@@ -287,7 +297,7 @@ export default function Draft({ result: r }) {
         finding_ids: chosen,
         written_on: state.writtenOn || "",
         reply_by: toCounterparty ? state.replyBy || "" : "",
-        language: CLOUD_AI_ENABLED ? lang : "ko",
+        language: DOCUMENT_TRANSLATION_ENABLED ? lang : "ko",
         incident_original:
           needsInterpretation && state.kind === "lawyer_request"
             ? state.incident
@@ -436,7 +446,7 @@ export default function Draft({ result: r }) {
                   {t(
                     "아는 내용만 적어주세요. 비워둔 내용은 초안에서 확인할 수 있습니다.",
                   )}
-                  {!CLOUD_AI_ENABLED && (
+                  {!DOCUMENT_TRANSLATION_ENABLED && (
                     <> {t("사건 경위는 한국어로 입력해주세요.")}</>
                   )}
                 </p>
@@ -557,7 +567,7 @@ export default function Draft({ result: r }) {
               ) : (
                 <DocumentView text={state.text} onBlank={openBlank} />
               )}
-              {CLOUD_AI_ENABLED && lang !== "ko" && (
+              {DOCUMENT_TRANSLATION_ENABLED && lang !== "ko" && (
                 <section className="document-translation">
                   <h2>{t("번역본")}</h2>
                   <PrivacyNote />
@@ -613,7 +623,7 @@ export default function Draft({ result: r }) {
                   <Icon name="download" />
                   {t("PDF 저장")}
                 </button>
-                {CLOUD_AI_ENABLED && lang !== "ko" && (
+                {DOCUMENT_TRANSLATION_ENABLED && lang !== "ko" && (
                   <>
                     <button
                       className="btn btn-ghost"

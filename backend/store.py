@@ -13,6 +13,7 @@ class StaleRevision(Exception):
 
 
 CURRENT_ANALYSIS = "SELECT revision,status FROM analyses WHERE id=?"
+SESSION_ROW = "SELECT 1 FROM agent_sessions WHERE id=?"
 INTERRUPTED = "UPDATE analyses SET status='failed', error='서버가 재시작되어 분석이 중단됐습니다. 새 분석을 실행해주세요.' WHERE status IN ('queued','running')"
 UTC_NOW = "to_char(now() AT TIME ZONE 'utc', 'YYYY-MM-DD HH24:MI:SS')"
 SCHEMA_LOCK = 7264019
@@ -23,7 +24,7 @@ DOCUMENTS_IN_USE = "SELECT json_extract(request,'$.document_id') FROM analyses W
 
 def postgres_sql(sql):
     """Rewrite this module's SQLite statements for Postgres; the store's queries stay in one dialect."""
-    if sql == CURRENT_ANALYSIS:
+    if sql in (CURRENT_ANALYSIS, SESSION_ROW):
         sql += " FOR UPDATE"  # Stands in for BEGIN IMMEDIATE: serializes writers of one analysis.
     if sql.startswith("CREATE TABLE"):
         sql = sql.replace("BLOB", "BYTEA").replace("DEFAULT CURRENT_TIMESTAMP", f"DEFAULT {UTC_NOW}")
@@ -62,6 +63,12 @@ class Store:
             db.execute("CREATE TABLE IF NOT EXISTS openai_usage (day TEXT PRIMARY KEY, calls INTEGER NOT NULL)")
             db.execute("CREATE TABLE IF NOT EXISTS chats (analysis_id TEXT NOT NULL, revision INTEGER NOT NULL, turn INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY (analysis_id, revision, turn))")
             db.execute("CREATE TABLE IF NOT EXISTS translations (analysis_id TEXT NOT NULL, revision INTEGER NOT NULL, language TEXT NOT NULL, purpose TEXT NOT NULL, source_hash TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY (analysis_id,revision,language,purpose,source_hash))")
+            db.execute("CREATE TABLE IF NOT EXISTS agent_sessions (id TEXT PRIMARY KEY, analysis_id TEXT, owner_hash TEXT NOT NULL, mode TEXT NOT NULL, facts TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)")
+            db.execute("CREATE TABLE IF NOT EXISTS agent_turns (session_id TEXT NOT NULL, turn INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY (session_id, turn))")
+            if self.url:
+                db.execute("ALTER TABLE analyses ADD COLUMN IF NOT EXISTS owner_hash TEXT")
+            elif "owner_hash" not in {r["name"] for r in db.execute("PRAGMA table_info(analyses)").fetchall()}:
+                db.execute("ALTER TABLE analyses ADD COLUMN owner_hash TEXT")
             db.execute("CREATE TABLE IF NOT EXISTS document_pages (document_id TEXT NOT NULL, page INTEGER NOT NULL, width INTEGER NOT NULL, height INTEGER NOT NULL, image BLOB NOT NULL, words TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (document_id, page))")
             # A shared database has other live instances, whose running jobs are not ours to fail.
             if not self.url:
@@ -91,9 +98,20 @@ class Store:
         with self.connect() as db:
             return bool(db.execute("INSERT INTO openai_usage(day,calls) VALUES (?,1) ON CONFLICT (day) DO UPDATE SET calls=openai_usage.calls+1 WHERE openai_usage.calls<? RETURNING calls", (day, limit)).fetchall())
 
-    def create(self, id, request):
+    @property
+    def shared(self):
+        """A shared (deployed) database never serves rows that predate owner tokens."""
+        return bool(self.url)
+
+    def create(self, id, request, owner_hash=None):
         with self.connect() as db:
-            db.execute("INSERT INTO analyses(id,revision,status,request) VALUES (?,1,'queued',?)", (id, json.dumps(request, ensure_ascii=False)))
+            db.execute("INSERT INTO analyses(id,revision,status,request,owner_hash) VALUES (?,1,'queued',?,?)", (id, json.dumps(request, ensure_ascii=False), owner_hash))
+
+    def owner_hash(self, id):
+        """None if the analysis does not exist; "" if it predates owner tokens."""
+        with self.connect() as db:
+            row = db.execute("SELECT owner_hash FROM analyses WHERE id=?", (id,)).fetchone()
+        return None if row is None else (row["owner_hash"] or "")
 
     def get(self, id):
         with self.connect() as db:
@@ -105,9 +123,12 @@ class Store:
         item["result"] = json.loads(item["result"]) if item["result"] else None
         return item
 
-    def list(self):
+    def list(self, allowed=None):
+        """allowed: ids the caller proved ownership of; legacy rows are included only on a local database."""
         with self.connect() as db:
-            rows = db.execute("SELECT id,revision,status,created_at,request FROM analyses ORDER BY created_at DESC, rowid DESC LIMIT 50").fetchall()
+            rows = db.execute("SELECT id,revision,status,created_at,request,owner_hash FROM analyses ORDER BY created_at DESC, rowid DESC LIMIT 500").fetchall()
+        if allowed is not None:
+            rows = [r for r in rows if r["id"] in allowed or (not r["owner_hash"] and not self.shared)][:50]
         return [{"analysis_id": r["id"], "analysis_revision": r["revision"], "status": r["status"], "created_at": r["created_at"], "title": json.loads(r["request"])["title"]} for r in rows]
 
     def start(self, id):
@@ -129,6 +150,8 @@ class Store:
         with self.connect() as db:
             db.execute("DELETE FROM translations WHERE analysis_id=?", (id,))
             db.execute("DELETE FROM chats WHERE analysis_id=?", (id,))
+            db.execute("DELETE FROM agent_turns WHERE session_id IN (SELECT id FROM agent_sessions WHERE analysis_id=?)", (id,))
+            db.execute("DELETE FROM agent_sessions WHERE analysis_id=?", (id,))
             row = db.execute("SELECT json_extract(request,'$.document_id') AS document_id FROM analyses WHERE id=?", (id,)).fetchone()
             deleted = db.execute("DELETE FROM analyses WHERE id=?", (id,)).rowcount == 1
             if row and row["document_id"]:
@@ -185,3 +208,40 @@ class Store:
             if not current or current["revision"] != revision or current["status"] not in {"completed", "awaiting_input"}:
                 raise StaleRevision()
             db.execute("INSERT INTO translations VALUES (?,?,?,?,?,?) ON CONFLICT (analysis_id,revision,language,purpose,source_hash) DO UPDATE SET payload=excluded.payload", (id, revision, language, purpose, source_hash, json.dumps(payload, ensure_ascii=False)))
+
+    # Agent sessions outlive analysis revisions: answering a context question no longer erases the conversation.
+    def create_session(self, id, analysis_id, owner_hash, mode):
+        with self.connect() as db:
+            db.execute("INSERT INTO agent_sessions(id,analysis_id,owner_hash,mode,facts) VALUES (?,?,?,?,'{}')", (id, analysis_id, owner_hash, mode))
+
+    def session(self, id):
+        with self.connect() as db:
+            row = db.execute("SELECT * FROM agent_sessions WHERE id=?", (id,)).fetchone()
+            if row is None:
+                return None
+            turns = db.execute("SELECT payload FROM agent_turns WHERE session_id=? ORDER BY turn", (id,)).fetchall()
+        return {**dict(row), "facts": json.loads(row["facts"]), "turns": [json.loads(t["payload"]) for t in turns]}
+
+    def sessions_for(self, analysis_id):
+        with self.connect() as db:
+            return [dict(r) for r in db.execute("SELECT id,owner_hash,mode FROM agent_sessions WHERE analysis_id=? ORDER BY created_at", (analysis_id,)).fetchall()]
+
+    def append_turn(self, id, previous_count, turn, facts):
+        """Save one completed turn and the facts it recorded; StaleRevision if another turn landed first."""
+        with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            exists = db.execute(SESSION_ROW, (id,)).fetchone()
+            count = db.execute("SELECT COUNT(*) AS n FROM agent_turns WHERE session_id=?", (id,)).fetchone()["n"]
+            if count != previous_count or not exists:
+                raise StaleRevision()
+            db.execute("INSERT INTO agent_turns VALUES (?,?,?)", (id, count + 1, json.dumps(turn, ensure_ascii=False)))
+            db.execute("UPDATE agent_sessions SET facts=? WHERE id=?", (json.dumps(facts, ensure_ascii=False), id))
+
+    def save_facts(self, id, facts):
+        with self.connect() as db:
+            db.execute("UPDATE agent_sessions SET facts=? WHERE id=?", (json.dumps(facts, ensure_ascii=False), id))
+
+    def delete_session(self, id):
+        with self.connect() as db:
+            db.execute("DELETE FROM agent_turns WHERE session_id=?", (id,))
+            return db.execute("DELETE FROM agent_sessions WHERE id=?", (id,)).rowcount == 1

@@ -5,6 +5,7 @@ import unittest
 import re
 from unittest.mock import patch
 from fastapi.testclient import TestClient
+from tests.owner_client import OwnerClient
 from backend.app import create_app
 
 
@@ -16,7 +17,7 @@ FRONTEND_DIR = Path(__file__).resolve().parents[1] / 'frontend/dist'
 class WorkspaceRouteTests(unittest.TestCase):
     def test_each_task_and_deep_link_serves_the_workspace(self):
         with tempfile.TemporaryDirectory() as folder:
-            with TestClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
+            with OwnerClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
                 for page in ('', 'upload/', 'samples/', 'review/?id=missing', 'chat/?id=missing',
                              'draft/?id=missing', 'documents/', 'history/', 'original/?id=missing',
                              'sources/?id=missing', 'confirm/?id=missing'):
@@ -31,7 +32,7 @@ class WorkspaceRouteTests(unittest.TestCase):
 
     def test_built_frontend_assets_and_api_boundaries(self):
         with tempfile.TemporaryDirectory() as folder:
-            with TestClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
+            with OwnerClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
                 home = client.get('/')
                 assets = re.findall(r'(?:src|href)="(/assets/[^\"]+)"', home.text)
                 self.assertTrue(assets)
@@ -48,7 +49,7 @@ class WorkspaceRouteTests(unittest.TestCase):
 
     def test_sample_pdf_links_still_download_after_relocation(self):
         with tempfile.TemporaryDirectory() as folder:
-            with TestClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
+            with OwnerClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
                 samples = client.get('/api/samples').json()
                 self.assertEqual(len(samples), 5)
                 for sample in samples:
@@ -65,7 +66,7 @@ class MissingFrontendTests(unittest.TestCase):
     def test_missing_build_explains_setup_without_serving_legacy_ui(self):
         with tempfile.TemporaryDirectory() as folder:
             with patch('backend.app.FRONTEND_DIR', Path(folder) / 'dist'):
-                with TestClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
+                with OwnerClient(create_app(Path(folder) / 'workspace.sqlite3')) as client:
                     response = client.get('/')
                     self.assertEqual(response.status_code, 503)
                     self.assertIn('./run_app.sh', response.json()['detail'])

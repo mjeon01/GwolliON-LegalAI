@@ -133,13 +133,27 @@ class DocumentPdfRequest(BaseModel):
 
 class StandaloneDraftRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    kind: Literal["lawyer_request", "help_request", "complaint"] = "lawyer_request"
+    kind: Literal["lawyer_request", "help_request", "complaint", "labor_petition"] = "lawyer_request"
+    written_on: str = Field(default="", max_length=20)
     incident: IncidentFacts
 
     @model_validator(mode="after")
     def needs_facts(self):
         if len(self.incident.summary.strip()) < 20:
             raise ValueError("실제로 있었던 일을 20자 이상 입력해주세요.")
+        return self
+
+
+class FilingRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    kind: Literal["labor_petition", "complaint", "lawyer_request", "help_request"]
+    language: Literal["ko", "zh", "es"] = "ko"
+    fields: dict[str, str] = Field(default_factory=dict, max_length=40)
+
+    @model_validator(mode="after")
+    def bounded(self):
+        if any(len(k) > 40 or len(v) > 8000 for k, v in self.fields.items()):
+            raise ValueError("입력이 너무 깁니다.")
         return self
 
 
@@ -186,3 +200,24 @@ class IncidentTranslationRequest(BaseModel):
     analysis_revision: int = Field(ge=1)
     language: Language
     incident: IncidentFacts
+
+
+class AgentSessionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    analysis_id: str | None = Field(default=None, pattern=r"^[0-9a-f-]{36}$")
+    contract_type: Literal["employment", "lease", "sale"] = "employment"
+    user_role: Literal["worker", "employer", "tenant", "landlord", "buyer", "seller"] = "worker"
+
+    @model_validator(mode="after")
+    def role_matches_contract(self):
+        roles = {"employment": ("worker", "employer"), "lease": ("tenant", "landlord"), "sale": ("buyer", "seller")}
+        if self.user_role not in roles[self.contract_type]:
+            raise ValueError("계약서 종류에 맞는 본인의 입장을 선택해주세요.")
+        return self
+
+
+class AgentMessageRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    message: str = Field(min_length=1, max_length=2000)
+    language: Language = "ko"
+    finding_id: str | None = Field(default=None, max_length=40)

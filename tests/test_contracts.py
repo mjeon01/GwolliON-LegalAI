@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
+from tests.owner_client import OwnerClient
 from pypdf import PdfWriter, PdfReader
 
 from backend.analysis import extract, evaluate
@@ -195,7 +196,7 @@ class APITests(unittest.TestCase):
         samples=patch("backend.app.SAMPLES_DIR",ROOT/"tests/fixtures/samples")
         samples.start()
         self.addCleanup(samples.stop)
-        self.client=TestClient(create_app(self.path))
+        self.client=OwnerClient(create_app(self.path))
         self.client.__enter__()
 
     def tearDown(self):

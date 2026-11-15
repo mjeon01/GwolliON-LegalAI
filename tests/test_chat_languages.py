@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
+from tests.owner_client import OwnerClient
 from backend.analysis import extract, evaluate
 from backend.app import create_app
 from backend.chat_translation import local_fields
@@ -41,7 +42,7 @@ class ChatLanguageTests(unittest.TestCase):
     def setUp(self):
         folder = tempfile.TemporaryDirectory(); self.addCleanup(folder.cleanup)
         self.app = create_app(Path(folder.name) / 'test.sqlite3')
-        self.client = TestClient(self.app); self.client.__enter__()
+        self.client = OwnerClient(self.app); self.client.__enter__()
         self.addCleanup(self.client.__exit__, None, None, None)
         request = AnalyzeRequest(text=(ROOT / 'tests/fixtures/samples/sale-risk.txt').read_text(), contract_type='sale')
         b, t, x = extract(request)

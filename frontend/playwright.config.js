@@ -20,10 +20,19 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: "../.venv/bin/python ../tests/browser_server.py",
-    url: "http://127.0.0.1:8021/api/health",
-    reuseExistingServer: false,
-    timeout: 30000,
-  },
+  webServer: [
+    {
+      command: "../.venv/bin/python ../tests/browser_server.py",
+      url: "http://127.0.0.1:8021/api/health",
+      reuseExistingServer: false,
+      timeout: 30000,
+    },
+    {
+      // The same app with the agent enabled and a scripted model (no paid calls).
+      command: "../.venv/bin/python ../tests/browser_server.py --agent",
+      url: "http://127.0.0.1:8023/api/health",
+      reuseExistingServer: false,
+      timeout: 30000,
+    },
+  ],
 });

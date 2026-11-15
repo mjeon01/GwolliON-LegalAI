@@ -12,6 +12,9 @@ from backend.store import Store
 
 class QuotaTests(unittest.TestCase):
     def setUp(self):
+        provider = patch('backend.openai_client.ai_provider', return_value='openai')
+        provider.start()
+        self.addCleanup(provider.stop)
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
         self.store = Store(Path(folder.name) / "t.sqlite3")

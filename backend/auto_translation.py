@@ -10,6 +10,7 @@ import re
 from urllib.error import URLError
 
 from backend.extraction import MONEY, generate
+from backend.config import ai_provider
 from backend import openai_client
 from backend.translation import FOREIGN_ROLES, LANGUAGES
 
@@ -58,13 +59,23 @@ def numbers(text):
     return Counter(int(n) for n in re.findall(r"\d+", re.sub(TOKEN, "", text).replace(",", "")))
 
 
+# Korean grammar left in a translation: particles and endings at a word's end, or connectives.
+KOREAN_GRAMMAR = re.compile(r"[가-힣](?:은|는|을|를|의|에|에서|으로|로|과|와|함|한다|하여|위해)(?![가-힣])|(?<![가-힣])(?:및|또는|위해|명의)(?![가-힣])")
+
+
+def half_translated(source, plain):
+    """True for 'Trabajador 명의 통장·도장 및 여권은…'; names kept in Korean (박상철, 대성메탈) are fine."""
+    hangul = len(re.findall(r"[가-힣]", plain))
+    return bool(KOREAN_GRAMMAR.search(plain)) or (hangul >= 8 and hangul > 0.6 * len(re.findall(r"[가-힣]", source)))
+
+
 def is_faithful(source, output, values, language):
     if Counter(re.findall(TOKEN, output)) != Counter(list(values)) or numbers(output) != numbers(source):
         return False
     plain = re.sub(TOKEN, "", output).strip()
     if len(plain) < len(re.sub(TOKEN, "", source).strip()) * MIN_LENGTH[language]:
         return False
-    if language == "es" and re.search(r"[一-鿿]", plain):
+    if language == "es" and (re.search(r"[一-鿿]", plain) or half_translated(source, plain)):
         return False
     found = {role for word, role in FOREIGN_ROLES.items() if word.lower() in plain.lower()}
     named = {role for role in SOURCE_ROLES if role in source} | ({"임차인"} if "세입자" in source else set())
@@ -86,12 +97,16 @@ def restore(text, values):
 
 
 def use_openai():
-    return bool(openai_client.settings()[0])
+    return ai_provider() == 'openai'
 
 
 def ask(batch, language):
     schema = {"type": "object", "properties": {k: {"type": "string"} for k in batch}, "required": list(batch)}
-    prompt = PROMPT.format(language=LANGUAGES[language], roles=GLOSSARY[language]) + json.dumps(batch, ensure_ascii=False)
+    prompt = PROMPT.format(language=LANGUAGES[language], roles=GLOSSARY[language])
+    if language == "es":
+        from backend.spanish_guide import glossary_prompt
+        prompt += glossary_prompt(list(batch.values()))
+    prompt += json.dumps(batch, ensure_ascii=False)
     try:
         if use_openai():
             return openai_client.generate(schema, prompt, num_predict=2400)[0]

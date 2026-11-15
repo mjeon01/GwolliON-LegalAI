@@ -26,6 +26,23 @@ TOPICS = {
     "sale_defect_waiver": ("매매 하자담보 면책", ["하자담보", "면책특약", "매매계약"]),
 }
 
+DATASET_KINDS = ['contract', 'contract_label', 'precedent_reference', 'interpretation_reference',
+                 'decision_reference', 'law_reference', 'qa_example', 'summary_example']
+TOPIC_ALIASES = {
+    'penalty': ['위약금'], 'included_allowance': ['포괄임금', '초과근무', '야근수당'],
+    'wage_deduction': ['급여공제', '임금공제', '월급공제'], 'leave_waiver': ['연차', '유급휴가'],
+    'noncompete': ['경업금지', '동종업계'], 'deposit_return': ['보증금', '새세입자'],
+    'repair_burden': ['수리비', '수선', '누수'], 'registration_waiver': ['전입신고', '확정일자'],
+    'sale_advance': ['잔금', '소유권이전'], 'sale_defect_waiver': ['하자', '면책'],
+}
+
+
+def dataset_terms(topics, fallback=()):
+    groups = [TOPICS[topic][1] for topic in dict.fromkeys(topics) if topic in TOPICS]
+    # Round-robin preserves different issues when the contract has many clauses.
+    terms = [group[i] for i in range(max(map(len, groups), default=0)) for group in groups if i < len(group)]
+    return list(dict.fromkeys([*terms, *fallback]))[:12]
+
 
 def plan(request, blocks):
     from backend.review import RULES, rule_matches
@@ -54,7 +71,7 @@ def plan(request, blocks):
         "sale": ("부동산 매매 동시이행", ["매매계약", "소유권이전", "동시이행"]),
     }[request.contract_type]
     administrative_query = next((term for term in ("영업정지", "등록취소", "행정처분", "중개업") if term in text), None)
-    return {"topics": topics, "article_refs": list(dict.fromkeys(refs)), "public_query": query, "dataset_terms": terms,
+    return {"topics": topics, "article_refs": list(dict.fromkeys(refs)), "public_query": query, "dataset_terms": dataset_terms(topics, terms),
             "case_focus": {"deposit_return": ["동시이행", "보증금 반환의무", "반환 지체", "신규 임차인"], "repair_burden": ["수선의무", "수선 의무"], "noncompete": ["경업금지"], "penalty": ["위약금", "손해배상액의 예정"], "sale_advance": ["동시이행"], "sale_defect_waiver": ["하자담보", "담보책임"]}.get(topics[0], []) if topics else [],
             "case_targets": ["prec", "expc"] + (["decc"] if administrative_query else []),
             "case_queries": {"prec": query, "expc": query, **({"decc": administrative_query} if administrative_query else {})}}
@@ -95,7 +112,7 @@ def retrieve(request, blocks):
                             law_status[query] = {"status": "unavailable"}
         except (EvidenceError, OSError, ValueError):
             failures.append({"target": "configuration", "reason": "official_api_unavailable"})
-    for source in corpus.search(selected["dataset_terms"], limit=2, kinds=["contract", "contract_label", "precedent_reference", "interpretation_reference", "decision_reference", "law_reference", "qa_example", "summary_example"]):
+    for source in corpus.search(selected["dataset_terms"], limit=4, kinds=DATASET_KINDS, diverse=True):
         sources[source["source_id"]] = source
     status = corpus.status()
     law_order = {(law, str(n)): i for i, (law, n) in enumerate(refs)}
@@ -107,10 +124,39 @@ def retrieve(request, blocks):
             "limitations": ["검색된 사례의 사실관계가 이 계약과 같다는 의미는 아님", "제공된 데이터는 학습·참고 자료이며 법률 판단 정답이 아님"]}
 
 
+def chat_references(result, question, finding=None):
+    """Retrieve local examples for the interpreted question, including follow-ups."""
+    from backend.review import RULES
+    eligible = {rule[0] for rule in RULES if rule[1] == result['contract_type']}
+    compact = re.sub(r'\s+', '', question)
+    topics = [topic for topic, (_, terms) in TOPICS.items() if topic in eligible and
+              any(term in compact for term in [*terms, *TOPIC_ALIASES.get(topic, [])])]
+    if finding:
+        topics.append(finding['issue_type'])
+    fallback = {'employment': ['근로계약', '근로시간', '임금지급'],
+                'lease': ['임대차', '보증금'], 'sale': ['매매계약', '소유권이전']}[result['contract_type']]
+    terms = dataset_terms(topics, fallback)
+    corpus = Corpus()
+    return {'topics': list(dict.fromkeys(topics)), 'terms': terms,
+            'sources': corpus.search(terms, limit=4, kinds=DATASET_KINDS, diverse=True),
+            'status': corpus.status().get('status', 'not_indexed')}
+
+
 def prompt_sources(bundle, limit=10):
     # Reserve room for case material and examples rather than fill the prompt with statutes.
     source_list = bundle.get("sources", [])
-    ordered = [s for s in source_list if s.get("kind") == "law"][:6] + [s for s in source_list if s.get("kind") != "law"][:4]
+    examples = [s for s in source_list if s.get('kind') == 'dataset']
+    cases = [s for s in source_list if s.get('kind', 'law') not in {'law', 'dataset'}]
+    references = []
+    for index in range(max(len(examples), len(cases))):
+        for group in (examples, cases):
+            if index < len(group):
+                references.append(group[index])
+        if len(references) >= 4:
+            break
+    references = references[:4]
+    law_slots = max(0, limit - len(references))
+    ordered = [s for s in source_list if s.get('kind', 'law') == 'law'][:min(6, law_slots)] + references
     return [{"source_id": s["source_id"], "kind": s.get("kind", "law"), "title": s["title"], "text": s["text"][:1000],
              "version_applicable": s.get("version_applicable", False), "version_note": s.get("version_note", ""),
              "decision_date": s.get("decision_date"), "effective_date": s.get("effective_date")} for s in ordered[:limit]]

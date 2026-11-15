@@ -1,6 +1,6 @@
 import { useLanguage, t } from "../i18n/index.js";
 import { useRef, useState } from "react";
-import { api, dateLabel, href, statusLabel } from "../lib/index.js";
+import { api, dateLabel, forgetAccess, href, statusLabel } from "../lib/index.js";
 import useLoad from "../hooks/useLoad.js";
 import {
   ButtonLink,
@@ -107,6 +107,7 @@ export function Library({ target = "review", selector = false }) {
         method: "DELETE",
       });
       setRemoved((old) => [...old, selected.analysis_id]);
+      forgetAccess(selected.analysis_id);
       try {
         Object.keys(sessionStorage)
           .filter(

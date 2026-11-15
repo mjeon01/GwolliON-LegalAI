@@ -1,5 +1,6 @@
 """Read server-only local configuration without modifying process environment."""
 from pathlib import Path
+import os
 import re
 
 
@@ -23,3 +24,12 @@ def load_env(path: Path) -> dict[str, str]:
             value = re.split(r"\s+#", value, maxsplit=1)[0].rstrip()
         values[key.strip()] = value
     return values
+
+
+def ai_provider() -> str:
+    """Translation uses an explicit provider; the presence of a key never opts in."""
+    settings = load_env(Path(__file__).resolve().parents[1] / '.env')
+    value = os.environ.get('GWOLLION_AI_PROVIDER', settings.get('GWOLLION_AI_PROVIDER', 'ollama')).strip().lower()
+    if value not in {'ollama', 'openai'}:
+        raise ValueError('GWOLLION_AI_PROVIDER는 ollama 또는 openai여야 합니다.')
+    return value

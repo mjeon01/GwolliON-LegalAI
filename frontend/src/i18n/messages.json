@@ -2026,5 +2026,777 @@
   "AI가 만든 참고 번역입니다. 계약의 효력은 한국어 원문을 기준으로 확인하세요.": {
     "zh": "这是AI生成的参考译文。合同效力请以韩文原文为准。",
     "es": "Traducción de referencia generada por IA. La validez del contrato se determina por el original coreano."
+  },
+  "답변에 인용한 참고 자료": {
+    "zh": "回答引用的参考资料",
+    "es": "Material de referencia citado en la respuesta"
+  },
+  "현재 계약의 사실관계·판단 결과를 뜻하지 않는 참고 자료입니다.": {
+    "zh": "这些资料仅供参考，不代表本合同的事实或认定结果。",
+    "es": "Estos materiales son orientativos; no establecen los hechos ni las conclusiones de este contrato."
+  },
+  "GWOLLION_AI_PROVIDER는 ollama 또는 openai여야 합니다.": {
+    "zh": "GWOLLION_AI_PROVIDER 必须设置为 ollama 或 openai。",
+    "es": "GWOLLION_AI_PROVIDER debe ser ollama u openai."
+  },
+  "한 조항이 6,000자를 넘습니다. 원문에 줄바꿈을 추가해 조항을 나눠주세요.": {
+    "zh": "单个条款超过 6,000 字。请在原文中换行，将条款分开。",
+    "es": "Una cláusula supera los 6.000 caracteres. Añada saltos de línea en el original para dividirla."
+  },
+  "로컬 AI 모드에서는 OpenAI 호출을 사용할 수 없습니다.": {
+    "zh": "本地 AI 模式下无法调用 OpenAI。",
+    "es": "Las llamadas a OpenAI están desactivadas en el modo de IA local."
+  },
+  "PDF로 저장": {
+    "zh": "保存为PDF",
+    "es": "Guardar como PDF"
+  },
+  "{0} 지우기": {
+    "zh": "删除{0}",
+    "es": "Borrar {0}"
+  },
+  "계약서 사진·파일 올리기": {
+    "zh": "上传合同照片或文件",
+    "es": "Subir foto o archivo del contrato"
+  },
+  "계약서 없이 상담하기": {
+    "zh": "没有合同也可咨询",
+    "es": "Consultar sin contrato"
+  },
+  "계약서 없이 상담": {
+    "zh": "无合同咨询",
+    "es": "Consulta sin contrato"
+  },
+  "계약서 없이 상담하기는 AI 연결이 필요합니다.": {
+    "zh": "无合同咨询需要连接AI。",
+    "es": "La consulta sin contrato requiere conexión con la IA."
+  },
+  "계약서가 생기면 등록하기": {
+    "zh": "拿到合同后再上传",
+    "es": "Subir el contrato cuando lo tenga"
+  },
+  "계약서가 없거나 지금 찍기 어려운가요?": {
+    "zh": "没有合同，或现在不方便拍照吗？",
+    "es": "¿No tiene contrato o no puede fotografiarlo ahora?"
+  },
+  "계약서를 받지 못했거나 지금 촬영하기 어렵나요?": {
+    "zh": "没有拿到合同，或现在不方便拍照吗？",
+    "es": "¿No recibió el contrato o no puede fotografiarlo ahora?"
+  },
+  "계약서를 받지 못했다면 그 자체가 확인할 문제일 수 있습니다. 들은 조건을 정리하고 교부 요청서를 준비합니다.": {
+    "zh": "如果没有拿到书面合同，这本身可能就是需要确认的问题。我们会整理您听到的条件，并准备索要合同的请求书。",
+    "es": "No haber recibido el contrato por escrito puede ser en sí un problema a revisar. Ordenaremos las condiciones que le dijeron y prepararemos una solicitud de entrega."
+  },
+  "궁금한 점이나 상황을 편하게 적어주세요.": {
+    "zh": "请随意写下您的疑问或情况。",
+    "es": "Escriba con libertad su duda o su situación."
+  },
+  "권리ON이 계약서를 읽고, 필요한 법령·판례·실제 계약서 사례를 직접 찾아 답합니다. 모르는 사실은 되묻습니다.": {
+    "zh": "权利ON会阅读合同，自行查找所需的法律、判例和真实合同案例来回答。不清楚的事实会向您确认。",
+    "es": "GwolliON lee el contrato y busca por sí mismo las leyes, sentencias y ejemplos de contratos reales necesarios. Si falta un dato, se lo preguntará."
+  },
+  "근로계약서는 받기 어렵거나 현장에서 촬영하기 곤란한 경우가 많습니다. 아래 방법 중 편한 것을 선택하세요.": {
+    "zh": "劳动合同常常很难拿到，或不方便在现场拍照。请选择下面方便的方式。",
+    "es": "A menudo es difícil recibir el contrato laboral o fotografiarlo en el lugar. Elija la opción que le resulte más cómoda."
+  },
+  "기록한 사실": {
+    "zh": "已记录的事实",
+    "es": "Hechos registrados"
+  },
+  "나의 입장": {
+    "zh": "我的身份",
+    "es": "Mi posición"
+  },
+  "나중에 사진·파일로 올리기": {
+    "zh": "稍后上传照片或文件",
+    "es": "Subir foto o archivo más tarde"
+  },
+  "대화를 불러오고 있습니다.": {
+    "zh": "正在加载对话。",
+    "es": "Cargando la conversación."
+  },
+  "대화에서 직접 말씀하신 내용만 기록합니다. 틀린 내용은 지워주세요.": {
+    "zh": "只记录您在对话中亲口说的内容。如有错误请删除。",
+    "es": "Solo se registra lo que usted dijo en la conversación. Borre lo que sea incorrecto."
+  },
+  "들은 조건으로 상담 시작": {
+    "zh": "按听到的条件开始咨询",
+    "es": "Empezar con las condiciones que le dijeron"
+  },
+  "들은 조건을 말씀해주시면 정리하고, 확인할 점과 요청할 문서를 함께 준비합니다.": {
+    "zh": "告诉我们您听到的条件，我们会整理出来，并一起准备需要确认的事项和要索取的文件。",
+    "es": "Cuéntenos las condiciones que le dijeron; las ordenaremos y prepararemos lo que hay que verificar y los documentos a solicitar."
+  },
+  "무료 상담: 고용노동부 1350 · 대한법률구조공단 132": {
+    "zh": "免费咨询：雇佣劳动部 1350 · 大韩法律救助公团 132",
+    "es": "Asesoría gratuita: Ministerio de Empleo y Trabajo 1350 · Corporación de Asistencia Legal de Corea 132"
+  },
+  "받은 사본, 메신저로 받은 사진이나 PDF, 갤러리 사진도 등록할 수 있습니다. 집에서 천천히 올려도 됩니다.": {
+    "zh": "收到的副本、通过聊天软件收到的照片或PDF、相册里的照片都可以上传。回家后慢慢上传也可以。",
+    "es": "Puede subir la copia recibida, fotos o PDF recibidos por mensajería o fotos de la galería. También puede hacerlo con calma desde casa."
+  },
+  "복사": {
+    "zh": "复制",
+    "es": "Copiar"
+  },
+  "빈칸을 채운 뒤 사용하세요: {0}": {
+    "zh": "请填写空白处后使用：{0}",
+    "es": "Complete los espacios en blanco antes de usarlo: {0}"
+  },
+  "사진·파일 올리기": {
+    "zh": "上传照片或文件",
+    "es": "Subir foto o archivo"
+  },
+  "상담 시작": {
+    "zh": "开始咨询",
+    "es": "Empezar consulta"
+  },
+  "서버에 OpenAI 설정이 되어 있지 않습니다. 계약서 사진이나 파일을 등록하면 로컬 검토를 이용할 수 있습니다.": {
+    "zh": "服务器未配置OpenAI。上传合同照片或文件即可使用本地审查。",
+    "es": "El servidor no tiene OpenAI configurado. Si sube una foto o archivo del contrato, puede usar la revisión local."
+  },
+  "수정 요청서 작성하기": {
+    "zh": "撰写修改请求书",
+    "es": "Redactar solicitud de modificación"
+  },
+  "시급, 근무시간, 시작일처럼 들은 내용을 그대로 적어주시면 됩니다.": {
+    "zh": "像时薪、工作时间、开始日期这样，把听到的内容照实写下即可。",
+    "es": "Escriba tal cual lo que le dijeron, como el salario por hora, el horario o la fecha de inicio."
+  },
+  "아직 기록한 사실이 없습니다.": {
+    "zh": "还没有记录的事实。",
+    "es": "Aún no hay hechos registrados."
+  },
+  "어떤 상황인지 알려주세요.": {
+    "zh": "请告诉我们您的情况。",
+    "es": "Cuéntenos su situación."
+  },
+  "지우기": {
+    "zh": "删除",
+    "es": "Borrar"
+  },
+  "확인된 인용 {0}건": {
+    "zh": "已核实的引用 {0} 条",
+    "es": "{0} citas verificadas"
+  },
+  "확인한 과정 {0}단계": {
+    "zh": "核查过程 {0} 步",
+    "es": "Proceso de verificación: {0} pasos"
+  },
+  "이 계약서에서 가장 먼저 확인할 조항은?": {
+    "zh": "这份合同最先要确认哪一条？",
+    "es": "¿Qué cláusula de este contrato debo revisar primero?"
+  },
+  "보통 근로계약서와 비교해 빠진 내용이 있어?": {
+    "zh": "和一般劳动合同相比，有缺少的内容吗？",
+    "es": "Comparado con un contrato laboral habitual, ¿falta algo?"
+  },
+  "이 임금이 최저임금보다 적은지 계산해줘": {
+    "zh": "帮我算一下这个工资是否低于最低工资",
+    "es": "Calcule si este salario es inferior al salario mínimo"
+  },
+  "근로계약서를 아직 못 받았어요": {
+    "zh": "我还没有拿到劳动合同",
+    "es": "Todavía no he recibido el contrato laboral"
+  },
+  "들은 근무조건을 정리하고 싶어요": {
+    "zh": "我想整理听到的工作条件",
+    "es": "Quiero ordenar las condiciones de trabajo que me dijeron"
+  },
+  "시급이 최저임금보다 적은지 궁금해요": {
+    "zh": "想知道时薪是否低于最低工资",
+    "es": "Quiero saber si mi salario por hora es inferior al mínimo"
+  },
+  "계약 전에 무엇을 확인해야 하나요?": {
+    "zh": "签约前应该确认什么？",
+    "es": "¿Qué debo comprobar antes de firmar?"
+  },
+  "보증금을 돌려받지 못하고 있어요": {
+    "zh": "押金一直没有退还给我",
+    "es": "No me devuelven el depósito"
+  },
+  "주택 임대차": {
+    "zh": "住房租赁",
+    "es": "Arrendamiento de vivienda"
+  },
+  "부동산 매매": {
+    "zh": "房地产买卖",
+    "es": "Compraventa de inmueble"
+  },
+  "질문을 살펴보고 있습니다.": {
+    "zh": "正在查看您的问题。",
+    "es": "Revisando su pregunta."
+  },
+  "필요한 자료를 판단하고 있습니다.": {
+    "zh": "正在判断需要哪些资料。",
+    "es": "Decidiendo qué información se necesita."
+  },
+  "인용과 근거를 원문과 대조하고 있습니다.": {
+    "zh": "正在将引用和依据与原文核对。",
+    "es": "Comparando citas y fundamentos con el texto original."
+  },
+  "검증 결과에 맞게 답변을 고치고 있습니다.": {
+    "zh": "正在根据核查结果修改回答。",
+    "es": "Corrigiendo la respuesta según la verificación."
+  },
+  "시급": {
+    "zh": "时薪",
+    "es": "Salario por hora"
+  },
+  "월급": {
+    "zh": "月薪",
+    "es": "Salario mensual"
+  },
+  "주당 근무시간": {
+    "zh": "每周工作时间",
+    "es": "Horas semanales"
+  },
+  "하루 근무시간": {
+    "zh": "每天工作时间",
+    "es": "Horas diarias"
+  },
+  "근무 시작일": {
+    "zh": "开始工作日期",
+    "es": "Fecha de inicio"
+  },
+  "기준 날짜": {
+    "zh": "基准日期",
+    "es": "Fecha de referencia"
+  },
+  "근무 장소": {
+    "zh": "工作地点",
+    "es": "Lugar de trabajo"
+  },
+  "담당 업무": {
+    "zh": "负责工作",
+    "es": "Tareas"
+  },
+  "사업주": {
+    "zh": "雇主",
+    "es": "Empleador"
+  },
+  "성명": {
+    "zh": "姓名",
+    "es": "Nombre"
+  },
+  "계약서 수령 여부": {
+    "zh": "是否收到合同",
+    "es": "¿Recibió el contrato?"
+  },
+  "판결문 (AI Hub)": {
+    "zh": "判决书 (AI Hub)",
+    "es": "Sentencia (AI Hub)"
+  },
+  "해석례 (AI Hub)": {
+    "zh": "解释例 (AI Hub)",
+    "es": "Interpretación (AI Hub)"
+  },
+  "결정례 (AI Hub)": {
+    "zh": "决定例 (AI Hub)",
+    "es": "Resolución (AI Hub)"
+  },
+  "법률 질의응답 (AI Hub)": {
+    "zh": "法律问答 (AI Hub)",
+    "es": "Preguntas legales (AI Hub)"
+  },
+  "판결 요약 (AI Hub)": {
+    "zh": "判决摘要 (AI Hub)",
+    "es": "Resumen de sentencia (AI Hub)"
+  },
+  "실제 계약서 문구 (AI Hub)": {
+    "zh": "真实合同条文 (AI Hub)",
+    "es": "Texto de contrato real (AI Hub)"
+  },
+  "참고 자료": {
+    "zh": "参考资料",
+    "es": "Material de referencia"
+  },
+  "근로계약서 서면 교부 요청서": {
+    "zh": "劳动合同书面交付请求书",
+    "es": "Solicitud de entrega del contrato laboral por escrito"
+  },
+  "확인되지 않은 인용을 답변에서 제외했습니다.": {
+    "zh": "已从回答中删除未经核实的引用。",
+    "es": "Se quitaron de la respuesta las citas no verificadas."
+  },
+  "법적 판단을 단정하는 표현이 남아 있습니다. 결론은 전문가 상담으로 확인하세요.": {
+    "zh": "回答中仍有断定法律结论的表述。请通过专业咨询确认结论。",
+    "es": "Quedan expresiones que dan por cierta una conclusión legal. Confírmela con un profesional."
+  },
+  "답변에 원문을 확인하지 못한 조문 번호가 있습니다. 해당 조문은 직접 확인이 필요합니다.": {
+    "zh": "回答中有未能核对原文的条文编号，需要自行确认该条文。",
+    "es": "La respuesta menciona artículos cuyo texto no se verificó. Compruébelos directamente."
+  },
+  "당사자 의무 설명이 사용자 입장과 맞지 않을 수 있습니다. 주의해서 읽어주세요.": {
+    "zh": "关于当事人义务的说明可能与您的身份不符，请谨慎阅读。",
+    "es": "La explicación de las obligaciones puede no corresponder a su posición. Léala con cuidado."
+  },
+  "답변을 만들지 못했습니다. 다시 질문해주세요.": {
+    "zh": "未能生成回答，请重新提问。",
+    "es": "No se pudo generar la respuesta. Vuelva a preguntar."
+  },
+  "존재하지 않는 조항 번호를 근거에서 제외했습니다.": {
+    "zh": "已从依据中删除不存在的条款编号。",
+    "es": "Se quitaron de los fundamentos números de cláusula inexistentes."
+  },
+  "파일의 글자를 그대로 읽었습니다. 바로 검토를 시작해도 됩니다.": {
+    "zh": "已直接读取文件中的文字，可以直接开始审查。",
+    "es": "Se leyó el texto del archivo tal cual. Ya puede iniciar la revisión."
+  },
+  "읽은 원문 보기·수정 (선택)": {
+    "zh": "查看·修改读取的原文（可选）",
+    "es": "Ver o editar el texto leído (opcional)"
+  },
+  "읽은 내용을 원본과 대조하고 확인 표시를 해주세요.": {
+    "zh": "请将读取的内容与原件核对并勾选确认。",
+    "es": "Compare el texto leído con el original y marque la confirmación."
+  },
+  "기준에 어긋나는 기재": {
+    "zh": "不符合标准的填写",
+    "es": "Dato contrario a la norma"
+  },
+  "채우거나 확인할 기재": {
+    "zh": "需填写或确认的内容",
+    "es": "Dato por completar o confirmar"
+  },
+  "근로시간·휴일": {
+    "zh": "工作时间·休息日",
+    "es": "Jornada y descansos"
+  },
+  "계약·서류": {
+    "zh": "合同·文件",
+    "es": "Contrato y documentos"
+  },
+  "숙식·통장": {
+    "zh": "食宿·存折",
+    "es": "Alojamiento y cuenta"
+  },
+  "월": {
+    "zh": "月薪",
+    "es": "Mensual"
+  },
+  "일급": {
+    "zh": "日薪",
+    "es": "Por día"
+  },
+  "연": {
+    "zh": "年薪",
+    "es": "Anual"
+  },
+  "금액": {
+    "zh": "金额",
+    "es": "Importe"
+  },
+  "원": {
+    "zh": "韩元",
+    "es": " wones"
+  },
+  "입국일부터 {0}개월": {
+    "zh": "自入境日起{0}个月",
+    "es": "{0} meses desde la llegada"
+  },
+  "1일 {0}분": {
+    "zh": "每天{0}分钟",
+    "es": "{0} minutos al día"
+  },
+  "매월 {0}일": {
+    "zh": "每月{0}日",
+    "es": "El día {0} de cada mes"
+  },
+  "주 {0}시간": {
+    "zh": "每周{0}小时",
+    "es": "{0} horas semanales"
+  },
+  "계약서를 다시 등록해주세요.": {
+    "zh": "请重新上传合同。",
+    "es": "Vuelva a subir el contrato."
+  },
+  "화면을 표시하지 못했습니다. 다시 불러오거나 새 계약서를 등록해주세요.": {
+    "zh": "无法显示页面。请重新加载或上传新合同。",
+    "es": "No se pudo mostrar la pantalla. Vuelva a cargarla o suba un contrato nuevo."
+  },
+  "상담하기": {
+    "zh": "咨询",
+    "es": "Consultar"
+  },
+  "최저시급을 못 받았는데 괜찮은 건가요?": {
+    "zh": "我没拿到最低时薪，这样没问题吗？",
+    "es": "No me pagan el salario mínimo por hora. ¿Es normal?"
+  },
+  "주휴수당은 언제 받을 수 있나요?": {
+    "zh": "什么时候能拿到周休津贴？",
+    "es": "¿Cuándo tengo derecho al pago del descanso semanal?"
+  },
+  "월급이 제날짜에 안 들어와요. 어떻게 해야 하나요?": {
+    "zh": "工资没有按时发放，我该怎么办？",
+    "es": "Mi sueldo no llega en la fecha acordada. ¿Qué hago?"
+  },
+  "회사가 여권을 맡기라고 해요": {
+    "zh": "公司要我把护照交给他们保管",
+    "es": "La empresa me pide que le deje mi pasaporte"
+  },
+  "갑자기 그만두라고 하는데 어떻게 하나요?": {
+    "zh": "公司突然让我走人，我该怎么办？",
+    "es": "De repente me dicen que deje el trabajo. ¿Qué hago?"
+  },
+  "궁금한 점이나 말로 안내받은 조건을 적어주시면 정리하고, 확인할 점과 요청할 문서를 함께 준비합니다.": {
+    "zh": "写下您的疑问或口头告知的条件，我们会整理并一起准备需要确认的事项和要申请的文件。",
+    "es": "Escriba su duda o las condiciones que le dijeron de palabra; las ordenamos y preparamos qué revisar y qué documentos pedir."
+  },
+  "궁금한 점을 묻거나, 사장님께 말로 들은 시급·근무시간·시작일을 그대로 적어주세요.": {
+    "zh": "可以直接提问，或照原样写下老板口头告诉您的时薪、工作时间和开始日期。",
+    "es": "Haga su pregunta o escriba tal cual el salario por hora, el horario y la fecha de inicio que le dijo el empleador."
+  },
+  "말로 안내받은 조건으로 상담하기": {
+    "zh": "按口头告知的条件咨询",
+    "es": "Consultar con las condiciones dichas de palabra"
+  },
+  "계약서를 받지 못했다면 그 자체가 확인할 문제일 수 있습니다. 말로 안내받은 조건을 정리하고 교부 요청서를 준비합니다.": {
+    "zh": "如果没有拿到合同，这本身可能就是需要确认的问题。我们会整理口头告知的条件并准备合同交付申请书。",
+    "es": "Si no recibió el contrato, eso ya puede ser un problema. Ordenamos las condiciones que le dijeron de palabra y preparamos una solicitud de entrega del contrato."
+  },
+  "실제로 있었던 일을 20자 이상 적어주세요.": {
+    "zh": "请用20个字以上写下实际发生的事情。",
+    "es": "Describa lo que pasó con al menos 20 caracteres."
+  },
+  "입력한 내용을 한국어로 옮기고 있습니다.": {
+    "zh": "正在将输入内容翻译成韩语。",
+    "es": "Pasando su texto al coreano."
+  },
+  "계약서 없이 문서 만들기": {
+    "zh": "无需合同即可制作文件",
+    "es": "Crear documentos sin contrato"
+  },
+  "있었던 일을 적으면 진정서·고소장 같은 문서 초안을 한국어로 정리합니다.": {
+    "zh": "写下发生的事情，我们会用韩语整理成申诉书、告诉状等文件草稿。",
+    "es": "Escriba lo que pasó y prepararemos en coreano un borrador como una denuncia laboral o una querella."
+  },
+  "계약서가 있다면 먼저 검토하기": {
+    "zh": "如果有合同，请先审查",
+    "es": "Si tiene contrato, revíselo primero"
+  },
+  "있었던 일을 적어주세요": {
+    "zh": "请写下发生的事情",
+    "es": "Cuéntenos qué pasó"
+  },
+  "문서 종류를 고르고 있었던 일을 적으면 초안을 만듭니다.": {
+    "zh": "选择文件类型并写下发生的事情，即可生成草稿。",
+    "es": "Elija el tipo de documento y cuente lo que pasó para crear el borrador."
+  },
+  "노동청 진정서": {
+    "zh": "劳动厅申诉书",
+    "es": "Denuncia ante la oficina de trabajo"
+  },
+  "임금체불·최저임금 미달 등을 고용노동부에 알립니다.": {
+    "zh": "向雇佣劳动部举报拖欠工资、低于最低工资等问题。",
+    "es": "Informa al Ministerio de Empleo y Trabajo de salarios impagados o por debajo del mínimo."
+  },
+  "고소장 초안": {
+    "zh": "告诉状草稿",
+    "es": "Borrador de querella"
+  },
+  "범죄로 의심되는 일을 수사기관에 알리기 전 정리합니다.": {
+    "zh": "在向侦查机关报案前整理疑似犯罪的事情。",
+    "es": "Ordena los hechos que parecen un delito antes de presentarlos a la policía."
+  },
+  "변호사 상담 요청문": {
+    "zh": "律师咨询申请书",
+    "es": "Solicitud de consulta con abogado"
+  },
+  "상황과 자료를 정리해 상담을 요청합니다.": {
+    "zh": "整理情况和资料并申请咨询。",
+    "es": "Resume su situación y sus pruebas para pedir asesoría."
+  },
+  "도움 요청문": {
+    "zh": "求助信",
+    "es": "Solicitud de ayuda"
+  },
+  "기관·지인에게 상황을 설명하고 도움을 요청합니다.": {
+    "zh": "向机构或熟人说明情况并请求帮助。",
+    "es": "Explica la situación a una entidad o persona de confianza y pide ayuda."
+  },
+  "상대방 (사업주·업체명)": {
+    "zh": "对方（雇主·公司名）",
+    "es": "La otra parte (empleador o empresa)"
+  },
+  "받지 못한 돈이나 피해": {
+    "zh": "未收到的钱或损失",
+    "es": "Dinero no recibido o daños"
+  },
+  "예: 2026년 9월부터 편의점에서 일했는데 시급 9,000원만 받았고, 10월 월급은 아직 못 받았습니다.": {
+    "zh": "例：从2026年9月开始在便利店工作，时薪只拿到9,000韩元，10月工资还没收到。",
+    "es": "Ej.: Trabajo en una tienda desde septiembre de 2026, me pagan solo 9.000 wones por hora y aún no recibí el sueldo de octubre."
+  },
+  "예: 10월 임금 1,200,000원, 최저임금 차액 약 300,000원": {
+    "zh": "例：10月工资1,200,000韩元，最低工资差额约300,000韩元",
+    "es": "Ej.: sueldo de octubre 1.200.000 wones, diferencia con el mínimo unos 300.000 wones"
+  },
+  "예: 문자로 받은 근무 조건, 통장 입금내역, 근무표 사진": {
+    "zh": "例：短信收到的工作条件、银行入账记录、排班表照片",
+    "es": "Ej.: condiciones recibidas por mensaje, movimientos bancarios, foto del horario"
+  },
+  "고소장": {
+    "zh": "告诉状",
+    "es": "Querella"
+  },
+  "범죄로 의심되는 일을 경찰서에 고소합니다.": {
+    "zh": "就疑似犯罪的行为向警察局提出告诉。",
+    "es": "Presenta una querella ante la policía por hechos que parecen delito."
+  },
+  "법률 상담 요청서": {
+    "zh": "法律咨询申请书",
+    "es": "Solicitud de asesoría legal"
+  },
+  "변호사·법률구조공단에 상황을 정리해 상담을 요청합니다.": {
+    "zh": "整理情况，向律师或法律援助公团申请咨询。",
+    "es": "Resume su caso para pedir asesoría a un abogado o a la Corporación de Asistencia Jurídica."
+  },
+  "도움 요청서": {
+    "zh": "求助申请书",
+    "es": "Solicitud de ayuda"
+  },
+  "기관이나 단체에 상황을 설명하고 도움을 요청합니다.": {
+    "zh": "向机构或团体说明情况并请求帮助。",
+    "es": "Explica su situación a una entidad u organización y pide ayuda."
+  },
+  "생년월일": {
+    "zh": "出生日期",
+    "es": "Fecha de nacimiento"
+  },
+  "주소": {
+    "zh": "地址",
+    "es": "Dirección"
+  },
+  "연락처": {
+    "zh": "联系方式",
+    "es": "Teléfono"
+  },
+  "진정인 (나)": {
+    "zh": "申诉人（本人）",
+    "es": "Denunciante (usted)"
+  },
+  "사업장명": {
+    "zh": "工作单位名称",
+    "es": "Nombre del negocio"
+  },
+  "예: 행복편의점 망원점": {
+    "zh": "例：幸福便利店望远店",
+    "es": "Ej.: Tienda Haengbok, sucursal Mangwon"
+  },
+  "대표자(사업주) 성명": {
+    "zh": "代表（雇主）姓名",
+    "es": "Nombre del empleador o representante"
+  },
+  "사업장 소재지": {
+    "zh": "工作单位地址",
+    "es": "Dirección del negocio"
+  },
+  "사업장 연락처": {
+    "zh": "工作单位电话",
+    "es": "Teléfono del negocio"
+  },
+  "예: 5명": {
+    "zh": "例：5人",
+    "es": "Ej.: 5 personas"
+  },
+  "근무 내용": {
+    "zh": "工作情况",
+    "es": "Datos del trabajo"
+  },
+  "입사일": {
+    "zh": "入职日期",
+    "es": "Fecha de ingreso"
+  },
+  "퇴사일 (재직 중이면 비워두세요)": {
+    "zh": "离职日期（在职请留空）",
+    "es": "Fecha de salida (déjela vacía si sigue trabajando)"
+  },
+  "예: 계산 및 상품 진열": {
+    "zh": "例：收银及商品陈列",
+    "es": "Ej.: caja y reposición"
+  },
+  "임금 조건": {
+    "zh": "工资条件",
+    "es": "Condiciones salariales"
+  },
+  "예: 시급 9,000원, 매월 10일 지급": {
+    "zh": "例：时薪9,000韩元，每月10日发放",
+    "es": "Ej.: 9.000 wones por hora, pago el día 10 de cada mes"
+  },
+  "받지 못한 돈과 있었던 일": {
+    "zh": "未领取的钱与发生的事情",
+    "es": "Dinero no pagado y lo que pasó"
+  },
+  "받지 못한 금품 (한 줄에 하나)": {
+    "zh": "未领取的款项（每行一项）",
+    "es": "Pagos no recibidos (uno por línea)"
+  },
+  "예: 10월 임금 1,200,000원\n9월 최저임금 차액 300,000원": {
+    "zh": "例：10月工资1,200,000韩元\n9月最低工资差额300,000韩元",
+    "es": "Ej.: sueldo de octubre 1.200.000 wones\ndiferencia con el mínimo de septiembre 300.000 wones"
+  },
+  "있었던 일": {
+    "zh": "发生的事情",
+    "es": "Lo que pasó"
+  },
+  "예: 9월 1일부터 주 5일 하루 8시간 일했는데 시급 9천원만 받았고, 10월 월급은 달라고 해도 다음 달에 준다며 주지 않았습니다.": {
+    "zh": "例：从9月1日起每周工作5天、每天8小时，但时薪只拿到9千韩元；10月工资催要后对方说下个月再给，一直没给。",
+    "es": "Ej.: desde el 1 de septiembre trabajé 5 días a la semana, 8 horas al día, me pagaron solo 9 mil wones por hora y el sueldo de octubre no me lo dieron aunque lo pedí."
+  },
+  "입증 자료 (한 줄에 하나)": {
+    "zh": "证明材料（每行一项）",
+    "es": "Pruebas (una por línea)"
+  },
+  "예: 통장 입금내역\n근무표 사진\n사업주와 주고받은 문자": {
+    "zh": "例：银行入账记录\n排班表照片\n与雇主的短信",
+    "es": "Ej.: movimientos bancarios\nfoto del horario\nmensajes con el empleador"
+  },
+  "요청 사항": {
+    "zh": "请求事项",
+    "es": "Lo que solicita"
+  },
+  "제출할 노동청": {
+    "zh": "提交的劳动厅",
+    "es": "Oficina de trabajo de destino"
+  },
+  "예: 서울서부지방고용노동청장 (모르면 비워두세요)": {
+    "zh": "例：首尔西部地方雇佣劳动厅长（不清楚可留空）",
+    "es": "Ej.: Oficina Regional de Empleo y Trabajo de Seúl Oeste (vacío si no lo sabe)"
+  },
+  "고소인 (나)": {
+    "zh": "告诉人（本人）",
+    "es": "Querellante (usted)"
+  },
+  "피고소인": {
+    "zh": "被告诉人",
+    "es": "Querellado"
+  },
+  "성명 (모르면 '성명불상')": {
+    "zh": "姓名（不清楚请填'姓名不详'）",
+    "es": "Nombre (si no lo sabe, escriba '성명불상')"
+  },
+  "나와의 관계": {
+    "zh": "与本人的关系",
+    "es": "Relación con usted"
+  },
+  "예: 고소인이 일한 편의점의 사업주": {
+    "zh": "例：告诉人工作过的便利店雇主",
+    "es": "Ej.: dueño de la tienda donde trabajé"
+  },
+  "고소 내용": {
+    "zh": "告诉内容",
+    "es": "Contenido de la querella"
+  },
+  "죄명 (모르면 비워두세요)": {
+    "zh": "罪名（不清楚可留空）",
+    "es": "Delito (vacío si no lo sabe)"
+  },
+  "예: 사기, 근로기준법 위반": {
+    "zh": "例：诈骗、违反劳动基准法",
+    "es": "Ej.: estafa, infracción de la Ley de Normas Laborales"
+  },
+  "언제, 어디서, 상대방이 무엇을 했는지 순서대로 적어주세요.": {
+    "zh": "请按顺序写下时间、地点以及对方做了什么。",
+    "es": "Escriba en orden cuándo, dónde y qué hizo la otra persona."
+  },
+  "고소 이유": {
+    "zh": "告诉理由",
+    "es": "Motivo de la querella"
+  },
+  "처벌을 원하는 이유를 적어주세요.": {
+    "zh": "请写下希望处罚的理由。",
+    "es": "Escriba por qué pide que se le sancione."
+  },
+  "증거 자료 (한 줄에 하나)": {
+    "zh": "证据材料（每行一项）",
+    "es": "Pruebas (una por línea)"
+  },
+  "예: 이체 내역\n대화 캡처": {
+    "zh": "例：转账记录\n聊天截图",
+    "es": "Ej.: comprobante de transferencia\ncaptura de la conversación"
+  },
+  "제출할 경찰서": {
+    "zh": "提交的警察局",
+    "es": "Comisaría de destino"
+  },
+  "예: 서울마포경찰서장 (모르면 비워두세요)": {
+    "zh": "例：首尔麻浦警察署长（不清楚可留空）",
+    "es": "Ej.: Comisaría de Mapo, Seúl (vacío si no lo sabe)"
+  },
+  "보내는 사람 (나)": {
+    "zh": "发件人（本人）",
+    "es": "Remitente (usted)"
+  },
+  "이메일": {
+    "zh": "电子邮箱",
+    "es": "Correo electrónico"
+  },
+  "상담 내용": {
+    "zh": "咨询内容",
+    "es": "Asunto de la consulta"
+  },
+  "받는 분": {
+    "zh": "收件人",
+    "es": "Destinatario"
+  },
+  "예: 대한법률구조공단 서울중앙지부": {
+    "zh": "例：大韩法律救助公团首尔中央分部",
+    "es": "Ej.: Corporación de Asistencia Jurídica de Corea, sede central de Seúl"
+  },
+  "피해 내용 (한 줄에 하나)": {
+    "zh": "损失内容（每行一项）",
+    "es": "Daños sufridos (uno por línea)"
+  },
+  "여쭙고 싶은 점 (한 줄에 하나)": {
+    "zh": "想咨询的问题（每行一项）",
+    "es": "Preguntas (una por línea)"
+  },
+  "보유 자료 (한 줄에 하나)": {
+    "zh": "持有的资料（每行一项）",
+    "es": "Documentos que tiene (uno por línea)"
+  },
+  "요청 내용": {
+    "zh": "请求内容",
+    "es": "Solicitud"
+  },
+  "예: 외국인력상담센터": {
+    "zh": "例：外国人力咨询中心",
+    "es": "Ej.: Centro de Asesoramiento para Trabajadores Extranjeros"
+  },
+  "요청하는 도움 (한 줄에 하나)": {
+    "zh": "需要的帮助（每行一项）",
+    "es": "Ayuda que solicita (una por línea)"
+  },
+  "문서를 완성했습니다. 내용을 확인한 뒤 PDF로 저장하세요.": {
+    "zh": "文件已完成。请核对内容后保存为PDF。",
+    "es": "El documento está listo. Revíselo y guárdelo en PDF."
+  },
+  "필요한 내용을 채우면 바로 제출할 수 있는 진정서·고소장을 한국어로 완성합니다.": {
+    "zh": "填写所需内容，即可用韩语完成可直接提交的申诉书和告诉状。",
+    "es": "Complete los datos y obtendrá en coreano una denuncia o querella lista para presentar."
+  },
+  "* 표시는 꼭 필요한 항목입니다. 나머지는 아는 것만 적어주세요.": {
+    "zh": "带*的为必填项，其余只需填写您知道的内容。",
+    "es": "Los campos con * son obligatorios; el resto, solo si lo sabe."
+  },
+  "문서를 작성하고 있습니다…": {
+    "zh": "正在撰写文件…",
+    "es": "Redactando el documento…"
+  },
+  "문서 완성하기": {
+    "zh": "完成文件",
+    "es": "Completar documento"
+  },
+  "완성 문서": {
+    "zh": "完成的文件",
+    "es": "Documento final"
+  },
+  "문서": {
+    "zh": "文件",
+    "es": "Documento"
+  },
+  "문서 종류를 고르고 내용을 채우면 제출용 문서를 완성합니다.": {
+    "zh": "选择文件类型并填写内容，即可完成可提交的文件。",
+    "es": "Elija el tipo de documento y complete los datos para obtener un documento listo para presentar."
   }
 }

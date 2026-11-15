@@ -1,0 +1,465 @@
+==============================================================================
+한국 근로계약서 핵심 용어·조건 가이드
+Guía de términos y condiciones clave del contrato de trabajo en Corea
+스페인어권 근로자를 위한 한국어–스페인어 대조 자료 · 2026년 11월 기준
+==============================================================================
+
+[목차]
+  1 근로계약서 핵심 용어 대조표 (한국어 · Español · Explicación) — 50개
+  2 한국 vs 스페인어권 근로계약서 비교 (스페인 · 멕시코 · 칠레 · 콜롬비아 · 아르헨티나)
+  3 외국인이 꼭 확인해야 할 계약 조항 체크리스트 (한국어 · Español)
+  4 도움받을 수 있는 곳 · 출처
+
+[안내] 이 자료는 한국 근로기준법과 고용노동부 표준근로계약서를 바탕으로 정리한 학습·안내용 자료이며 법률 자문이 아닙니다. 수치는 2026년 11월 기준이고, 법 개정에 따라 바뀔 수 있습니다. 실제 계약이나 분쟁에는 공인노무사 또는 고용노동부(국번 없이 1350)에 확인하세요. Material informativo, no constituye asesoría legal. Datos vigentes a noviembre de 2026; pueden cambiar con reformas legales.
+
+
+==============================================================================
+1. 근로계약서 핵심 용어 대조표 Glosario de términos clave
+==============================================================================
+한국 표준근로계약서와 근로기준법에 나오는 용어를 스페인어로 옮기고, 스페인어권 사람이 이해할 수 있도록 스페인어로 풀어 썼습니다. 오른쪽 칸은 스페인어 설명의 한국어 요지입니다.
+
+
+■ A. 계약의 기본 · Conceptos básicos del contrato
+------------------------------------------------------------------------------
+[1] 근로계약서
+    · Español: Contrato de trabajo
+    · Explicación en español: Documento escrito con las condiciones de trabajo acordadas. En Corea el empleador debe entregar una copia al trabajador, aunque este no la pida.
+    · 한국어 요지: 근로조건을 적은 서면 계약. 사업주는 요구가 없어도 1부를 교부해야 함
+
+[2] 표준근로계약서
+    · Español: Contrato estándar de trabajo
+    · Explicación en español: Modelo oficial del Ministerio de Empleo y Trabajo que incluye todas las condiciones que la ley exige escribir.
+    · 한국어 요지: 법정 필수 항목을 모두 담은 고용노동부 양식
+
+[3] 근로기준법
+    · Español: Ley de Normas Laborales
+    · Explicación en español: Ley principal que fija las condiciones mínimas de trabajo en Corea. Se aplica igual a trabajadores coreanos y extranjeros.
+    · 한국어 요지: 한국 노동조건의 최저기준. 외국인에게도 동일 적용
+
+[4] 사용자 · 사업주
+    · Español: Empleador
+    · Explicación en español: Persona o empresa que contrata al trabajador, dirige su trabajo y paga el salario.
+    · 한국어 요지: 고용하고 임금을 주는 사람·회사
+
+[5] 근로자
+    · Español: Trabajador / Empleado
+    · Explicación en español: Persona que trabaja bajo la dirección del empleador a cambio de un salario, sin importar su nacionalidad ni su tipo de contrato.
+    · 한국어 요지: 국적·고용형태와 무관하게 임금을 받고 일하는 사람
+
+[6] 기간의 정함이 없는 근로계약
+    · Español: Contrato indefinido
+    · Explicación en español: Contrato sin fecha de finalización (empleo fijo).
+    · 한국어 요지: 종료일이 없는 계약(정규직)
+
+[7] 기간제 근로계약
+    · Español: Contrato de duración determinada
+    · Explicación en español: Contrato con fecha de fin. En empresas de 5 o más trabajadores, si se supera en total 2 años, en principio pasa a considerarse indefinido.
+    · 한국어 요지: 종료일이 있는 계약. 5인 이상 사업장에서 2년 초과 시 원칙적으로 무기계약 간주
+
+[8] 수습기간
+    · Español: Período de prueba
+    · Explicación en español: Etapa inicial para evaluar al trabajador. Si el contrato es de 1 año o más, en los primeros 3 meses se puede pagar como mínimo el 90 % del salario mínimo (no se permite en trabajos manuales simples).
+    · 한국어 요지: 계약 1년 이상일 때 처음 3개월은 최저임금의 90%까지 감액 가능(단순노무직 제외)
+
+[9] 단시간 근로자
+    · Español: Trabajador a tiempo parcial
+    · Explicación en español: Quien trabaja menos horas por semana que un trabajador a tiempo completo del mismo puesto. Sus derechos se calculan en proporción a sus horas.
+    · 한국어 요지: 통상근로자보다 짧게 일하는 사람. 권리는 시간에 비례
+
+[10] 취업규칙
+    · Español: Reglamento interno de trabajo
+    · Explicación en español: Normas de la empresa sobre horarios, salarios y disciplina. Obligatorio en empresas con 10 o más trabajadores; no puede ser peor que la ley.
+    · 한국어 요지: 회사 내부 규칙. 10인 이상 의무, 법보다 불리할 수 없음
+
+[11] 단체협약
+    · Español: Convenio colectivo
+    · Explicación en español: Acuerdo firmado entre el sindicato y la empresa sobre condiciones de trabajo. Tiene prioridad sobre el reglamento interno.
+    · 한국어 요지: 노동조합과 회사가 맺은 협약
+
+
+■ B. 근로시간 · 휴일 · Jornada y descansos
+------------------------------------------------------------------------------
+[12] 소정근로시간
+    · Español: Jornada ordinaria pactada
+    · Explicación en español: Horas de trabajo acordadas en el contrato. El máximo legal es 8 horas al día y 40 horas a la semana.
+    · 한국어 요지: 계약으로 정한 근로시간. 법정 한도 1일 8시간·주 40시간
+
+[13] 연장근로
+    · Español: Horas extraordinarias
+    · Explicación en español: Trabajo por encima de la jornada legal. Requiere acuerdo del trabajador y no puede superar 12 horas semanales (52 horas en total).
+    · 한국어 요지: 합의 필요, 주 12시간 한도(총 52시간)
+
+[14] 야간근로
+    · Español: Trabajo nocturno
+    · Explicación en español: Trabajo realizado entre las 22:00 y las 06:00.
+    · 한국어 요지: 오후 10시~오전 6시 근로
+
+[15] 휴일근로
+    · Español: Trabajo en día de descanso
+    · Explicación en español: Trabajo en el día de descanso semanal o en un día festivo remunerado.
+    · 한국어 요지: 주휴일·유급 공휴일에 하는 근로
+
+[16] 가산수당
+    · Español: Recargo salarial
+    · Explicación en español: Pago adicional del 50 % sobre el salario ordinario por horas extra, nocturnas o en día de descanso (100 % si en día de descanso se superan 8 horas). Obligatorio en empresas de 5 o más trabajadores.
+    · 한국어 요지: 연장·야간·휴일근로 시 50% 가산(휴일 8시간 초과분은 100%). 5인 이상 사업장
+
+[17] 휴게시간
+    · Español: Tiempo de descanso (pausa)
+    · Explicación en español: Pausa libre durante la jornada: al menos 30 minutos cada 4 horas y 1 hora cada 8 horas. Normalmente no se paga.
+    · 한국어 요지: 4시간마다 30분, 8시간마다 1시간 이상. 보통 무급
+
+[18] 주휴일
+    · Español: Día de descanso semanal remunerado
+    · Explicación en español: Un día libre pagado por semana para quien trabaja 15 horas o más a la semana y cumple los días de trabajo acordados.
+    · 한국어 요지: 주 15시간 이상·소정근로일 개근 시 주 1일 유급휴일
+
+[19] 주휴수당
+    · Español: Pago del descanso semanal
+    · Explicación en español: Salario correspondiente a ese día de descanso semanal. Es una figura propia de Corea; se suele olvidar en trabajos por horas.
+    · 한국어 요지: 주휴일에 대한 임금. 시급제 아르바이트에서 자주 누락
+
+[20] 공휴일 (유급)
+    · Español: Días festivos oficiales remunerados
+    · Explicación en español: Festivos nacionales (Año Nuevo lunar, Chuseok, etc.). En empresas de 5 o más trabajadores son días libres pagados.
+    · 한국어 요지: 설·추석 등. 5인 이상 사업장은 유급휴일
+
+[21] 노동절 (근로자의 날)
+    · Español: Día del Trabajo (1 de mayo)
+    · Explicación en español: Día libre remunerado para todos los trabajadores, sin importar el tamaño de la empresa.
+    · 한국어 요지: 5월 1일, 모든 사업장 유급휴일
+
+[22] 연차유급휴가
+    · Español: Vacaciones anuales remuneradas
+    · Explicación en español: Tras 1 año con al menos 80 % de asistencia: 15 días. Antes del primer año: 1 día por cada mes completo (máx. 11). Desde el 3.er año se suma 1 día cada 2 años, hasta 25. En empresas de 5 o más.
+    · 한국어 요지: 1년 80% 출근 시 15일, 1년 미만은 매월 1일(최대 11일), 최대 25일. 5인 이상
+
+[23] 연차수당
+    · Español: Pago por vacaciones no disfrutadas
+    · Explicación en español: Dinero que se paga por los días de vacaciones que no se usaron, por ejemplo al terminar el contrato.
+    · 한국어 요지: 쓰지 못한 연차에 대한 금전 보상
+
+
+■ C. 임금 · Salario
+------------------------------------------------------------------------------
+[24] 임금
+    · Español: Salario / Remuneración
+    · Explicación en español: Todo lo que el empleador paga por el trabajo, con cualquier nombre (sueldo, pluses, bonos).
+    · 한국어 요지: 명칭과 무관하게 근로의 대가로 받는 모든 금품
+
+[25] 기본급
+    · Español: Salario base
+    · Explicación en español: Parte fija del salario, sin contar pluses ni horas extra.
+    · 한국어 요지: 수당·연장근로를 뺀 고정 급여
+
+[26] 제수당
+    · Español: Complementos / pluses
+    · Explicación en español: Pagos adicionales al salario base: transporte, comida, familia, puesto, etc.
+    · 한국어 요지: 교통비·식대·가족수당 등
+
+[27] 통상임금
+    · Español: Salario ordinario
+    · Explicación en español: Salario fijo y regular que se usa como base para calcular los recargos por horas extra y el pago del día de descanso.
+    · 한국어 요지: 가산수당·주휴수당 계산의 기준이 되는 정기·고정 임금
+
+[28] 평균임금
+    · Español: Salario medio
+    · Explicación en español: Promedio diario de lo cobrado en los últimos 3 meses. Se usa para calcular la indemnización por retiro.
+    · 한국어 요지: 최근 3개월 임금의 1일 평균. 퇴직금 계산 기준
+
+[29] 최저임금
+    · Español: Salario mínimo
+    · Explicación en español: En 2026: 10.320 wones por hora; 2.156.880 wones al mes (209 horas, incluido el descanso semanal). Igual para extranjeros. En 2027 sube a 10.700 wones/hora.
+    · 한국어 요지: 2026년 시급 10,320원, 월 2,156,880원. 2027년 10,700원
+
+[30] 포괄임금제
+    · Español: Salario global (con horas extra incluidas)
+    · Explicación en español: Sistema en que el sueldo mensual ya incluye un número fijo de horas extra. Hay que comprobar cuántas horas incluye; las horas que superen ese número deben pagarse aparte.
+    · 한국어 요지: 월급에 일정 연장근로를 미리 포함. 포함 시간 초과분은 별도 지급
+
+[31] 상여금
+    · Español: Bonificación / gratificación
+    · Explicación en español: Pago extra (por ejemplo, en fiestas). En Corea NO es obligatorio por ley: solo se cobra si el contrato o el reglamento lo establece.
+    · 한국어 요지: 법정 의무 아님. 계약·규칙에 있을 때만 지급
+
+[32] 임금지급일
+    · Español: Fecha de pago
+    · Explicación en español: El salario debe pagarse al menos una vez al mes, en una fecha fija, en dinero, directamente al trabajador y de forma íntegra.
+    · 한국어 요지: 매월 1회 이상, 정해진 날, 통화로, 직접, 전액 지급
+
+[33] 임금명세서
+    · Español: Nómina / recibo de sueldo
+    · Explicación en español: Documento que detalla cada concepto del salario y los descuentos. El empleador debe entregarlo en cada pago.
+    · 한국어 요지: 항목별 지급·공제 내역. 지급 때마다 교부 의무
+
+[34] 공제
+    · Español: Deducción / descuento
+    · Explicación en español: Cantidades restadas del salario (impuestos, seguros, alojamiento, comida). Las que no exige la ley solo pueden descontarse con acuerdo del trabajador.
+    · 한국어 요지: 세금·보험·숙식비 등. 법정 외 공제는 근로자 동의 필요
+
+[35] 원천징수
+    · Español: Retención de impuestos
+    · Explicación en español: Impuesto sobre la renta que el empleador descuenta del salario y paga directamente al Estado.
+    · 한국어 요지: 회사가 급여에서 떼어 대신 납부하는 소득세
+
+[36] 임금체불
+    · Español: Impago de salarios
+    · Explicación en español: Cuando el empleador no paga el salario completo o a tiempo. Se puede denunciar ante la oficina regional de trabajo.
+    · 한국어 요지: 임금을 제때·전액 주지 않는 것. 노동청에 진정 가능
+
+
+■ D. 사회보험 · 퇴직 · 해고 · Seguros sociales, retiro y despido
+------------------------------------------------------------------------------
+[37] 4대보험
+    · Español: Cuatro seguros sociales
+    · Explicación en español: Pensión Nacional, Seguro Nacional de Salud, Seguro de Empleo y Seguro de Accidentes de Trabajo. Las cuotas se reparten entre empleador y trabajador (el de accidentes lo paga solo el empleador).
+    · 한국어 요지: 국민연금·건강보험·고용보험·산재보험. 산재는 사업주 전액 부담
+
+[38] 국민연금
+    · Español: Pensión Nacional
+    · Explicación en español: Sistema público de jubilación. Para extranjeros depende del país de origen y de los convenios de seguridad social; en algunos casos se puede pedir la devolución al salir de Corea.
+    · 한국어 요지: 외국인은 국적·사회보장협정에 따라 가입·반환 여부 다름
+
+[39] 건강보험
+    · Español: Seguro Nacional de Salud
+    · Explicación en español: Cubre la atención médica. Los trabajadores extranjeros con contrato están afiliados por regla general.
+    · 한국어 요지: 의료비 지원. 직장가입 원칙
+
+[40] 고용보험
+    · Español: Seguro de Empleo
+    · Explicación en español: Da prestación por desempleo y ayudas de formación. Para extranjeros es obligatorio o voluntario según el tipo de visado.
+    · 한국어 요지: 실업급여 등. 외국인은 체류자격별 의무/임의
+
+[41] 산재보험
+    · Español: Seguro de Accidentes de Trabajo
+    · Explicación en español: Cubre accidentes y enfermedades causados por el trabajo. Protege a todo trabajador, incluido el extranjero.
+    · 한국어 요지: 업무상 재해 보상. 외국인 포함 모든 근로자
+
+[42] 퇴직금
+    · Español: Indemnización por retiro
+    · Explicación en español: Pago al terminar la relación laboral, por cualquier motivo (también por renuncia), si se trabajó 1 año o más con 15 horas o más por semana: 30 días de salario medio por cada año trabajado.
+    · 한국어 요지: 1년 이상·주 15시간 이상 근무 시, 사유 불문 1년당 30일분 평균임금
+
+[43] 해고
+    · Español: Despido
+    · Explicación en español: Fin del contrato por decisión del empleador. En empresas de 5 o más trabajadores necesita causa justificada y debe comunicarse por escrito.
+    · 한국어 요지: 5인 이상 사업장은 정당한 이유·서면 통지 필요
+
+[44] 해고예고
+    · Español: Preaviso de despido
+    · Explicación en español: El empleador debe avisar con 30 días de antelación o pagar 30 días de salario. No se aplica si el trabajador lleva menos de 3 meses.
+    · 한국어 요지: 30일 전 예고 또는 30일분 통상임금. 근속 3개월 미만 제외
+
+[45] 부당해고 구제신청
+    · Español: Reclamación por despido injustificado
+    · Explicación en español: Recurso ante la Comisión de Relaciones Laborales dentro de los 3 meses siguientes al despido.
+    · 한국어 요지: 해고일부터 3개월 이내 노동위원회에 신청
+
+[46] 사직서
+    · Español: Carta de renuncia / dimisión
+    · Explicación en español: Documento con el que el trabajador comunica que deja el empleo. Conviene entregarlo por escrito y guardar una copia.
+    · 한국어 요지: 스스로 그만둘 때 내는 문서. 사본 보관 권장
+
+
+■ E. 외국인 관련 · Términos para trabajadores extranjeros
+------------------------------------------------------------------------------
+[47] 체류자격 (비자)
+    · Español: Estatus de residencia (tipo de visado)
+    · Explicación en español: Categoría de visado que determina qué trabajo se puede hacer en Corea. Trabajar fuera de lo permitido puede causar multas o la expulsión.
+    · 한국어 요지: 할 수 있는 일을 정하는 비자 종류. 범위 밖 취업은 처벌 대상
+
+[48] 고용허가제
+    · Español: Sistema de Permiso de Empleo (EPS)
+    · Explicación en español: Programa para contratar trabajadores extranjeros no profesionales (visados E-9 y H-2). Usa un contrato oficial propio.
+    · 한국어 요지: E-9·H-2 근로자 고용 제도, 별도 법정 서식 사용
+
+[49] 외국인등록증
+    · Español: Tarjeta de Registro de Extranjero
+    · Explicación en español: Documento de identidad para extranjeros que residen en Corea más de 90 días. El empleador no puede quedárselo.
+    · 한국어 요지: 90일 초과 체류 외국인의 신분증. 사업주 보관 금지
+
+[50] 고용노동부 · 지방노동청
+    · Español: Ministerio de Empleo y Trabajo / Oficina regional de trabajo
+    · Explicación en español: Autoridad que recibe denuncias por impago, despido o malas condiciones. Teléfono de atención: 1350.
+    · 한국어 요지: 임금체불·부당대우 신고 기관. 상담 1350
+
+
+==============================================================================
+2. 한국 vs 스페인어권 근로계약서 비교 Corea frente a los países hispanohablantes
+==============================================================================
+스페인어권 근로자가 자기 나라 기준을 그대로 기대하면 오해가 생기기 쉬운 항목을 골랐습니다. 가장 큰 차이는 법정 보너스(13월 급여)가 한국에는 없다는 점과, 반대로 주휴수당·퇴직금은 한국에만 있는 형태라는 점입니다.
+
+▶ 서면 계약
+    · 한국: 모든 근로계약 서면 명시·교부 의무. 위반 시 500만원 이하 벌금
+    · 스페인: 4주 넘는 관계 등은 서면화 원칙, 공공고용서비스에 등록
+    · 중남미 주요국: 멕시코·칠레 등 대부분 서면 계약 원칙
+    · 외국인이 주의할 점: 말로만 계약하는 관행이 있어도 한국에선 위법. 반드시 사본 받기
+
+▶ 법정 근로시간
+    · 한국: 주 40시간 + 연장 12시간 = 최대 52시간
+    · 스페인: 주 40시간(단체협약으로 더 짧을 수 있음), 연장근로 연 80시간 한도
+    · 중남미 주요국: 멕시코 주 48시간 → 2027년부터 2시간씩 줄여 2030년 40시간 · 칠레 42시간(2026.4~), 2028년 40시간 · 콜롬비아 42시간(2026.7.15~)
+    · 외국인이 주의할 점: 한국은 '주 52시간'이 상한이지 기본이 아님. 연장근로는 합의가 필요
+
+▶ 수습기간
+    · 한국: 법정 상한 없음(관행상 3개월). 1년 이상 계약은 3개월간 최저임금 90%까지 감액 가능
+    · 스페인: 상한: 학위 소지 전문직 6개월, 그 외 2개월(소규모 기업 비전문직 3개월). 서면에 기간 명시해야 유효
+    · 중남미 주요국: 멕시코는 원칙 30일(관리·전문직 최대 180일) 등 국가별 상이
+    · 외국인이 주의할 점: 감액 조건(1년 이상 계약·3개월 이내·단순노무 제외)을 넘는 감액은 위법
+
+▶ 연차휴가
+    · 한국: 1년 근속(80% 출근) 후 15일, 최대 25일. 1년 미만은 월 1일
+    · 스페인: 연 30일(역일, 주말 포함) 이상
+    · 중남미 주요국: 멕시코 1년차 12일 · 칠레 15영업일 · 콜롬비아 15영업일 · 아르헨티나 14일(역일)
+    · 외국인이 주의할 점: 스페인 출신은 한국 15일을 짧게 느낄 수 있음. 공휴일은 연차와 별개
+
+▶ 13월 급여 · 법정 보너스
+    · 한국: 법정 의무 없음. 상여금은 계약·취업규칙에 있을 때만
+    · 스페인: 연 2회 특별급여(pagas extraordinarias, 보통 여름·12월) — 12개월 분할 가능
+    · 중남미 주요국: 멕시코 aguinaldo(12월, 15일분 이상) · 콜롬비아 prima de servicios(연 30일분, 2회) · 아르헨티나 SAC(연 2회)
+    · 외국인이 주의할 점: 가장 흔한 오해. 연봉이 12회로 나뉘는지, 상여금이 있는지 계약서로 확인
+
+▶ 주 1회 유급휴일
+    · 한국: 주휴수당: 주 15시간 이상 + 개근 조건
+    · 스페인: 주 1.5일 휴식은 보장되나 '주휴수당' 같은 별도 수당 개념은 없음(월급에 포함)
+    · 중남미 주요국: 멕시코 séptimo día, 콜롬비아 일요 유급휴식 등 유사 개념 있음
+    · 외국인이 주의할 점: 시급제 근로자는 시급 × 근로시간 외에 주휴수당이 추가로 붙는지 확인
+
+▶ 퇴직 시 보상
+    · 한국: 퇴직금: 1년 이상 근무하면 사직이어도 1년당 30일분 평균임금
+    · 스페인: finiquito(미지급분 정산)는 항상 · 해고 보상금(indemnización)은 해고 유형별(부당해고 시 근속 1년당 33일분)
+    · 중남미 주요국: 콜롬비아 cesantías(연 1개월분 적립) · 멕시코 부당해고 시 3개월분 + α
+    · 외국인이 주의할 점: 한국에선 자발적 퇴사도 퇴직금 대상. 14일 이내 지급이 원칙
+
+▶ 해고
+    · 한국: 5인 이상: 정당한 이유 + 서면 통지 + 30일 예고
+    · 스페인: 사유별 절차(징계·객관적 사유), 부당 판정 시 복직 또는 보상
+    · 중남미 주요국: 대부분 정당 사유 없으면 보상금 지급
+    · 외국인이 주의할 점: 5인 미만 사업장은 부당해고 구제 대상이 아님(예고 의무는 적용)
+
+▶ 임금 지급 주기
+    · 한국: 매월 1회 이상 정기일(보통 월급)
+    · 스페인: 월급 원칙
+    · 중남미 주요국: 멕시코·콜롬비아 등은 보름(quincenal) 지급이 흔함
+    · 외국인이 주의할 점: 한국은 한 달에 한 번이 일반적이라 첫 급여까지 기간이 길 수 있음
+
+▶ 단체협약의 비중
+    · 한국: 개별 계약·취업규칙 중심
+    · 스페인: 업종별 단체협약(convenio colectivo)이 임금표·휴가·수습까지 정하는 핵심 문서
+    · 중남미 주요국: 국가별로 다르나 법전(Código/Ley Federal) 중심
+    · 외국인이 주의할 점: 스페인 출신은 '내 convenio'를 찾으려 함 → 한국은 취업규칙과 계약서가 기준
+
+▶ 사회보험
+    · 한국: 4대보험(연금·건강·고용·산재)
+    · 스페인: Seguridad Social 단일 체계
+    · 중남미 주요국: 멕시코 IMSS · 칠레 AFP · 콜롬비아 EPS/AFP 등
+    · 외국인이 주의할 점: 국민연금은 국가별 협정에 따라 가입·반환 여부가 다름
+
+▶ 사업장 규모별 차등
+    · 한국: 5인 미만은 가산수당·연차·부당해고 구제·52시간 한도 등 일부 미적용
+    · 스페인: 규모별 차등이 크지 않음
+    · 중남미 주요국: 일부 국가에 소기업 특례 존재
+    · 외국인이 주의할 점: 계약 전 '직원이 몇 명인지' 확인이 매우 중요
+
+중남미 수치는 국가별 대표 기준을 요약한 것이며, 업종·단체협약·근속연수에 따라 달라질 수 있습니다.
+
+
+==============================================================================
+3. 외국인이 꼭 확인해야 할 계약 조항 Lista de comprobación para trabajadores extranjeros
+==============================================================================
+서명 전에 아래 15가지를 확인하세요. 스페인어 칸은 근로자에게 그대로 보여줄 수 있도록 썼습니다.
+
+[1] 계약서 사본 받기 필수
+    · 한국어 설명: 서명한 계약서를 반드시 1부 받기. 이해할 수 있는 언어 번역본도 함께 요청
+    · Explicación para el trabajador: Pida siempre una copia firmada del contrato y, si es posible, una versión en español. El empleador está obligado a entregársela.
+
+[2] 비자와 업무 일치 필수
+    · 한국어 설명: 체류자격이 허용하는 업무·근무처인지 확인. 사업주가 시켜도 범위 밖 근무는 근로자도 처벌될 수 있음
+    · Explicación para el trabajador: Compruebe que el trabajo y el lugar están permitidos por su visado. Trabajar fuera de lo permitido puede traerle multas o la expulsión, aunque se lo pida el empleador.
+
+[3] 최저임금 이상인지
+    · 한국어 설명: 2026년 시급 10,320원(2027년 10,700원). 기본급만 따로 계산해도 최저임금 이상이어야 함
+    · Explicación para el trabajador: El salario no puede ser inferior al mínimo: 10.320 wones/hora en 2026 y 10.700 en 2027. Las horas extra no cuentan para llegar al mínimo.
+
+[4] 수습 감액 조건
+    · 한국어 설명: 1년 이상 계약 + 처음 3개월 + 단순노무 아님 → 이 경우에만 최저임금 90%까지 가능
+    · Explicación para el trabajador: Durante la prueba solo se puede pagar el 90 % del mínimo si el contrato dura 1 año o más, en los primeros 3 meses y en trabajos no manuales simples.
+
+[5] 근로시간·휴게 실제와 일치
+    · 한국어 설명: 시작·종료·휴게 시각이 실제와 같은지. 출퇴근 기록을 스스로 남겨 두기
+    · Explicación para el trabajador: Verifique que el horario y las pausas del contrato son los reales. Guarde su propio registro de horas (fotos, notas o una aplicación).
+
+[6] 포괄임금 여부
+    · 한국어 설명: 월급에 연장근로가 포함돼 있다면 몇 시간분인지 계약서에 적혀 있어야 함
+    · Explicación para el trabajador: Si su sueldo "incluye horas extra", pregunte cuántas. Las horas que superen esa cantidad deben pagarse aparte.
+
+[7] 주휴수당
+    · 한국어 설명: 주 15시간 이상 일하면 주 1일분 유급휴일 임금 발생. 시급제에서 특히 확인
+    · Explicación para el trabajador: Si trabaja 15 horas o más por semana, tiene derecho al pago de un día de descanso semanal, además de las horas trabajadas.
+
+[8] 회사 규모 (5인 기준)
+    · 한국어 설명: 5인 미만이면 가산수당·연차·부당해고 구제 등 일부 보호가 없음
+    · Explicación para el trabajador: Pregunte cuántos trabajadores tiene la empresa. Con menos de 5, no se aplican los recargos por horas extra, las vacaciones anuales ni la protección contra el despido injustificado.
+
+[9] 보너스 기대하지 않기
+    · 한국어 설명: 한국에는 법정 13월 급여·aguinaldo가 없음. 상여금은 계약서에 있을 때만
+    · Explicación para el trabajador: En Corea no existe por ley la paga extra ni el aguinaldo. Solo recibirá bonificación si está escrita en el contrato.
+
+[10] 4대보험 가입
+    · 한국어 설명: 입사 후 가입 여부 확인(건강보험증 등). 산재보험은 누구나 보호
+    · Explicación para el trabajador: Confirme que está dado de alta en los seguros sociales. Si sufre un accidente laboral, el seguro de accidentes le protege siempre.
+
+[11] 공제 항목 · 숙식비
+    · 한국어 설명: 숙소·식사비를 월급에서 뺀다면 금액과 동의를 서면으로. 임금명세서로 매달 확인
+    · Explicación para el trabajador: Cualquier descuento por alojamiento o comida debe estar acordado por escrito. Revise cada mes su nómina (recibo de sueldo).
+
+[12] 여권·외국인등록증 보관 금지
+    · 한국어 설명: 사업주가 여권·등록증을 가져가 보관하는 것은 출입국관리법상 금지
+    · Explicación para el trabajador: El empleador no puede quedarse con su pasaporte ni con su tarjeta de registro de extranjero. Es ilegal.
+
+[13] 급여 통장은 본인 명의
+    · 한국어 설명: 임금은 본인에게 직접 지급. 사업주가 근로자 통장·도장을 관리하면 안 됨
+    · Explicación para el trabajador: El salario debe pagarse a usted directamente o en una cuenta a su nombre. El empleador no puede guardar su libreta bancaria ni su sello.
+
+[14] 퇴직금 · 퇴사 정산
+    · 한국어 설명: 1년 이상 일하면 사직해도 퇴직금 발생. 퇴사 후 14일 이내 모든 금품 정산이 원칙
+    · Explicación para el trabajador: Si trabajó 1 año o más, tiene derecho a indemnización por retiro aunque renuncie. Todo lo pendiente debe pagarse en 14 días tras salir.
+
+[15] 해고 시 대응
+    · 한국어 설명: 30일 전 예고 또는 30일분 임금. 부당해고는 3개월 이내 노동위원회 구제신청
+    · Explicación para el trabajador: Si le despiden, deben avisarle con 30 días o pagarle 30 días. Si cree que es injusto, reclame ante la Comisión de Relaciones Laborales en un plazo de 3 meses.
+
+
+■ 4. 도움받을 수 있는 곳 · Dónde pedir ayuda
+------------------------------------------------------------------------------
+▶ 고용노동부 고객상담센터
+    · Organismo: Centro de atención del Ministerio de Empleo y Trabajo
+    · 연락처: 1350 (국번 없음)
+    · 용도 · Para qué: 임금체불·근로조건 상담 · Consultas sobre salarios impagados y condiciones de trabajo
+
+▶ 외국인종합안내센터
+    · Organismo: Centro de Información para Extranjeros
+    · 연락처: 1345
+    · 용도 · Para qué: 체류자격·비자 · Visados y estatus de residencia
+
+▶ 외국인력상담센터
+    · Organismo: Centro de Asesoramiento para Trabajadores Extranjeros
+    · 연락처: 1577-0071
+    · 용도 · Para qué: 외국인 근로자 고용·근로 상담 · Asesoría laboral para extranjeros
+
+▶ 노동위원회
+    · Organismo: Comisión de Relaciones Laborales
+    · 연락처: 지역 노동위원회
+    · 용도 · Para qué: 부당해고 구제신청 · Reclamación por despido injustificado
+
+각 기관의 스페인어 통역 지원 여부는 전화 시 확인하세요. · Pregunte al llamar si hay intérprete de español.
+
+
+■ 출처 · Fuentes
+------------------------------------------------------------------------------
+  - 2026 최저임금 10,320원·월 2,156,880원 — bizforms.co.kr/365guide/view.asp?number=162 · 2027 최저임금 10,700원 — taxnet.co.kr/contents/taxnetpost/post-detail?id=4905
+  - 외국인 표준근로계약서(외국인고용법 시행규칙 별지 제6호) — www3.chosun.ac.kr/bbs/global/419/365463/download.do · 다국어 표준양식 언어 — bizforms.co.kr/365guide/view.asp?number=338
+  - 멕시코 근로시간 단계적 단축(2030년 40시간) — politica.expansion.mx (2026.2.26) · bhrmx.com 2026년 3월 자료
+  - 칠레 Ley 21.561 (2026.4.26 42시간, 2028년 40시간) — reporteminero.cl (2026.4.30) · 콜롬비아 Ley 2101 (2026.7.15 42시간) — portafolio.co · elcolombiano.com (2026.7.14)
+  - 스페인 연차 30일·특별급여·수습기간 — elespanol.com (2026.8.6) · safeguardglobal.com/es/country/spain · asest.es · globalization-partners.com/es/globalpedia/spain-employer-of-record
+  - 그 밖의 한국 근로기준법 기준(가산수당·연차·퇴직금·해고예고 등)과 멕시코·아르헨티나 휴가·보너스 기준은 법령 일반 내용을 요약함

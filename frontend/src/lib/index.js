@@ -10,10 +10,60 @@ export const href = (name, id, extra = {}) => {
 };
 export const go = (name, id, extra) =>
   window.location.assign(href(name, id, extra));
+// Owner tokens: the server only shows an analysis or agent session to the browser that created it.
+const ACCESS_KEY = "gwollion:access";
+const OWNED = /\/api\/(?:analyses|agent\/sessions)\/([0-9a-f-]{36})/;
+function readAccess() {
+  try {
+    return JSON.parse(localStorage.getItem(ACCESS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+export function rememberAccess(id, token) {
+  if (!id || !token) return;
+  try {
+    localStorage.setItem(ACCESS_KEY, JSON.stringify({ ...readAccess(), [id]: token }));
+  } catch {
+    /* Storage can be disabled; the page keeps working until it is closed. */
+  }
+}
+export function forgetAccess(id) {
+  const all = readAccess();
+  delete all[id];
+  try {
+    localStorage.setItem(ACCESS_KEY, JSON.stringify(all));
+  } catch {
+    /* disabled storage */
+  }
+}
+export const accessToken = (id) => readAccess()[id];
+export function accessHeaders(path) {
+  if (/^\/api\/analyses\/?(?:\?|$)/.test(path))
+    return {
+      "X-Gwollion-Tokens": Object.entries(readAccess())
+        .map(([id, token]) => `${id}:${token}`)
+        .join(","),
+    };
+  const token = accessToken(path.match(OWNED)?.[1]);
+  return token ? { "X-Gwollion-Token": token } : {};
+}
+// For <img src> and download links, which cannot carry headers.
+export const withAccess = (path) => {
+  const token = accessToken(path.match(OWNED)?.[1]);
+  return token
+    ? `${path}${path.includes("?") ? "&" : "?"}access=${encodeURIComponent(token)}`
+    : path;
+};
 export async function api(path, options = {}) {
-  const response = await fetch(path, options);
+  const response = await fetch(path, {
+    ...options,
+    headers: { ...accessHeaders(path), ...(options.headers || {}) },
+  });
   if (response.status === 204) return null;
   const data = await response.json().catch(() => ({}));
+  if (data && data.access_token)
+    rememberAccess(data.session_id || data.analysis_id, data.access_token);
   if (!response.ok) {
     const detail = data.detail;
     const error = new Error(

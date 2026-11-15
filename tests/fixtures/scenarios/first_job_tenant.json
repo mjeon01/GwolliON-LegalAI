@@ -1,0 +1,16 @@
+{
+  "id": "first_job_tenant",
+  "title": "사회초년생 임차인",
+  "persona": "첫 직장 근처에 다세대주택 월세 계약을 앞둔 사회초년생. 보증금을 돌려받을 수 있을지 걱정한다.",
+  "mode": "contract",
+  "contract": "samples/lease-villa.txt",
+  "contract_type": "lease",
+  "user_role": "tenant",
+  "language": "ko",
+  "turns": [
+    {"message": "계약 끝나고 보증금 돌려받을 때 문제가 될 만한 조항이 있어?",
+     "expect": {"tools_any": ["read_contract", "lookup_law"], "language": "ko", "evidence": true}},
+    {"message": "집주인이 새 세입자가 들어와야 보증금을 준다고 하면 어떻게 해야 돼?",
+     "expect": {"tools_all": ["remedy_guide"], "language": "ko", "forbidden": ["새\\s*세입자를\\s*(?:직접\\s*)?구하(?:세요|셔야)"]}}
+  ]
+}

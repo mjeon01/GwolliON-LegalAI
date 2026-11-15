@@ -13,8 +13,10 @@ import {
 import Upload from "./pages/Upload.jsx";
 import Review, { Confirm, Original, Sources } from "./pages/Review.jsx";
 import Chat from "./pages/Chat.jsx";
+import Interview from "./pages/Interview.jsx";
 import Draft from "./pages/Draft.jsx";
-import { Library, Samples } from "./pages/Library.jsx";
+import StandaloneDraft from "./pages/StandaloneDraft.jsx";
+import { Samples } from "./pages/Library.jsx";
 const Hero = lazy(() => import("./components/Hero.jsx"));
 const titles = {
   home: "어려운 계약서, 내 권리부터 명확하게",
@@ -27,21 +29,18 @@ const titles = {
   original: "계약서 원문",
   sources: "근거 자료",
   confirm: "추가 정보 확인",
+  interview: "계약서 없이 상담하기",
 };
 function AnalysisPage() {
   const { data, error, loading } = useAnalysis(analysisId);
+  // Without a reviewed contract: documents and questions work on their own; nothing lists past reviews.
   if (!analysisId)
-    return (
-      <Library
-        selector
-        target={
-          page === "chat"
-            ? "chat"
-            : page === "draft" || page === "documents"
-              ? "draft"
-              : "review"
-        }
-      />
+    return page === "draft" || page === "documents" ? (
+      <StandaloneDraft />
+    ) : page === "chat" ? (
+      <Interview />
+    ) : (
+      <Upload />
     );
   if (loading) return <Loading text={t("계약서를 검토하고 있습니다.")} />;
   if (error)
@@ -61,9 +60,9 @@ function AnalysisPage() {
         )}
         <Empty
           title={t("이 계약서를 불러오지 못했습니다.")}
-          action={<ButtonLink to="/history/">{t("검토 기록으로")}</ButtonLink>}
+          action={<ButtonLink to="/upload/">{t("새 계약서 검토")}</ButtonLink>}
         >
-          {t("기록에서 다른 계약서를 선택하거나 다시 등록해주세요.")}
+          {t("계약서를 다시 등록해주세요.")}
         </Empty>
       </>
     );
@@ -92,10 +91,10 @@ class ErrorBoundary extends Component {
       <div className="workspace">
         <ErrorNotice
           message={t(
-            "화면을 표시하지 못했습니다. 다시 불러오거나 검토 기록으로 이동해주세요.",
+            "화면을 표시하지 못했습니다. 다시 불러오거나 새 계약서를 등록해주세요.",
           )}
         />
-        <ButtonLink to="/history/">{t("검토 기록")}</ButtonLink>
+        <ButtonLink to="/upload/">{t("새 계약서 검토")}</ButtonLink>
       </div>
     ) : (
       this.props.children
@@ -117,12 +116,13 @@ export default function App() {
         <div className="app-shell">
           <Header />
           <main id="main" className="workspace">
-            {page === "upload" ? (
+            {page === "upload" || page === "history" ? (
+              // Booth use: visitors start fresh; past reviews are not listed.
               <Upload />
+            ) : page === "interview" ? (
+              <Interview />
             ) : page === "samples" ? (
               <Samples />
-            ) : page === "history" ? (
-              <Library />
             ) : [
                 "review",
                 "chat",

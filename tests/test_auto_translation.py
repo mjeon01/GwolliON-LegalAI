@@ -9,6 +9,7 @@ from unittest.mock import patch
 from urllib.error import URLError
 
 from fastapi.testclient import TestClient
+from tests.owner_client import OwnerClient
 
 from backend.app import create_app
 from backend.auto_translation import is_faithful, lock, restore, translate_texts
@@ -113,7 +114,7 @@ class ApiTests(unittest.TestCase):
         self.addCleanup(catalog.stop)
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
-        self.client = TestClient(create_app(Path(folder.name) / "t.sqlite3"))
+        self.client = OwnerClient(create_app(Path(folder.name) / "t.sqlite3"))
         self.client.__enter__()
         self.addCleanup(self.client.__exit__, None, None, None)
         sample = next(s for s in self.client.get("/api/samples").json() if s["id"] == "employment-cafe")

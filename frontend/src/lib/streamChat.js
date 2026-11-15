@@ -1,9 +1,12 @@
+import { accessHeaders } from "./index.js";
+
 export async function streamChat(path, body, onEvent, signal) {
   const response = await fetch(path, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "text/event-stream",
+      ...accessHeaders(path),
     },
     body: JSON.stringify(body),
     signal,

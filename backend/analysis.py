@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 import re
 
+from backend import foreign_form
 from backend.extraction import blocks_from_text, rules_extract, ollama_extract, assemble_terms
 from backend.knowledge import Knowledge
 from backend.structure import structure_contract, validate_completeness
@@ -38,13 +39,28 @@ def extract(request):
                     assisted += 1
     else:
         found, model, rejected = rules_extract(blocks, request.contract_type), "rules-v2", 0
+    form = foreign_form.parse(blocks) if request.contract_type == "employment" else None
+    if form:
+        # The bilingual form's numbered rows are read directly; they replace label-based guesses.
+        found.update(foreign_form.terms(form))
     metadata = {"engine": request.engine, "model": model, "rejected_candidates": rejected,
                 "method": "ollama_with_form_rules" if request.engine == "ollama" else "form_rules", "form_rule_candidates_added": assisted,
-                "grounding": grounding}
-    if request.engine == "ollama":
+                "grounding": grounding, "form": "foreign_standard" if form else None}
+    if request.engine != "rules":
+        # The trained clause classifier supports the AI engines; the rules engine stays deterministic.
+        from backend.clause_model import classify
+        try:
+            metadata["clause_model"] = classify(blocks, request.contract_type)
+        except Exception:
+            metadata["clause_model"] = None
+    if form and request.user_role == "worker":
+        # The official form's printed protections and English lines read as burdens to a language model
+        # (15 false findings on a correctly filled form). Its rows are checked by foreign_form instead.
+        metadata["method"] = "foreign_form_rules"
+    elif request.engine == "ollama":
         from backend.review import semantic_review
         metadata["semantic_review"] = semantic_review(blocks, request.contract_type, request.user_role, grounding)
-    if request.engine == "openai":
+    elif request.engine == "openai":
         from backend.review import openai_review
         metadata["semantic_review"] = openai_review(blocks, request.contract_type, request.user_role, grounding)
         metadata["model"] = metadata["semantic_review"]["model"]
@@ -60,7 +76,9 @@ def evaluate(request, blocks, terms, extraction, analysis_id, revision):
         from backend.retrieval import retrieve
         extraction = {**extraction, "grounding": retrieve(request, blocks)}
         grounding = extraction["grounding"]
-        if request.engine == "ollama":
+        if extraction.get("method") == "foreign_form_rules":
+            pass
+        elif request.engine == "ollama":
             from backend.review import semantic_review
             extraction["semantic_review"] = semantic_review(blocks, request.contract_type, request.user_role, grounding)
         elif request.engine == "openai":
@@ -191,6 +209,6 @@ def evaluate(request, blocks, terms, extraction, analysis_id, revision):
             "actions": actions, "context": context, "extraction": extraction,
             "coverage": {"pages_read": sorted({b["page"] for b in blocks}), "document_complete": context["document_complete"],
                          "checked_issue_types": list(dict.fromkeys(i["issue_type"] for i in issues)),
-                         "limitations": ["전문가 법률 검수 전의 쟁점 확인용 MVP", "단시간·기간제의 추가 조항은 근거 조회 지원; 외국인 전용 조항은 후속 범위", "사진·스캔 OCR은 오인식 가능: 추출문을 원본과 대조해야 함", "최저임금 금액·등기·손해액 계산 미지원; 검색된 판례의 직접 적용은 별도 검토"]},
+                         "limitations": ["전문가 법률 검수 전의 쟁점 확인용 MVP", "단시간·기간제의 추가 조항은 근거 조회 지원; 외국인 표준근로계약서(별지 제6호서식)는 항목별 점검", "사진·스캔 OCR은 오인식 가능: 추출문을 원본과 대조해야 함", "최저임금 금액·등기·손해액 계산 미지원; 검색된 판례의 직접 적용은 별도 검토"]},
             "versions": {"model": extraction["model"], "prompt": "extract-v2-grounded-review-v4", "rules": "review-v4",
                          "knowledge": sorted({s["snapshot_id"] for s in sources.values()})}}

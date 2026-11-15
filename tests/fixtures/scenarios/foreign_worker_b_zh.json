@@ -1,0 +1,18 @@
+{
+  "id": "foreign_worker_b_zh",
+  "title": "외국인 근로자 B (중국어)",
+  "persona": "한국어 계약서를 읽기 어려운 중국어권 근로자. 카페에서 일을 시작하며 무급 수습과 임금을 걱정한다.",
+  "mode": "contract",
+  "contract": "samples/employment-cafe.txt",
+  "contract_type": "employment",
+  "user_role": "worker",
+  "language": "zh",
+  "turns": [
+    {"message": "这份合同里哪条对我最不利？",
+     "expect": {"tools_any": ["classify_clauses", "read_contract"], "language": "zh", "evidence": true}},
+    {"message": "我的时薪是9000韩元，每周工作40小时。这低于最低工资吗？",
+     "expect": {"tools_all": ["minimum_wage_check"], "facts_min": 1, "language": "zh"}},
+    {"message": "如果老板不给我工资，我应该去哪里求助？",
+     "expect": {"tools_all": ["remedy_guide"], "language": "zh", "mentions_any": ["1350", "1577-0071"]}}
+  ]
+}

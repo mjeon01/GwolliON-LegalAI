@@ -12,6 +12,29 @@ import {
   PageHead,
   Workflow,
 } from "../components/UI.jsx";
+const won = (n) => Number(n).toLocaleString("ko-KR");
+/** A found term as a short value ("월 2,156,880원"), falling back to the line it was read from. */
+function termText(term) {
+  const c = term.candidates[0];
+  const v = c?.normalized_value;
+  if (!v) return c?.value_text;
+  if (v.amount != null) {
+    const unit =
+      { month: "월 ", hour: "시급 ", day: "일급 ", year: "연 " }[v.period] ||
+      "";
+    return (
+      t(unit.trim() ? unit.trim() : "금액") + " " + won(v.amount) + t("원")
+    );
+  }
+  if (v.months) return t("입국일부터 {0}개월", v.months);
+  if (v.start && v.end) return `${v.start} ~ ${v.end}`;
+  if (v.minutes != null) return t("1일 {0}분", v.minutes);
+  if (v.day) return t("매월 {0}일", v.day);
+  if (v.start_date)
+    return v.end_date ? `${v.start_date} ~ ${v.end_date}` : v.start_date;
+  if (v.hours != null) return t("주 {0}시간", v.hours);
+  return v.text || c.value_text;
+}
 export default function Review({ result: original }) {
   const {
     result: r,
@@ -86,6 +109,15 @@ export default function Review({ result: original }) {
             )}
           </span>
           <h2>{t(review.headline)}</h2>
+          {review.summary?.topics?.length > 0 && (
+            <ul className="topic-chips">
+              {review.summary.topics.map((topic) => (
+                <li key={topic.topic}>
+                  {t(topic.topic)} <strong>{topic.count}</strong>
+                </li>
+              ))}
+            </ul>
+          )}
           <p>{t(review.scope_note)}</p>
         </div>
         <div className="result-count">
@@ -120,20 +152,27 @@ export default function Review({ result: original }) {
         </section>
         <div className="panel key-facts">
           <h3>{t("계약서에서 찾은 조건")}</h3>
-          {r.terms.slice(0, 6).map((term) => (
-            <div key={term.key}>
-              <span>{t(term.label)}</span>
-              <strong>
-                {t(
-                  term.status === "not_found"
-                    ? "원문에서 찾지 못함"
-                    : term.status === "conflict"
-                      ? "서로 다른 내용 · 확인 필요"
-                      : term.candidates[0]?.value_text,
-                )}
-              </strong>
-            </div>
-          ))}
+          {r.terms
+            // Weekly hours are optional; most forms state daily hours only.
+            .filter(
+              (term) =>
+                term.key !== "weekly_hours" || term.status !== "not_found",
+            )
+            .slice(0, 6)
+            .map((term) => (
+              <div key={term.key}>
+                <span>{t(term.label)}</span>
+                <strong>
+                  {t(
+                    term.status === "not_found"
+                      ? "원문에서 찾지 못함"
+                      : term.status === "conflict"
+                        ? "서로 다른 내용 · 확인 필요"
+                        : termText(term),
+                  )}
+                </strong>
+              </div>
+            ))}
           <a className="text-link" href={href("original", r.analysis_id)}>
             {t("원문에서 확인")}
             <Icon />
